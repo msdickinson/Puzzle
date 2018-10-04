@@ -34,6 +34,10 @@ class Block {
     constructor() {
         this.Color = BlockColor.Brown;
         this.State = BlockState.None;
+        this.TotalChain = 0;
+        this.Tick = 0;
+        this.FallGroupTicks = 0;
+        this.groupId = 0;
     }
 }
 class HoverBlocks {
@@ -51,12 +55,20 @@ class Active {
 class Selector {
 }
 class Set {
+    constructor() {
+        this.Row = 0;
+        this.Col = 0;
+        this.Count = 0;
+        this.NewSetIndex = 0;
+        this.Intersects = 0;
+        this.Type = SetType.Col;
+    }
 }
 class Constants {
 }
 Constants.MAX_ROWS = 14;
 Constants.MAX_COLS = 6;
-Constants.STARTING_ROWS = 4;
+Constants.STARTING_ROWS = 8;
 Constants.TICKS_FOR_BLOCK_ROW_CHANGE = 50;
 Constants.TICKS_FOR_SWAP = 2;
 Constants.TICKS_FOR_REMOVING_BLOCKS = 10;
@@ -110,6 +122,7 @@ class Game {
                 block.Color = BlockColor.Red;
                 block.FallGroupTicks = 0;
                 block.Tick = 0;
+                block.groupId = 0;
                 this.Blocks[row][col] = new Block();
                 this.HoverBlocks[row][col] = new HoverBlocks();
                 this.FallBlocks[row][col] = new FallBlocks();
@@ -117,12 +130,13 @@ class Game {
         }
         for (var i = 0; i < Constants.MAX_ROWS * Constants.MAX_COLS; i++) {
             this.BlockSets[i] = 0;
+            this.Set[i] = new Set();
         }
         this.Score = 0;
         this.Level = 5;
         this.groupId = 1;
         this.Selector.Row = 2;
-        this.Selector.Col = 3;
+        this.Selector.Col = 2;
         this.CreateSetupBlocks();
     }
     Tick() {
@@ -338,7 +352,7 @@ class Game {
         var currentBlockRow = 0;
         var currentBlockCol = 0;
         this.SetCount = 0;
-        for (var row = 0; row < Constants.MAX_ROWS; row++) {
+        for (var row = 1; row < Constants.MAX_ROWS; row++) {
             currentBlockCol = 0;
             setCount = 1;
             for (var col = 1; col < Constants.MAX_COLS; col++) {
@@ -391,9 +405,9 @@ class Game {
             }
         }
         for (var col = 0; col < Constants.MAX_COLS; col++) {
-            currentBlockRow = 0;
+            currentBlockRow = 1;
             setCount = 1;
-            for (var row = 1; row < Constants.MAX_ROWS; row++) {
+            for (var row = 2; row < Constants.MAX_ROWS; row++) {
                 if (((this.Blocks[currentBlockRow][col].State == BlockState.Exist || this.Blocks[currentBlockRow][col].State == BlockState.Remove) && this.Blocks[currentBlockRow][col].groupId == 0) && ((this.Blocks[row][col].State == BlockState.Exist || this.Blocks[row][col].State == BlockState.Remove) && this.Blocks[row][col].groupId == 0) && (this.Blocks[row][col].Color == this.Blocks[currentBlockRow][col].Color)) {
                     setCount++;
                 }
@@ -448,23 +462,23 @@ class Game {
                 NewSetIndex++;
             }
             for (var j = i; j < this.SetCount; j++) {
-                if (i == j || Set[j].NewSetIndex == Set[i].NewSetIndex) {
+                if (i == j || this.Set[j].NewSetIndex == this.Set[i].NewSetIndex) {
                     continue;
                 }
-                if (Set[i].Type == SetType.Col && Set[j].Type == SetType.Row && Set[j].Row == Set[i].Row && Set[j].Col >= Set[i].Col && Set[j].Col <= (Set[i].Col + Set[i].Count)) {
-                    Set[j].Intersects++;
-                    Set[j].NewSetIndex = Set[i].NewSetIndex;
+                if (this.Set[i].Type == SetType.Col && this.Set[j].Type == SetType.Row && this.Set[j].Row == this.Set[i].Row && this.Set[j].Col >= this.Set[i].Col && this.Set[j].Col <= (this.Set[i].Col + this.Set[i].Count)) {
+                    this.Set[j].Intersects++;
+                    this.Set[j].NewSetIndex = this.Set[i].NewSetIndex;
                     this.BlockSetsCount = this.BlockSetsCount - 1;
                 }
-                if (Set[j].Type == SetType.Col && Set[i].Type == SetType.Row && Set[j].Col >= Set[i].Col && Set[j].Col <= (Set[i].Col + Set[i].Count)) {
-                    Set[i].Intersects++;
-                    Set[i].NewSetIndex = Set[j].NewSetIndex;
+                if (this.Set[j].Type == SetType.Col && this.Set[i].Type == SetType.Row && this.Set[j].Col >= this.Set[i].Col && this.Set[j].Col <= (this.Set[i].Col + this.Set[i].Count)) {
+                    this.Set[i].Intersects++;
+                    this.Set[i].NewSetIndex = this.Set[j].NewSetIndex;
                     this.BlockSetsCount = this.BlockSetsCount - 1;
                 }
             }
         }
         for (var i = 0; i < this.SetCount; i++) {
-            this.BlockSets[Set[i].NewSetIndex] += Set[i].Count - Set[i].Intersects;
+            this.BlockSets[this.Set[i].NewSetIndex] += this.Set[i].Count - this.Set[i].Intersects;
         }
         if (this.SetCount > 0) {
             this.groupId++;
@@ -536,7 +550,7 @@ class Game {
                                 this.FallBlocks[row][col].Row = k - 1;
                             }
                             if (this.Blocks[k - 1][col].State == BlockState.Falling) {
-                                this.FallBlocks[row][col].Row = FallBlocks[k - 1][col].Row + 1;
+                                this.FallBlocks[row][col].Row = this.FallBlocks[k - 1][col].Row + 1;
                                 break;
                             }
                         }
@@ -586,6 +600,9 @@ class Game {
             } while (!this.IsNewBlockVaild(row, col, blockColor));
             this.Blocks[row][col].Color = blockColor;
             this.Blocks[row][col].State = BlockState.Exist;
+            this.Blocks[row][col].groupId = 0;
+            this.Blocks[row][col].Tick = 0;
+            this.Blocks[row][col].FallGroupTicks = 0;
         }
     }
     //Condtional
@@ -599,11 +616,11 @@ class Game {
     IsNewBlockVaild(blockRow, blockCol, blockColor) {
         var foundValue = false;
         var i = 0;
-        var rowSameColor = 1;
+        var rowSameColor = 0;
         i = 1;
         do {
             foundValue = false;
-            if ((blockRow - i) > 0 && this.Blocks[blockRow - i][blockCol].State == BlockState.Exist && this.Blocks[blockRow - i][blockCol].Color == blockColor) {
+            if ((blockRow - i) >= 0 && this.Blocks[blockRow - i][blockCol].State == BlockState.Exist && this.Blocks[blockRow - i][blockCol].Color == blockColor) {
                 rowSameColor++;
                 foundValue = true;
             }
@@ -612,7 +629,7 @@ class Game {
         i = 1;
         do {
             foundValue = false;
-            if ((blockRow + i) < (Constants.MAX_ROWS - 2) && this.Blocks[blockRow + i][blockCol].State == BlockState.Exist && this.Blocks[blockRow + i][blockCol].Color == blockColor) {
+            if ((blockRow + i) <= (Constants.MAX_ROWS - 1) && this.Blocks[blockRow + i][blockCol].State == BlockState.Exist && this.Blocks[blockRow + i][blockCol].Color == blockColor) {
                 rowSameColor++;
                 foundValue = true;
             }
@@ -625,7 +642,7 @@ class Game {
         i = 1;
         do {
             foundValue = false;
-            if ((blockCol - i) > 0 && this.Blocks[blockRow][blockCol - i].State == BlockState.Exist && this.Blocks[blockRow][blockCol - i].Color == blockColor) {
+            if ((blockCol - i) >= 0 && this.Blocks[blockRow][blockCol - i].State == BlockState.Exist && this.Blocks[blockRow][blockCol - i].Color == blockColor) {
                 colSameColor++;
                 foundValue = true;
             }
@@ -634,7 +651,7 @@ class Game {
         i = 1;
         do {
             foundValue = false;
-            if ((blockCol + i) < (Constants.MAX_COLS - 2) && this.Blocks[blockRow][blockCol + i].State == BlockState.Exist && this.Blocks[blockRow][blockCol + i].Color == blockColor) {
+            if ((blockCol + i) <= (Constants.MAX_COLS - 1) && this.Blocks[blockRow][blockCol + i].State == BlockState.Exist && this.Blocks[blockRow][blockCol + i].Color == blockColor) {
                 colSameColor++;
                 foundValue = true;
             }
@@ -842,7 +859,7 @@ class View {
             this.blocksSprite[row] = [];
             for (let col = 0; col < Constants.MAX_COLS; col++) {
                 this.blocksSprite[row][col] = new PIXI.Sprite(this.textures["BlockBrown.png"]);
-                this.blocksSprite[row][col].x = ((Constants.MAX_COLS - 1) - col) * 50 + 3;
+                this.blocksSprite[row][col].x = (col) * 50 + 3;
                 this.blocksSprite[row][col].y = ((Constants.MAX_ROWS - 1) - row) * 50;
                 this.blocksSprite[row][col].visible = false;
                 this.BlocksContainer.addChild(this.blocksSprite[row][col]);
@@ -867,31 +884,31 @@ class View {
                 }
                 else {
                     this.blocksSprite[row][col].visible = true;
-                    //Set Texture
-                    if (Blocks[row][col].Color == BlockColor.Blue) {
-                        this.blocksSprite[row][col].texture = this.textures["BlockBlue.png"];
-                    }
-                    else if (Blocks[row][col].Color == BlockColor.Green) {
-                        this.blocksSprite[row][col].texture = this.textures["BlockGreen.png"];
-                    }
-                    else if (Blocks[row][col].Color == BlockColor.Purple) {
-                        this.blocksSprite[row][col].texture = this.textures["BlockPurple.png"];
-                    }
-                    else if (Blocks[row][col].Color == BlockColor.Red) {
-                        this.blocksSprite[row][col].texture = this.textures["BlockRed.png"];
-                    }
-                    else if (Blocks[row][col].Color == BlockColor.Yellow) {
-                        this.blocksSprite[row][col].texture = this.textures["BlockYellow.png"];
-                    }
-                    else if (Blocks[row][col].Color == BlockColor.Brown) {
-                        this.blocksSprite[row][col].texture = this.textures["BlockBrown.png"];
-                    }
+                }
+                //Set Texture
+                if (Blocks[row][col].Color == BlockColor.Green) {
+                    this.blocksSprite[row][col].texture = this.textures["BlockGreen.png"];
+                }
+                else if (Blocks[row][col].Color == BlockColor.Blue) {
+                    this.blocksSprite[row][col].texture = this.textures["BlockBlue.png"];
+                }
+                else if (Blocks[row][col].Color == BlockColor.Red) {
+                    this.blocksSprite[row][col].texture = this.textures["BlockRed.png"];
+                }
+                else if (Blocks[row][col].Color == BlockColor.Purple) {
+                    this.blocksSprite[row][col].texture = this.textures["BlockPurple.png"];
+                }
+                else if (Blocks[row][col].Color == BlockColor.Yellow) {
+                    this.blocksSprite[row][col].texture = this.textures["BlockYellow.png"];
+                }
+                else if (Blocks[row][col].Color == BlockColor.Brown) {
+                    this.blocksSprite[row][col].texture = this.textures["BlockBrown.png"];
                 }
             }
         }
     }
     UpdateSelector(selector) {
-        this.selectorSprite.x = ((Constants.MAX_COLS - 2) - selector.Col) * 50 + 3;
+        this.selectorSprite.x = (selector.Col) * 50 + 3;
         this.selectorSprite.y = ((Constants.MAX_ROWS - 1) - selector.Row) * 50;
     }
 }
