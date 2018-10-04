@@ -1,0 +1,28 @@
+C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Console\bin\Debug\netcoreapp2.1\Console.deps.json
+C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Console\bin\Debug\netcoreapp2.1\Console.runtimeconfig.json
+C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Console\bin\Debug\netcoreapp2.1\Console.runtimeconfig.dev.json
+C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Console\bin\Debug\netcoreapp2.1\Console.dll
+C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Console\bin\Debug\netcoreapp2.1\Console.pdb
+C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Console\bin\Debug\netcoreapp2.1\Puzzle.dll
+C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Console\bin\Debug\netcoreapp2.1\Puzzle.pdb
+C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Console\obj\Debug\netcoreapp2.1\Console.csprojAssemblyReference.cache
+C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Console\obj\Debug\netcoreapp2.1\Console.csproj.CoreCompileInputs.cache
+C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Console\obj\Debug\netcoreapp2.1\Console.AssemblyInfoInputs.cache
+C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Console\obj\Debug\netcoreapp2.1\Console.AssemblyInfo.cs
+C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Console\obj\Debug\netcoreapp2.1\Console.csproj.CopyComplete
+C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Console\obj\Debug\netcoreapp2.1\Console.dll
+C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Console\obj\Debug\netcoreapp2.1\Console.pdb
+C:\Users\marks\Source\Repos\Puzzle\Console\bin\Debug\netcoreapp2.1\Console.deps.json
+C:\Users\marks\Source\Repos\Puzzle\Console\bin\Debug\netcoreapp2.1\Console.runtimeconfig.json
+C:\Users\marks\Source\Repos\Puzzle\Console\bin\Debug\netcoreapp2.1\Console.runtimeconfig.dev.json
+C:\Users\marks\Source\Repos\Puzzle\Console\bin\Debug\netcoreapp2.1\Console.dll
+C:\Users\marks\Source\Repos\Puzzle\Console\bin\Debug\netcoreapp2.1\Console.pdb
+C:\Users\marks\Source\Repos\Puzzle\Console\bin\Debug\netcoreapp2.1\Puzzle.dll
+C:\Users\marks\Source\Repos\Puzzle\Console\bin\Debug\netcoreapp2.1\Puzzle.pdb
+C:\Users\marks\Source\Repos\Puzzle\Console\obj\Debug\netcoreapp2.1\Console.csprojAssemblyReference.cache
+C:\Users\marks\Source\Repos\Puzzle\Console\obj\Debug\netcoreapp2.1\Console.csproj.CoreCompileInputs.cache
+C:\Users\marks\Source\Repos\Puzzle\Console\obj\Debug\netcoreapp2.1\Console.AssemblyInfoInputs.cache
+C:\Users\marks\Source\Repos\Puzzle\Console\obj\Debug\netcoreapp2.1\Console.AssemblyInfo.cs
+C:\Users\marks\Source\Repos\Puzzle\Console\obj\Debug\netcoreapp2.1\Console.csproj.CopyComplete
+C:\Users\marks\Source\Repos\Puzzle\Console\obj\Debug\netcoreapp2.1\Console.dll
+C:\Users\marks\Source\Repos\Puzzle\Console\obj\Debug\netcoreapp2.1\Console.pdb
