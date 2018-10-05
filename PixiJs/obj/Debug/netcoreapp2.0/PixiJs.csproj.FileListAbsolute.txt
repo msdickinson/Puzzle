@@ -9,6 +9,7 @@ C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\PixiJs\obj\Debug\net
 C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.AssemblyInfo.cs
 C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.dll
 C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.pdb
+C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.csprojAssemblyReference.cache
 C:\Users\marks\Source\Repos\Puzzle\PixiJs\bin\Debug\netcoreapp2.0\PixiJs.deps.json
 C:\Users\marks\Source\Repos\Puzzle\PixiJs\bin\Debug\netcoreapp2.0\PixiJs.runtimeconfig.json
 C:\Users\marks\Source\Repos\Puzzle\PixiJs\bin\Debug\netcoreapp2.0\PixiJs.runtimeconfig.dev.json
@@ -19,4 +20,3 @@ C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.Assembl
 C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.AssemblyInfo.cs
 C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.dll
 C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.pdb
-C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.csprojAssemblyReference.cache

@@ -81,7 +81,6 @@ class Constants {
     public static MAX_ROWS: number = 14;
     public static MAX_COLS: number = 6;
     public static STARTING_ROWS: number = 8;
-    public static TICKS_FOR_BLOCK_ROW_CHANGE: number = 50;
     public static TICKS_FOR_SWAP: number = 2;
     public static TICKS_FOR_REMOVING_BLOCKS: number = 10;
     public static TICKS_FOR_HOVER: number = 5;
@@ -361,6 +360,7 @@ class Game {
                         this.Blocks[row][col].State = BlockState.None;
                         this.Blocks[row][col].TotalChain = 0;
                         this.Blocks[row][col].Tick = 0;
+                        this.Blocks[row][col].groupId = 0;
                     }
                 }
             }

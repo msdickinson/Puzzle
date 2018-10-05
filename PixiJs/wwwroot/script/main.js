@@ -69,7 +69,6 @@ class Constants {
 Constants.MAX_ROWS = 14;
 Constants.MAX_COLS = 6;
 Constants.STARTING_ROWS = 8;
-Constants.TICKS_FOR_BLOCK_ROW_CHANGE = 50;
 Constants.TICKS_FOR_SWAP = 2;
 Constants.TICKS_FOR_REMOVING_BLOCKS = 10;
 Constants.TICKS_FOR_HOVER = 5;
@@ -338,6 +337,7 @@ class Game {
                         this.Blocks[row][col].State = BlockState.None;
                         this.Blocks[row][col].TotalChain = 0;
                         this.Blocks[row][col].Tick = 0;
+                        this.Blocks[row][col].groupId = 0;
                     }
                 }
             }
