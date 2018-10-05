@@ -6,6 +6,7 @@
     <link href="css/main.css" rel="stylesheet" />
     <script src="script/pixi.js"></script>
     <script src="script/mainloop.js"></script>
+    <script src="script/howler.js"></script>
 </head>
 <body>
     <div id="Loading" class="loading">
@@ -17,8 +18,9 @@
         (function () { var script = document.createElement('script'); script.onload = function () { var stats = new Stats(); document.body.appendChild(stats.dom); requestAnimationFrame(function loop() { stats.update(); requestAnimationFrame(loop) }); }; script.src = '//rawgit.com/mrdoob/stats.js/master/build/stats.min.js'; document.head.appendChild(script); })()
     </script>
     <script type="module">
-        import { Game, View } from '/script/main.js';
+        import { Game, View, Sounds } from '/script/main.js';
         let game = new Game();
+        let sound = new Sounds();
 
         let view = null;
             const frontEndPromise = new Promise(resolve => {
@@ -42,24 +44,28 @@
             view.UpdateSelector(game.Selector);
             view.UpdateBlockStates(game.Blocks);
             view.UpdateBlockContainerState(game.BlockInc);
+            view.UpdateLevel(game.Level);
+            view.UpdateScore(game.Score);
+            sound.RunSoundRequests(game.SoundRequests);
         }
+
 
         document.addEventListener('keydown', (event) => {
         const keyName = event.key;
         if(keyName == "W" || keyName == "w" || keyName == "ArrowUp"){
-        game.RequestMoveSelector(game.Selector.Row + 1, game.Selector.Col);
+            game.RequestMoveSelector(game.Selector.Row + 1, game.Selector.Col);
         }
         else if(keyName == "a" || keyName == "A" || keyName == "ArrowLeft"){
-        game.RequestMoveSelector(game.Selector.Row, game.Selector.Col - 1);
+            game.RequestMoveSelector(game.Selector.Row, game.Selector.Col - 1);
         }
         else if(keyName == "s" || keyName == "S" || keyName == "ArrowDown"){
-        game.RequestMoveSelector(game.Selector.Row - 1, game.Selector.Col);
+            game.RequestMoveSelector(game.Selector.Row - 1, game.Selector.Col);
         }
         else if(keyName == "d" || keyName == "d" || keyName == "ArrowRight"){
-        game.RequestMoveSelector(game.Selector.Row, game.Selector.Col + 1);
+            game.RequestMoveSelector(game.Selector.Row, game.Selector.Col + 1);
         }
         else if(keyName == " "){
-        game.RequestSwitch();
+            game.RequestSwitch();
         }
         });
 

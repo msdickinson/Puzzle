@@ -26,6 +26,17 @@ enum BlockColor {
     Yellow,
     Brown
 }
+class SoundRequests {
+    public Swap: boolean = false;
+    public Remove: boolean = false;
+    public Fall: boolean = false;
+    public Hover: boolean = false;
+    public MusicOn: boolean = false;
+    public MusicOff: boolean = false;
+    public Combo: boolean = false;
+    public LargeCombo: boolean = false;
+    public MegaCombo: boolean = false;   
+}
 class Block {
     public Color: BlockColor = BlockColor.Brown;
     public State: BlockState = BlockState.None;
@@ -35,39 +46,39 @@ class Block {
     public groupId: number = 0;
 }
 class HoverBlocks {
-    public Row: number;
-    public Col: number;
+    public Row: number = 0;
+    public Col: number = 0;
 }
 class FallBlocks {
-    public Row: number;
-    public Col: number;
+    public Row: number = 0;
+    public Col: number = 0;
 }
 class RemovalInstance {
-    Chain: number;
-    Tick: number;
-    EndTick: number;
+    Chain: number = 0;
+    Tick: number = 0;
+    EndTick: number = 0;
 }
 class Effect {
-    StartTick: number;
-    EndTick: number;
-    Row: number;
-    Col: number;
+    StartTick: number = 0;
+    EndTick: number = 0;
+    Row: number = 0;
+    Col: number = 0;
 }
 class Tick {
-    public Puzzle: number;
-    public MoveBlocksUp: number;
-    public Swap: number;
+    public Puzzle: number = 0;
+    public MoveBlocksUp: number = 0;
+    public Swap: number = 0;
 }
 class Active {
-    public Puzzle: boolean;
-    public Hover: boolean;
-    public Swap: boolean;
-    public BlocksRemoving: boolean;
-    public Falling: boolean;
+    public Puzzle: boolean = false;
+    public Hover: boolean = false;
+    public Swap: boolean = false;
+    public BlocksRemoving: boolean = false;
+    public Falling: boolean = false;
 }
 class Selector {
-    public Row: number;
-    public Col: number;
+    public Row: number = 0;
+    public Col: number = 0;
 }
 class Set {
     public Row: number = 0;
@@ -78,21 +89,21 @@ class Set {
     public Type: SetType = SetType.Col;
 }
 class Constants {
-    public static MAX_ROWS: number = 14;
+    public static MAX_ROWS: number = 12;
     public static MAX_COLS: number = 6;
     public static STARTING_ROWS: number = 8;
-    public static TICKS_FOR_BLOCK_ROW_CHANGE: number = 50;
     public static TICKS_FOR_SWAP: number = 2;
     public static TICKS_FOR_REMOVING_BLOCKS: number = 10;
     public static TICKS_FOR_HOVER: number = 5;
     public static TICKS_FOR_HOVER_SWAP: number = 10;
 }
+
 class Game {
+    public SoundRequests: SoundRequests;
     public Blocks: Block[][] = [];
     HoverBlocks: HoverBlocks[][] = [];
     FallBlocks: FallBlocks[][] = [];
     BlocksMoveFast: boolean = false;
-    public GameOver: boolean;
 
     //Switch
     SwitchLeftBlockRow: number = 0;
@@ -123,7 +134,7 @@ class Game {
 
     //|Public|
     public Reset(): void {
-        this.GameOver = false;
+        this.SoundRequests = new SoundRequests();
         this.Active.Puzzle = true;
         this.Active.Hover = false;
         this.Active.Swap = false;
@@ -154,7 +165,7 @@ class Game {
             this.Set[i] = new Set();
         }
         this.Score = 0;
-        this.Level = 5;
+        this.Level = 1;
         this.groupId = 1;
         this.Selector.Row = 2;
         this.Selector.Col = 2;
@@ -192,6 +203,7 @@ class Game {
     public RequestSwitch(): void {
         if (!this.Active.Swap) {
             if ((this.Blocks[this.Selector.Row][this.Selector.Col].State == BlockState.None || this.Blocks[this.Selector.Row][this.Selector.Col].State == BlockState.Exist) && (this.Blocks[this.Selector.Row][this.Selector.Col + 1].State == BlockState.None || this.Blocks[this.Selector.Row][this.Selector.Col + 1].State == BlockState.Exist) && (this.Blocks[this.Selector.Row][this.Selector.Col].State != BlockState.None || this.Blocks[this.Selector.Row][this.Selector.Col + 1].State != BlockState.None)) {
+                this.SoundRequests.Swap = true;
                 this.WaitForSwap = false;
                 this.Active.Swap = true;
                 this.SwitchLeftBlockRow = this.Selector.Row;
@@ -259,6 +271,7 @@ class Game {
         var largetChain: number = 0;
         for (var row: number = 0; row < Constants.MAX_ROWS; row++) {
             for (var col: number = 0; col < Constants.MAX_COLS; col++) {
+                this.SoundRequests.Fall = true;
                 if (this.Blocks[row][col].State == BlockState.Falling || this.Blocks[row][col].State == BlockState.LockedForFall) {
                     this.Blocks[row][col].Tick++;
                     if (this.Blocks[row][col].Tick == this.Blocks[row][col].FallGroupTicks) {
@@ -289,29 +302,22 @@ class Game {
     private MoveBlocksUpTick(): void {
         this.Ticks.MoveBlocksUp++;
         if (!this.BlocksMoveFast) {
-            if (this.Level <= 10 && (this.Ticks.MoveBlocksUp % <number>Math.round(96 - 7.3 * this.Level - 1)) == 0) {
-                this.BlockInc += 5;
-            }
-            if (this.Level > 10 && this.Level < 15 && (this.Ticks.MoveBlocksUp % <number>Math.round(30.0 * this.Level - 10)) == 0) {
-                this.BlockInc += 5;
-            }
-            if (this.Level >= 15 && (this.Ticks.MoveBlocksUp % <number>(30 - Math.round(2.0 * this.Level - 15))) == 0) {
-                this.BlockInc += 5;
-            }
-            if (this.Level >= 20 && this.Ticks.MoveBlocksUp % (60 * 20) == 0) {
-                this.BlockInc += 1;
-            }
+            this.BlockInc += 50 / (300 - ((this.Level - 1) * 10));
         }
         else {
-            if (this.Ticks.MoveBlocksUp % 1 == 0 && this.BlockInc != 50) {
+            if (this.Ticks.MoveBlocksUp % 1 == 0 && this.BlockInc >= 50) {
                 this.BlockInc += 2.5;
             }
         }
-        if (this.BlockInc == 50) {
-            this.BlockInc = 0;
-            this.Ticks.MoveBlocksUp = 0;
-            this.RowChange();
-            this.CheckForSets(0);
+        if (this.BlockInc >= 50) {
+            this.CheckForGameOver();
+            if (this.Active.Puzzle) {
+                this.BlockInc = 0;
+                this.Ticks.MoveBlocksUp = 0;
+                this.RowChange();
+                this.CheckForSets(0);
+            }
+         
         }
     }
     private SwapBlocksTick(): void {
@@ -449,6 +455,7 @@ class Game {
                         this.Set[this.SetCount].NewSetIndex = -1;
                         this.Set[this.SetCount].Intersects = 0;
                         this.Set[this.SetCount].Type = SetType.Row;
+
                         this.SetCount++;
                     }
                     while (row != Constants.MAX_ROWS - 1) {
@@ -478,6 +485,10 @@ class Game {
                 this.SetCount++;
             }
         }
+        for (var i: number = 0; i < this.SetCount; i++) {
+            
+        }
+
         var NewSetIndex: number = 0;
         this.BlockSetsCount = this.SetCount;
         for (var i: number = 0; i < this.SetCount; i++) {
@@ -506,6 +517,7 @@ class Game {
             this.BlockSets[this.Set[i].NewSetIndex] += this.Set[i].Count - this.Set[i].Intersects;
         }
         if (this.SetCount > 0) {
+            this.SoundRequests.Remove = true;
             this.groupId++;
             for (var row: number = 0; row < Constants.MAX_ROWS; row++) {
                 for (var col: number = 0; col < Constants.MAX_COLS; col++) {
@@ -515,7 +527,7 @@ class Game {
                 }
             }
             this.Active.BlocksRemoving = true;
-            this.GetScore();
+            this.GetScore(chain);
         }
     }
     private CheckForHover(chain: number, switchedBlocks: boolean): void {
@@ -606,7 +618,6 @@ class Game {
         }
     }
     private RowChange(): void {
-        this.CheckForGameOver();
         this.MoveBlocksUpOneRow();
         this.AddBlockRow(0);
     }
@@ -637,7 +648,7 @@ class Game {
     private CheckForGameOver(): void {
         for (var col: number = 0; col < Constants.MAX_COLS; col++) {
             if (this.Blocks[Constants.MAX_ROWS - 1][col].State == BlockState.Exist) {
-                this.GameOver = true;
+                this.Active.Puzzle = false;
             }
         }
     }
@@ -697,49 +708,49 @@ class Game {
     }
 
     //Score
-    private GetScore(): void {
-        this.ChainScore();
-        for (var i: number = 0; this.BlockSetsCount < 0; i++) {
-            this.TotalBlockScore(this.BlockSetsCount);
+    private GetScore(chain: number): void {
+        this.ChainScore(chain);
+        for (var i: number = 0; i < this.SetCount; i++) {
+            this.TotalBlockScore(this.BlockSets[i]);
         }
     }
-    private ChainScore(): void {
-        var addtionalScore: number = 0;this.Chain
-        if (this.Chain == 2) {
+    private ChainScore(chain: number): void {
+        let addtionalScore = 0;
+        if (chain == 2) {
             addtionalScore = 50;
         }
-        if (this.Chain == 3) {
+        if (chain == 3) {
             addtionalScore = 130;
         }
-        if (this.Chain == 4) {
+        if (chain == 4) {
             addtionalScore = 280;
         }
-        if (this.Chain == 5) {
+        if (chain == 5) {
             addtionalScore = 580;
         }
-        if (this.Chain == 6) {
+        if (chain == 6) {
             addtionalScore = 980;
         }
-        if (this.Chain == 7) {
+        if (chain == 7) {
             addtionalScore = 1480;
         }
-        if (this.Chain == 8) {
+        if (chain == 8) {
             addtionalScore = 2180;
         }
-        if (this.Chain == 9) {
+        if (chain == 9) {
             addtionalScore = 3080;
         }
-        if (this.Chain == 10) {
+        if (chain == 10) {
             addtionalScore = 4180;
         }
-        if (this.Chain == 11) {
+        if (chain == 11) {
             addtionalScore = 5480;
         }
-        if (this.Chain == 12) {
+        if (chain == 12) {
             addtionalScore = 6980;
         }
-        if (this.Chain > 12) {
-            addtionalScore = 6980 + ((this.Chain - 12) * 1800);
+        if (chain > 12) {
+            addtionalScore = 6980 + ((chain - 12) * 1800);
         }
         this.Score += addtionalScore;
     }
@@ -874,6 +885,8 @@ class View {
     private selectorSprite: PIXI.Sprite;
     private BlocksContainer: PIXI.Container;
     private resolve: Function;
+    private level: PIXI.Text;
+    private score: PIXI.Text;
     constructor(document: Document, resolve: Function) {
         this.app = new PIXI.Application(306, 709, { backgroundColor: 0x1099bb });
 
@@ -883,6 +896,25 @@ class View {
             .add("/images/textures.json")
             .load(                this.CreateSprites.bind(this)            );    }
     private CreateSprites() {
+        let levelTextStyle = new PIXI.TextStyle({
+            fontSize: 24,
+            fontWeight: 'bold',
+            fill: "#fdfdfd"
+        });
+        this.level = new PIXI.Text('', levelTextStyle);
+        this.level.x = 27;
+        this.level.y = 15;
+
+        let scoreTextStyle = new PIXI.TextStyle({
+            fontSize: 24,
+            fontWeight: 'bold',
+            fill: "#fdfdfd"
+        });
+        this.score = new PIXI.Text('00000', levelTextStyle);
+        this.score.x = 200;
+        this.score.y = 15;
+
+
         this.textures = PIXI.loader.resources["/images/textures.json"].spritesheet.textures;
 
         //Layout
@@ -893,12 +925,27 @@ class View {
 
         //Blocks
         this.BlocksContainer = new PIXI.Container();
+        this.BlocksContainer.x = 0;
+        this.BlocksContainer.y = 0;
+        var thing = new PIXI.Graphics();
+        this.app.stage.addChild(thing);
+        thing.x = 0;
+        thing.y = 0;
+        thing.lineStyle(0);
+        thing.beginFill(0x8bc5ff, 0.4);
+        thing.moveTo(3, 0);
+        thing.lineTo(3, (Constants.MAX_ROWS - 1) * 50 + 106);
+        thing.lineTo(Constants.MAX_COLS * 50 + 3, (Constants.MAX_ROWS - 1) * 50 + 106);
+        thing.lineTo(Constants.MAX_COLS * 50 + 3, 0);
+        this.BlocksContainer.mask = thing;
+
+
         for (let row = 0; row < Constants.MAX_ROWS; row++) {
             this.blocksSprite[row] = [];
             for (let col = 0; col < Constants.MAX_COLS; col++) {
                 this.blocksSprite[row][col] = new PIXI.Sprite(this.textures["BlockBrown.png"]);
                 this.blocksSprite[row][col].x = (col) * 50 + 3;
-                this.blocksSprite[row][col].y = ((Constants.MAX_ROWS - 1) - row) * 50;
+                this.blocksSprite[row][col].y = ((Constants.MAX_ROWS - 1) - row) * 50 + 106;
                 this.blocksSprite[row][col].visible = false;
                 this.BlocksContainer.addChild(this.blocksSprite[row][col]);
             }
@@ -908,7 +955,8 @@ class View {
         //Order Of Sprite (z)
         this.app.stage.addChild(this.layoutSprite);
         this.app.stage.addChild(this.BlocksContainer);
-
+        this.app.stage.addChild(this.level);
+        this.app.stage.addChild(this.score);
         this.resolve("Loaded");
     }
     private UpdateBlockContainerState(y: number) {
@@ -953,11 +1001,41 @@ class View {
     }
     private UpdateSelector(selector: Selector) {
         this.selectorSprite.x = ( selector.Col) * 50 + 3;
-        this.selectorSprite.y = ((Constants.MAX_ROWS - 1) - selector.Row ) * 50;
+        this.selectorSprite.y = ((Constants.MAX_ROWS - 1) - selector.Row ) * 50 + 106;
+    }
+    private UpdateLevel(level: number) {
+        this.level.text = String(level);
+    }
+    private UpdateScore(score: number) {
+        this.score.text = String(score);
     }
 }
-class Input {
-
+class Sounds {
+    private swapSound = null;
+    private fallSound = null;
+    private removeSound = null;
+    constructor() {
+        this.swapSound = new Howl({
+            src: ['/sound/swap.mp3']
+        });        this.fallSound = new Howl({
+            src: ['/sound/swap.mp3']
+        });        this.removeSound = new Howl({
+            src: ['/sound/swap.mp3']
+        });    }
+    private RunSoundRequests(soundRequests: SoundRequests) {
+        if (soundRequests.Swap) {
+            this.swapSound.play();
+            soundRequests.Swap = false;
+        }
+        if (soundRequests.Fall) {
+            //this.fallSound.play();
+            soundRequests.Fall = false;
+        }
+        if (soundRequests.Remove) {
+            //this.removeSound.play();
+            soundRequests.Remove = false;
+        }
+    }
 }
 
-export { Input, View, Game };
+export { Sounds, View, Game };

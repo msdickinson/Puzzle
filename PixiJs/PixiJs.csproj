@@ -18,6 +18,9 @@
     <EmbeddedResource Remove="wwwroot\js\**" />
     <None Remove="wwwroot\js\**" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Remove="wwwroot\script\pixi.js.d.ts" />
+  </ItemGroup>
 
 
 </Project>
