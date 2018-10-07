@@ -1,127 +1,49 @@
-var SetType;
-(function (SetType) {
-    SetType[SetType["Mixed"] = 0] = "Mixed";
-    SetType[SetType["Row"] = 1] = "Row";
-    SetType[SetType["Col"] = 2] = "Col";
-})(SetType || (SetType = {}));
-var BlockState;
-(function (BlockState) {
-    BlockState[BlockState["None"] = 0] = "None";
-    BlockState[BlockState["Exist"] = 1] = "Exist";
-    BlockState[BlockState["Hover"] = 2] = "Hover";
-    BlockState[BlockState["HoverSwap"] = 3] = "HoverSwap";
-    BlockState[BlockState["Switch"] = 4] = "Switch";
-    BlockState[BlockState["SwitchNone"] = 5] = "SwitchNone";
-    BlockState[BlockState["Remove"] = 6] = "Remove";
-    BlockState[BlockState["Falling"] = 7] = "Falling";
-    BlockState[BlockState["LockedForFall"] = 8] = "LockedForFall";
-})(BlockState || (BlockState = {}));
-var KeyState;
-(function (KeyState) {
-    KeyState[KeyState["Down"] = 0] = "Down";
-    KeyState[KeyState["Up"] = 1] = "Up";
-})(KeyState || (KeyState = {}));
-var BlockColor;
-(function (BlockColor) {
-    BlockColor[BlockColor["Green"] = 0] = "Green";
-    BlockColor[BlockColor["Blue"] = 1] = "Blue";
-    BlockColor[BlockColor["Red"] = 2] = "Red";
-    BlockColor[BlockColor["Purple"] = 3] = "Purple";
-    BlockColor[BlockColor["Yellow"] = 4] = "Yellow";
-    BlockColor[BlockColor["Brown"] = 5] = "Brown";
-})(BlockColor || (BlockColor = {}));
-class SoundRequests {
-    constructor() {
-        this.Swap = false;
-        this.Remove = false;
-        this.Fall = false;
-        this.Hover = false;
-        this.MusicOn = false;
-        this.MusicOff = false;
-        this.Combo = false;
-        this.LargeCombo = false;
-        this.MegaCombo = false;
+import { SetType, BlockState, BlockColor, InputOptions, SoundRequest, Block, HoverBlock, FallBlock, Tick, Active, Selector, BlockSet, Constants } from 'dataTypes.js';
+class Puzzle {
+    constructor(soundService, textures) {
+        this.logic = new PuzzleLogic();
+        this.View = new PIXI.Container();
+        this.view = new PuzzleView(this.View, textures);
+    }
+    Tick() {
+        this.logic.Tick();
+    }
+    ViewUpdate() {
+        this.view.Update(this.logic);
+    }
+    SoundUpdate() {
+        for (var i = 0; i < this.logic.SoundRequests.length; i++) {
+            if (this.logic.SoundRequests[i] === SoundRequest.Swap) {
+                this.soundService.swap.play();
+            }
+            if (this.logic.SoundRequests[i] === SoundRequest.Fall) {
+                this.soundService.swap.play();
+            }
+            if (this.logic.SoundRequests[i] === SoundRequest.Remove) {
+                this.soundService.swap.play();
+            }
+        }
+        this.logic.SoundRequests.length = 0;
+    }
+    InputAction(input) {
+        if (input === InputOptions.Up) {
+            this.logic.RequestMoveSelector(this.logic.Selector.Row + 1, this.logic.Selector.Col);
+        }
+        else if (input === InputOptions.Left) {
+            this.logic.RequestMoveSelector(this.logic.Selector.Row, this.logic.Selector.Col - 1);
+        }
+        else if (input === InputOptions.Down) {
+            this.logic.RequestMoveSelector(this.logic.Selector.Row - 1, this.logic.Selector.Col);
+        }
+        else if (input === InputOptions.Right) {
+            this.logic.RequestMoveSelector(this.logic.Selector.Row, this.logic.Selector.Col + 1);
+        }
+        else if (input === InputOptions.A) {
+            this.logic.RequestSwitch();
+        }
     }
 }
-class Block {
-    constructor() {
-        this.Color = BlockColor.Brown;
-        this.State = BlockState.None;
-        this.TotalChain = 0;
-        this.Tick = 0;
-        this.FallGroupTicks = 0;
-        this.groupId = 0;
-    }
-}
-class HoverBlocks {
-    constructor() {
-        this.Row = 0;
-        this.Col = 0;
-    }
-}
-class FallBlocks {
-    constructor() {
-        this.Row = 0;
-        this.Col = 0;
-    }
-}
-class RemovalInstance {
-    constructor() {
-        this.Chain = 0;
-        this.Tick = 0;
-        this.EndTick = 0;
-    }
-}
-class Effect {
-    constructor() {
-        this.StartTick = 0;
-        this.EndTick = 0;
-        this.Row = 0;
-        this.Col = 0;
-    }
-}
-class Tick {
-    constructor() {
-        this.Puzzle = 0;
-        this.MoveBlocksUp = 0;
-        this.Swap = 0;
-    }
-}
-class Active {
-    constructor() {
-        this.Puzzle = false;
-        this.Hover = false;
-        this.Swap = false;
-        this.BlocksRemoving = false;
-        this.Falling = false;
-    }
-}
-class Selector {
-    constructor() {
-        this.Row = 0;
-        this.Col = 0;
-    }
-}
-class Set {
-    constructor() {
-        this.Row = 0;
-        this.Col = 0;
-        this.Count = 0;
-        this.NewSetIndex = 0;
-        this.Intersects = 0;
-        this.Type = SetType.Col;
-    }
-}
-class Constants {
-}
-Constants.MAX_ROWS = 12;
-Constants.MAX_COLS = 6;
-Constants.STARTING_ROWS = 8;
-Constants.TICKS_FOR_SWAP = 2;
-Constants.TICKS_FOR_REMOVING_BLOCKS = 10;
-Constants.TICKS_FOR_HOVER = 5;
-Constants.TICKS_FOR_HOVER_SWAP = 10;
-class Game {
+class PuzzleLogic {
     constructor() {
         this.Blocks = [];
         this.HoverBlocks = [];
@@ -149,7 +71,7 @@ class Game {
     }
     //|Public|
     Reset() {
-        this.SoundRequests = new SoundRequests();
+        this.SoundRequests = [];
         this.Active.Puzzle = true;
         this.Active.Hover = false;
         this.Active.Swap = false;
@@ -171,13 +93,13 @@ class Game {
                 block.Tick = 0;
                 block.groupId = 0;
                 this.Blocks[row][col] = new Block();
-                this.HoverBlocks[row][col] = new HoverBlocks();
-                this.FallBlocks[row][col] = new FallBlocks();
+                this.HoverBlocks[row][col] = new HoverBlock();
+                this.FallBlocks[row][col] = new FallBlock();
             }
         }
         for (var i = 0; i < Constants.MAX_ROWS * Constants.MAX_COLS; i++) {
             this.BlockSets[i] = 0;
-            this.Set[i] = new Set();
+            this.Set[i] = new BlockSet();
         }
         this.Score = 0;
         this.Level = 1;
@@ -218,7 +140,7 @@ class Game {
     RequestSwitch() {
         if (!this.Active.Swap) {
             if ((this.Blocks[this.Selector.Row][this.Selector.Col].State == BlockState.None || this.Blocks[this.Selector.Row][this.Selector.Col].State == BlockState.Exist) && (this.Blocks[this.Selector.Row][this.Selector.Col + 1].State == BlockState.None || this.Blocks[this.Selector.Row][this.Selector.Col + 1].State == BlockState.Exist) && (this.Blocks[this.Selector.Row][this.Selector.Col].State != BlockState.None || this.Blocks[this.Selector.Row][this.Selector.Col + 1].State != BlockState.None)) {
-                this.SoundRequests.Swap = true;
+                this.SoundRequests.push(SoundRequest.Swap);
                 this.WaitForSwap = false;
                 this.Active.Swap = true;
                 this.SwitchLeftBlockRow = this.Selector.Row;
@@ -284,7 +206,7 @@ class Game {
         var largetChain = 0;
         for (var row = 0; row < Constants.MAX_ROWS; row++) {
             for (var col = 0; col < Constants.MAX_COLS; col++) {
-                this.SoundRequests.Fall = true;
+                this.SoundRequests.push(SoundRequest.Fall);
                 if (this.Blocks[row][col].State == BlockState.Falling || this.Blocks[row][col].State == BlockState.LockedForFall) {
                     this.Blocks[row][col].Tick++;
                     if (this.Blocks[row][col].Tick == this.Blocks[row][col].FallGroupTicks) {
@@ -525,7 +447,7 @@ class Game {
             this.BlockSets[this.Set[i].NewSetIndex] += this.Set[i].Count - this.Set[i].Intersects;
         }
         if (this.SetCount > 0) {
-            this.SoundRequests.Remove = true;
+            this.SoundRequests.push(SoundRequest.Remove);
             this.groupId++;
             for (var row = 0; row < Constants.MAX_ROWS; row++) {
                 for (var col = 0; col < Constants.MAX_COLS; col++) {
@@ -875,22 +797,11 @@ class Game {
         this.Score += addtionalScore;
     }
 }
-class View {
-    constructor(document, resolve) {
-        this.texture = null; //var bunny = PIXI.Sprite.fromImage('required/assets/basics/bunny.png');
-        this.textures = null;
+class PuzzleView {
+    constructor(container, textures) {
         this.blocksSprite = [];
-        this.app = new PIXI.Application(306, 709, { backgroundColor: 0x1099bb });
-        document.body.appendChild(this.app.view);
-        this.resolve = resolve;
-        this.LoadContent();
-    }
-    LoadContent() {
-        PIXI.loader
-            .add("/images/textures.json")
-            .load(this.CreateSprites.bind(this));
-    }
-    CreateSprites() {
+        this.textures = [];
+        this.textures = textures;
         let levelTextStyle = new PIXI.TextStyle({
             fontSize: 24,
             fontWeight: 'bold',
@@ -907,17 +818,15 @@ class View {
         this.score = new PIXI.Text('00000', levelTextStyle);
         this.score.x = 200;
         this.score.y = 15;
-        this.textures = PIXI.loader.resources["/images/textures.json"].spritesheet.textures;
         //Layout
-        this.layoutSprite = new PIXI.Sprite(this.textures["Layout.png"]);
+        this.layoutSprite = new PIXI.Sprite(textures["Layout.png"]);
         //Selector
-        this.selectorSprite = new PIXI.Sprite(this.textures["Selector.png"]);
+        this.selectorSprite = new PIXI.Sprite(textures["Selector.png"]);
         //Blocks
-        this.BlocksContainer = new PIXI.Container();
-        this.BlocksContainer.x = 0;
-        this.BlocksContainer.y = 0;
+        this.blocksContainer = new PIXI.Container();
+        this.blocksContainer.x = 0;
+        this.blocksContainer.y = 0;
         var thing = new PIXI.Graphics();
-        this.app.stage.addChild(thing);
         thing.x = 0;
         thing.y = 0;
         thing.lineStyle(0);
@@ -926,7 +835,7 @@ class View {
         thing.lineTo(3, (Constants.MAX_ROWS - 1) * 50 + 106);
         thing.lineTo(Constants.MAX_COLS * 50 + 3, (Constants.MAX_ROWS - 1) * 50 + 106);
         thing.lineTo(Constants.MAX_COLS * 50 + 3, 0);
-        this.BlocksContainer.mask = thing;
+        this.blocksContainer.mask = thing;
         for (let row = 0; row < Constants.MAX_ROWS; row++) {
             this.blocksSprite[row] = [];
             for (let col = 0; col < Constants.MAX_COLS; col++) {
@@ -934,19 +843,27 @@ class View {
                 this.blocksSprite[row][col].x = (col) * 50 + 3;
                 this.blocksSprite[row][col].y = ((Constants.MAX_ROWS - 1) - row) * 50 + 106;
                 this.blocksSprite[row][col].visible = false;
-                this.BlocksContainer.addChild(this.blocksSprite[row][col]);
+                this.blocksContainer.addChild(this.blocksSprite[row][col]);
             }
         }
-        this.BlocksContainer.addChild(this.selectorSprite);
+        this.blocksContainer.addChild(this.selectorSprite);
         //Order Of Sprite (z)
-        this.app.stage.addChild(this.layoutSprite);
-        this.app.stage.addChild(this.BlocksContainer);
-        this.app.stage.addChild(this.level);
-        this.app.stage.addChild(this.score);
+        this.container.addChild(thing);
+        this.container.addChild(this.layoutSprite);
+        this.container.addChild(this.blocksContainer);
+        this.container.addChild(this.level);
+        this.container.addChild(this.score);
         this.resolve("Loaded");
     }
+    Update(puzzleLogic) {
+        this.UpdateSelector(puzzleLogic.Selector);
+        this.UpdateBlockStates(puzzleLogic.Blocks);
+        this.UpdateBlockContainerState(puzzleLogic.BlockInc);
+        this.UpdateLevel(puzzleLogic.Level);
+        this.UpdateScore(puzzleLogic.Score);
+    }
     UpdateBlockContainerState(y) {
-        this.BlocksContainer.y = -y;
+        this.blocksContainer.y = -y;
     }
     UpdateBlockStates(Blocks) {
         for (let row = 0; row < Constants.MAX_ROWS; row++) {
@@ -992,35 +909,5 @@ class View {
         this.score.text = String(score);
     }
 }
-class Sounds {
-    constructor() {
-        this.swapSound = null;
-        this.fallSound = null;
-        this.removeSound = null;
-        this.swapSound = new Howl({
-            src: ['/sound/swap.mp3']
-        });
-        this.fallSound = new Howl({
-            src: ['/sound/swap.mp3']
-        });
-        this.removeSound = new Howl({
-            src: ['/sound/swap.mp3']
-        });
-    }
-    RunSoundRequests(soundRequests) {
-        if (soundRequests.Swap) {
-            this.swapSound.play();
-            soundRequests.Swap = false;
-        }
-        if (soundRequests.Fall) {
-            //this.fallSound.play();
-            soundRequests.Fall = false;
-        }
-        if (soundRequests.Remove) {
-            //this.removeSound.play();
-            soundRequests.Remove = false;
-        }
-    }
-}
-export { Sounds, View, Game };
-//# sourceMappingURL=main.js.map
+export { Puzzle };
+//# sourceMappingURL=puzzle.js.map

@@ -20,6 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Remove="wwwroot\script\pixi.js.d.ts" />
+    <Content Remove="wwwroot\script\services.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="wwwroot\script\services.ts" />
   </ItemGroup>
 
 
