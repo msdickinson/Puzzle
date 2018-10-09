@@ -7,11 +7,3 @@ C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Puzzle\obj\Debug\net
 C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Puzzle\obj\Debug\netstandard2.0\Puzzle.AssemblyInfo.cs
 C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Puzzle\obj\Debug\netstandard2.0\Puzzle.dll
 C:\Users\mdickinson\Desktop\Learning Projects\Puzzle\Puzzle\Puzzle\obj\Debug\netstandard2.0\Puzzle.pdb
-C:\Users\marks\Source\Repos\Puzzle\Puzzle\bin\Debug\netstandard2.0\Puzzle.deps.json
-C:\Users\marks\Source\Repos\Puzzle\Puzzle\bin\Debug\netstandard2.0\Puzzle.dll
-C:\Users\marks\Source\Repos\Puzzle\Puzzle\bin\Debug\netstandard2.0\Puzzle.pdb
-C:\Users\marks\Source\Repos\Puzzle\Puzzle\obj\Debug\netstandard2.0\Puzzle.csproj.CoreCompileInputs.cache
-C:\Users\marks\Source\Repos\Puzzle\Puzzle\obj\Debug\netstandard2.0\Puzzle.AssemblyInfoInputs.cache
-C:\Users\marks\Source\Repos\Puzzle\Puzzle\obj\Debug\netstandard2.0\Puzzle.AssemblyInfo.cs
-C:\Users\marks\Source\Repos\Puzzle\Puzzle\obj\Debug\netstandard2.0\Puzzle.dll
-C:\Users\marks\Source\Repos\Puzzle\Puzzle\obj\Debug\netstandard2.0\Puzzle.pdb

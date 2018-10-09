@@ -136,5 +136,6 @@ Constants.TICKS_FOR_SWAP = 2;
 Constants.TICKS_FOR_REMOVING_BLOCKS = 10;
 Constants.TICKS_FOR_HOVER = 5;
 Constants.TICKS_FOR_HOVER_SWAP = 10;
+Constants.TICKS_FOR_FALL = 3;
 export { SetType, BlockState, KeyState, BlockColor, InputOptions, InputSet, SoundRequest, Block, HoverBlock, FallBlock, RemovalInstance, Effect, Tick, Active, Selector, BlockSet, Constants };
 //# sourceMappingURL=dataTypes.js.map

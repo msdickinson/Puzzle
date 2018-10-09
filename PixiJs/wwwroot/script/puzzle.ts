@@ -1,20 +1,23 @@
-﻿import { SoundService, ViewService, InputService } from 'services.js'
+﻿import { SoundService, ViewService, InputService } from './services.js'
 
 import {
     SetType, InputSet, BlockState, KeyState, BlockColor, InputOptions, SoundRequest,
      Block, HoverBlock, FallBlock, RemovalInstance, Effect, Tick, Active, Selector, BlockSet, Constants
-} from 'dataTypes.js'
+} from './dataTypes.js'
 
 class Puzzle {
-    private logic: PuzzleLogic;
+    public logic: PuzzleLogic;
     private view: PuzzleView;
     private soundService: SoundService;
     private viewService: ViewService;
+    private mute: boolean;
+    private debug: boolean = true;
     public View: PIXI.Container;
-    constructor(soundService: SoundService, textures: PIXI.Texture[]) {
+    constructor(View: PIXI.Container, soundService: SoundService, textures: PIXI.Texture[], mute: boolean) {
         this.logic = new PuzzleLogic();
-
-        this.View = new PIXI.Container();
+        this.soundService = soundService;
+        this.mute = mute;
+        this.View = View;
         this.view = new PuzzleView(this.View, textures);
     }
 
@@ -25,16 +28,17 @@ class Puzzle {
         this.view.Update(this.logic);
     }
     public SoundUpdate() {
-        for (var i = 0; i < this.logic.SoundRequests.length; i++) {
-
-            if (this.logic.SoundRequests[i] === SoundRequest.Swap) {
-                this.soundService.swap.play();
-            }
-            if (this.logic.SoundRequests[i] === SoundRequest.Fall) {
-                this.soundService.swap.play();
-            }
-            if (this.logic.SoundRequests[i] === SoundRequest.Remove) {
-                this.soundService.swap.play();
+        if (!this.mute) {
+            for (var i = 0; i < this.logic.SoundRequests.length; i++) {
+                if (this.logic.SoundRequests[i] === SoundRequest.Swap) {
+                    this.soundService.swap.play();
+                }
+                if (this.logic.SoundRequests[i] === SoundRequest.Fall) {
+                    this.soundService.swap.play();
+                }
+                if (this.logic.SoundRequests[i] === SoundRequest.Remove) {
+                    this.soundService.swap.play();
+                }
             }
         }
         this.logic.SoundRequests.length = 0;
@@ -54,6 +58,9 @@ class Puzzle {
         }
         else if (input === InputOptions.A) {
             this.logic.RequestSwitch();
+        }
+        if (this.debug) {
+            this.ViewUpdate();
         }
     }
 }
@@ -81,7 +88,7 @@ class PuzzleLogic {
 
     public Selector: Selector = new Selector();
     public Active: Active = new Active();
-    Ticks: Tick = new Tick();
+    public Ticks: Tick = new Tick();
     SetCount: number = 0;
     Set: BlockSet[] = [];
 
@@ -532,7 +539,7 @@ class PuzzleLogic {
                         if (this.Blocks[row][col].TotalChain > chain) {
                             chain = this.Blocks[row][col].TotalChain;
                         }
-                        this.Blocks[row][col].FallGroupTicks = 3;
+                        this.Blocks[row][col].FallGroupTicks = Constants.TICKS_FOR_FALL;
                         for (var k: number = row; k > 0; k--) {
                             if (this.Active.Swap && k - 2 >= 0 && this.Blocks[k - 1][col].State == BlockState.Switch || this.Blocks[k - 1][col].State == BlockState.SwitchNone && this.Blocks[k - 2][col].State == BlockState.None) {
                                 this.WaitForSwap = true;
@@ -540,7 +547,7 @@ class PuzzleLogic {
                             if (this.Blocks[k - 1][col].State == BlockState.None) {
                                 this.FallBlocks[row][col].Row = k - 1;
                                 this.Blocks[k - 1][col].State = BlockState.LockedForFall;
-                                this.Blocks[k - 1][col].FallGroupTicks = 3;
+                                this.Blocks[k - 1][col].FallGroupTicks = Constants.TICKS_FOR_FALL;
                                 this.Blocks[k - 1][col].groupId = this.Blocks[row][col].groupId;
                             }
                             if (this.Blocks[k - 1][col].State == BlockState.LockedForFall) {
@@ -580,6 +587,7 @@ class PuzzleLogic {
     private RowChange(): void {
         this.MoveBlocksUpOneRow();
         this.AddBlockRow(0);
+        this.Selector.Row = this.Selector.Row + 1;
     }
     private MoveBlocksUpOneRow(): void {
         for (var row: number = Constants.MAX_ROWS - 1; row >= 1; row--) {
@@ -848,6 +856,7 @@ class PuzzleView {
     private container: PIXI.Container;
     
     constructor(container: PIXI.Container, textures: PIXI.Texture[]) {
+        this.container = container;
         this.textures = textures;
         let levelTextStyle = new PIXI.TextStyle({
             fontSize: 24,
@@ -908,7 +917,6 @@ class PuzzleView {
         this.container.addChild(this.blocksContainer);
         this.container.addChild(this.level);
         this.container.addChild(this.score);
-        this.resolve("Loaded");
     }
     
     public Update(puzzleLogic: PuzzleLogic) {

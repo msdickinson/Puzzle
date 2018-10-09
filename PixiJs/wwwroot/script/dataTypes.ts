@@ -111,6 +111,7 @@ class Constants {
     public static TICKS_FOR_REMOVING_BLOCKS: number = 10;
     public static TICKS_FOR_HOVER: number = 5;
     public static TICKS_FOR_HOVER_SWAP: number = 10;
+    public static TICKS_FOR_FALL: number = 3;
 }
 
 export {

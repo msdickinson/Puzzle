@@ -1,8 +1,11 @@
-import { SetType, BlockState, BlockColor, InputOptions, SoundRequest, Block, HoverBlock, FallBlock, Tick, Active, Selector, BlockSet, Constants } from 'dataTypes.js';
+import { SetType, BlockState, BlockColor, InputOptions, SoundRequest, Block, HoverBlock, FallBlock, Tick, Active, Selector, BlockSet, Constants } from './dataTypes.js';
 class Puzzle {
-    constructor(soundService, textures) {
+    constructor(View, soundService, textures, mute) {
+        this.debug = true;
         this.logic = new PuzzleLogic();
-        this.View = new PIXI.Container();
+        this.soundService = soundService;
+        this.mute = mute;
+        this.View = View;
         this.view = new PuzzleView(this.View, textures);
     }
     Tick() {
@@ -12,15 +15,17 @@ class Puzzle {
         this.view.Update(this.logic);
     }
     SoundUpdate() {
-        for (var i = 0; i < this.logic.SoundRequests.length; i++) {
-            if (this.logic.SoundRequests[i] === SoundRequest.Swap) {
-                this.soundService.swap.play();
-            }
-            if (this.logic.SoundRequests[i] === SoundRequest.Fall) {
-                this.soundService.swap.play();
-            }
-            if (this.logic.SoundRequests[i] === SoundRequest.Remove) {
-                this.soundService.swap.play();
+        if (!this.mute) {
+            for (var i = 0; i < this.logic.SoundRequests.length; i++) {
+                if (this.logic.SoundRequests[i] === SoundRequest.Swap) {
+                    this.soundService.swap.play();
+                }
+                if (this.logic.SoundRequests[i] === SoundRequest.Fall) {
+                    this.soundService.swap.play();
+                }
+                if (this.logic.SoundRequests[i] === SoundRequest.Remove) {
+                    this.soundService.swap.play();
+                }
             }
         }
         this.logic.SoundRequests.length = 0;
@@ -40,6 +45,9 @@ class Puzzle {
         }
         else if (input === InputOptions.A) {
             this.logic.RequestSwitch();
+        }
+        if (this.debug) {
+            this.ViewUpdate();
         }
     }
 }
@@ -502,7 +510,7 @@ class PuzzleLogic {
                         if (this.Blocks[row][col].TotalChain > chain) {
                             chain = this.Blocks[row][col].TotalChain;
                         }
-                        this.Blocks[row][col].FallGroupTicks = 3;
+                        this.Blocks[row][col].FallGroupTicks = Constants.TICKS_FOR_FALL;
                         for (var k = row; k > 0; k--) {
                             if (this.Active.Swap && k - 2 >= 0 && this.Blocks[k - 1][col].State == BlockState.Switch || this.Blocks[k - 1][col].State == BlockState.SwitchNone && this.Blocks[k - 2][col].State == BlockState.None) {
                                 this.WaitForSwap = true;
@@ -510,7 +518,7 @@ class PuzzleLogic {
                             if (this.Blocks[k - 1][col].State == BlockState.None) {
                                 this.FallBlocks[row][col].Row = k - 1;
                                 this.Blocks[k - 1][col].State = BlockState.LockedForFall;
-                                this.Blocks[k - 1][col].FallGroupTicks = 3;
+                                this.Blocks[k - 1][col].FallGroupTicks = Constants.TICKS_FOR_FALL;
                                 this.Blocks[k - 1][col].groupId = this.Blocks[row][col].groupId;
                             }
                             if (this.Blocks[k - 1][col].State == BlockState.LockedForFall) {
@@ -549,6 +557,7 @@ class PuzzleLogic {
     RowChange() {
         this.MoveBlocksUpOneRow();
         this.AddBlockRow(0);
+        this.Selector.Row = this.Selector.Row + 1;
     }
     MoveBlocksUpOneRow() {
         for (var row = Constants.MAX_ROWS - 1; row >= 1; row--) {
@@ -801,6 +810,7 @@ class PuzzleView {
     constructor(container, textures) {
         this.blocksSprite = [];
         this.textures = [];
+        this.container = container;
         this.textures = textures;
         let levelTextStyle = new PIXI.TextStyle({
             fontSize: 24,
@@ -853,7 +863,6 @@ class PuzzleView {
         this.container.addChild(this.blocksContainer);
         this.container.addChild(this.level);
         this.container.addChild(this.score);
-        this.resolve("Loaded");
     }
     Update(puzzleLogic) {
         this.UpdateSelector(puzzleLogic.Selector);

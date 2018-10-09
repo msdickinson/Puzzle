@@ -1,14 +1,19 @@
-﻿import { InputSet, InputOptions } from 'dataTypes.js'
+﻿import { InputSet, InputOptions } from './dataTypes.js'
 
 class ViewService {
     private app: PIXI.Application;
     public textures: PIXI.Texture[] = [];
-    constructor(element: Document) {
-        this.app = new PIXI.Application(306, 709, { backgroundColor: 0x1099bb });
-        element.appendChild(this.app.view);        this.textures = PIXI.loader.resources["/images/textures.json"].spritesheet.textures;    }
+    constructor(element: HTMLElement, resolve: Function, reject: Function) {
+               this.app = new PIXI.Application(306, 659, { backgroundColor: 0x1099bb });
+        //this.app = new PIXI.Application(306 * 3, 659, { backgroundColor: 0x1099bb });
+        //this.app = new PIXI.Application(2000, 1300, { backgroundColor: 0x1099bb });
+       // element.appendChild(this.app.view);        element.insertBefore(this.app.view, element.firstChild);
+        PIXI.loader
+            .add("/images/textures.json")
+            .load(                (() => {                    this.textures = PIXI.loader.resources["/images/textures.json"].spritesheet.textures;
+                    resolve();                }).bind(this)            );    }
     public AddContainer(container: PIXI.Container) {
         this.app.stage.addChild(container);
-        return container;
     }
     public RemoveContainer(container: PIXI.Container) {
         this.app.stage.removeChild(container);
@@ -18,32 +23,33 @@ class SoundService {
     public swap = null;
     public fall = null;
     public remove = null;
-    constructor() {
+    constructor(resolve: Function, reject: Function) {
         this.swap = new Howl({
-            src: ['/sound/swap.mp3']
+            src: ['./sound/swap.mp3']
         });        this.fall = new Howl({
-            src: ['/sound/swap.mp3']
+            src: ['./sound/swap.mp3']
         });        this.remove = new Howl({
-            src: ['/sound/swap.mp3']
-        });    }
+            src: ['./sound/swap.mp3']
+        });        //Not Proper, but functional enough for now        resolve();    }
 }
 class InputService {
-    private keyboadLeftFunctions: Function[];
-    private keyboadRightFunctions: Function[];
-    private joyPadOneFunctions: Function[];
-    private joyPadTwoFunctions: Function[];
-    private joyPadThreeFunctions: Function[];
-    private joyPadFourFunctions: Function[];
+    private keyboadLeftFunctions: Function[] = [];
+    private keyboadRightFunctions: Function[] = [];
+    private joyPadOneFunctions: Function[]=[];
+    private joyPadTwoFunctions: Function[] = [];
+    private joyPadThreeFunctions: Function[] = [];
+    private joyPadFourFunctions: Function[] = [];
     private document: Document;
-    constructor(document: Document) {
+    constructor(document: Document, resolve: Function, reject: Function) {
         this.document = document;
         this.keyboardLeftAddListener();
-        this.keyboardRightAddListener()
+        this.keyboardRightAddListener();
+        resolve();
     }
 
     public Subscribe(inputCallBack: Function, inputSet: InputSet) {
         if (inputSet == InputSet.LeftKeyboard) {
-            this.keyboadRightFunctions.push(inputCallBack);
+            this.keyboadLeftFunctions.push(inputCallBack);
         }
         else if (inputSet == InputSet.RightKeyboard) {
             this.keyboadRightFunctions.push(inputCallBack);
@@ -97,12 +103,12 @@ class InputService {
             }
             else if (event.key == "s" || keyName == "S") {
                 for (let i = 0; i < this.keyboadLeftFunctions.length; i++) {
-                    this.keyboadLeftFunctions[i](InputOptions.Right);
+                    this.keyboadLeftFunctions[i](InputOptions.Down);
                 }
             }
             else if (event.key == "d" || keyName == "d") {
                 for (let i = 0; i < this.keyboadLeftFunctions.length; i++) {
-                    this.keyboadLeftFunctions[i](InputOptions.Down);
+                    this.keyboadLeftFunctions[i](InputOptions.Right);
                 }
             }
             else if (event.key == " ") {
@@ -115,64 +121,64 @@ class InputService {
     private keyboardRightAddListener() {
         this.document.addEventListener('keydown', (event) => {
             const keyName = event.key;
-            if (event.key == "ArrowUp" || keyName == "w") {
-                for (let i = 0; i < this.keyboadLeftFunctions.length; i++) {
-                    this.keyboadLeftFunctions[i](InputOptions.Up);
+            if (event.key == "ArrowUp") {
+                for (let i = 0; i < this.keyboadRightFunctions.length; i++) {
+                    this.keyboadRightFunctions[i](InputOptions.Up);
                 }
             }
-            else if (event.key == "ArrowLeft" || keyName == "A") {
-                for (let i = 0; i < this.keyboadLeftFunctions.length; i++) {
-                    this.keyboadLeftFunctions[i](InputOptions.Left);
+            else if (event.key == "ArrowLeft") {
+                for (let i = 0; i < this.keyboadRightFunctions.length; i++) {
+                    this.keyboadRightFunctions[i](InputOptions.Left);
                 }
             }
-            else if (event.key == "ArrowDown" || keyName == "S") {
-                for (let i = 0; i < this.keyboadLeftFunctions.length; i++) {
-                    this.keyboadLeftFunctions[i](InputOptions.Right);
+            else if (event.key == "ArrowDown") {
+                for (let i = 0; i < this.keyboadRightFunctions.length; i++) {
+                    this.keyboadRightFunctions[i](InputOptions.Down);
                 }
             }
-            else if (event.key == "ArrowRight" || keyName == "d") {
-                for (let i = 0; i < this.keyboadLeftFunctions.length; i++) {
-                    this.keyboadLeftFunctions[i](InputOptions.Down);
+            else if (event.key == "ArrowRight") {
+                for (let i = 0; i < this.keyboadRightFunctions.length; i++) {
+                    this.keyboadRightFunctions[i](InputOptions.Right);
                 }
             }
             else if (event.key == "Enter") {
-                for (let i = 0; i < this.keyboadLeftFunctions.length; i++) {
-                    this.keyboadLeftFunctions[i](InputOptions.A);
+                for (let i = 0; i < this.keyboadRightFunctions.length; i++) {
+                    this.keyboadRightFunctions[i](InputOptions.A);
                 }
             }
         });
     }
 }
 class GameLoopService {
-    private updateFunctions: Function[];
-    private drawFunctions: Function[];
+    private updateFunctions: Function[] = [];
+    private viewFunctions: Function[] = [];
 
     constructor() {
     }
 
-    private update() {
-        for (let i = 0; i < this.update.length; i++) {
+    public tick() {
+        for (let i = 0; i < this.updateFunctions.length; i++) {
             this.updateFunctions[i]();
         }
     }
-    private draw() {
-        for (let i = 0; i < this.update.length; i++) {
-            this.drawFunctions[i]();
+    public updateView() {
+        for (let i = 0; i < this.viewFunctions.length; i++) {
+            this.viewFunctions[i]();
         }
     }
 
     public Subscribe(logic: Function, view: Function, sound: Function) {
         this.updateFunctions.push(logic);
-        this.drawFunctions.push(view);
-        this.drawFunctions.push(sound);
+        this.viewFunctions.push(view);
+        this.viewFunctions.push(sound);
     }
     public Unsubscribe(update: Function, view: Function, sound: Function) {
         this.updateFunctions = this.updateFunctions.filter(func => func != update);
-        this.drawFunctions = this.drawFunctions.filter(func => func != view && func != sound);
+        this.viewFunctions = this.viewFunctions.filter(func => func != view && func != sound);
     }
 
     public Start() {
-        // MainLoop.setUpdate(this.update).setDraw(this.draw).start();
+
     }
     public Stop() {
 
