@@ -9,12 +9,21 @@
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.ResponseCompression" Version="2.1.1" />
   </ItemGroup>
-
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.4" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Remove="wwwroot\js\**" />
     <Content Remove="wwwroot\js\**" />
     <EmbeddedResource Remove="wwwroot\js\**" />
     <None Remove="wwwroot\js\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="wwwroot\script\pixi.js.d.ts" />
+    <Content Remove="wwwroot\script\services.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="wwwroot\script\services.ts" />
   </ItemGroup>
 
 

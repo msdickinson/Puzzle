@@ -39,3 +39,12 @@ layout {
     width: 800px;
     height: 710px;
 }
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+}
+
+td, th {
+    text-align: left;
+    padding: 8px;
+}
