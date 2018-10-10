@@ -5,6 +5,8 @@ class Player {
     constructor(playerName, puzzle) {
         this.playerName = playerName;
         this.puzzle = puzzle;
+        // Sets Math.random to a PRNG initialized using the given explicit seed.
+        var myrng = Math.seedrandom('hello.');
     }
 }
 class Application {
@@ -52,7 +54,8 @@ class Application {
         container.x = x;
         container.y = y;
         container.scale.set(scale, scale);
-        const puzzle = new Puzzle(container, this.soundService, this.viewService.textures, mute, log);
+        //let seed = seedrandom();
+        const puzzle = new Puzzle(container, this.soundService, this.viewService.textures, mute, log, 0);
         this.viewService.AddContainer(puzzle.View);
         this.inputService.Subscribe(puzzle.InputAction.bind(puzzle), InputSet.LeftKeyboard);
         this.inputService.Subscribe(puzzle.InputAction.bind(puzzle), InputSet.RightKeyboard);

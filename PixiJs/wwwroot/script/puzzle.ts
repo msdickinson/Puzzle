@@ -14,13 +14,20 @@ class Puzzle {
     public View: PIXI.Container;
     private debug: boolean = true;
     private randomSeed: number;
+    private random = null
     constructor(View: PIXI.Container, soundService: SoundService, textures: PIXI.Texture[], mute: boolean, log: boolean, randomSeed: number) {
-        let x = 0;
+       // this.randomSeed;
+       // this.random = seedrandom(randomSeed);
         this.logic = new PuzzleLogic(log);
         this.soundService = soundService;
         this.mute = mute;
         this.View = View;
         this.view = new PuzzleView(this.View, textures);
+
+
+       // let x = this.random.int32();
+       // x = this.random.int32();
+       // x= this.random.int32();
     }
 
     public Tick() {
@@ -1054,9 +1061,7 @@ class PuzzleLogPlayer {
             this.Log.concat(logItems);
             this.LogId = this.Log[this.Log.length - 1].Id;
         }
-        else {
-            console.log("Merge Gap");
-        }
+
     }
     public Tick(ticks: number) {
         for (var i = 0; i < ticks; i++) {

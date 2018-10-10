@@ -2,12 +2,17 @@ import { SetType, BlockState, BlockColor, InputOptions, SoundRequest, Block, Hov
 class Puzzle {
     constructor(View, soundService, textures, mute, log, randomSeed) {
         this.debug = true;
-        let x = 0;
+        this.random = null;
+        // this.randomSeed;
+        // this.random = seedrandom(randomSeed);
         this.logic = new PuzzleLogic(log);
         this.soundService = soundService;
         this.mute = mute;
         this.View = View;
         this.view = new PuzzleView(this.View, textures);
+        // let x = this.random.int32();
+        // x = this.random.int32();
+        // x= this.random.int32();
     }
     Tick() {
         this.logic.Tick();
@@ -988,9 +993,6 @@ class PuzzleLogPlayer {
             this.Log = this.Log.filter(e => e.Id < logItems[0].Id);
             this.Log.concat(logItems);
             this.LogId = this.Log[this.Log.length - 1].Id;
-        }
-        else {
-            console.log("Merge Gap");
         }
     }
     Tick(ticks) {
