@@ -8,7 +8,6 @@
     <script src="script/lib/pixi.js"></script>
     <script src="script/lib/mainloop.js"></script>
     <script src="script/lib/howler.js"></script>
-    <script src="script/lib/FileSaver.js"></script>
     <script src="script/lib/jszip.js"></script>
 </head>
 <body>
@@ -23,7 +22,6 @@
             <fieldset>
                 <input id="Ticks" type="number" step="1" min="1" max="10000" value="1" style="width: 235px">
                 <button onclick="ApplyTicks()" class="pure-button pure-button-primary">Ticks</button>
-                <button onclick="CreateZip()" class="pure-button pure-button-primary">Zip</button>
             </fieldset>
         </div>
     </div>
@@ -248,17 +246,16 @@
         g();
         });
 
-
-
-        window.CreateZip = function CreateZip(){
-        var zip = new JSZip();
+        function Zip(){
+            var zip = new JSZip();
 
         for(let i = 0; i < App.players.length; i++){
-        zip.file(App.players[i].playerName + ".json", JSON.stringify(App.players[i].puzzle.logic.LogItems));
-        zip.generateAsync({type:"blob"}).then(function(content) {
-        saveAs(content, "Logs" +  Math.round((new Date()).getTime() / 1000) + ".zip");
-        });
+            zip.file(App.players[i].playerName, JSON.stringify(App.players[i].puzzle.logic));
+            zip.generateAsync({type:"blob"}).then(function(content) {
+                saveAs(content, "Logs" +  Math.round((new Date()).getTime() / 1000) + ".zip");
+            });
         }
+
         }
 
     </script>

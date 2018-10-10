@@ -2,7 +2,7 @@
 
 import {
     SetType, InputSet, BlockState, KeyState, BlockColor, InputOptions, SoundRequest,
-     Block, HoverBlock, FallBlock, RemovalInstance, Effect, Tick, Active, Selector, BlockSet, Constants
+    Block, HoverBlock, FallBlock, RemovalInstance, Effect, Tick, Active, Selector, BlockSet, Constants, LogItem
 } from './dataTypes.js'
 
 class Puzzle {
@@ -11,10 +11,12 @@ class Puzzle {
     private soundService: SoundService;
     private viewService: ViewService;
     private mute: boolean;
-    private debug: boolean = true;
     public View: PIXI.Container;
-    constructor(View: PIXI.Container, soundService: SoundService, textures: PIXI.Texture[], mute: boolean) {
-        this.logic = new PuzzleLogic();
+    private debug: boolean = true;
+    private randomSeed: number;
+    constructor(View: PIXI.Container, soundService: SoundService, textures: PIXI.Texture[], mute: boolean, log: boolean, randomSeed: number) {
+        let x = 0;
+        this.logic = new PuzzleLogic(log);
         this.soundService = soundService;
         this.mute = mute;
         this.View = View;
@@ -66,6 +68,8 @@ class Puzzle {
 }
 
 class PuzzleLogic {
+    public Log: Boolean = false;
+    public LogItems: LogItem[] = [];
     public SoundRequests: SoundRequest[];
     public Blocks: Block[][] = [];
     HoverBlocks: HoverBlock[][] = [];
@@ -95,12 +99,14 @@ class PuzzleLogic {
     BlockSetsCount: number;
     BlockSets: number[] = [];
 
-    constructor() {
+    constructor(log) {
+        this.Log = log;
         this.Reset();
     }
 
     //|Public|
     public Reset(): void {
+        this.LogItems = [];
         this.SoundRequests = [];
         this.Active.Puzzle = true;
         this.Active.Hover = false;
@@ -140,6 +146,27 @@ class PuzzleLogic {
     }
     public Tick(): void {
         if (this.Active.Puzzle) {
+            if (this.Log) {
+                if (this.LogItems.length === 0) {
+                    let logItem = new LogItem();
+                    logItem.Id = this.LogItems.length;
+                    logItem.Action = "Tick";
+                    logItem.ValueOne = 1;
+                    this.LogItems.push(logItem);
+                }
+                else if(this.LogItems[this.LogItems.length - 1].Action !== "Tick") {
+                    let logItem = new LogItem();
+                    logItem.Id = this.LogItems.length;
+                    logItem.Action = "Tick";
+                    logItem.ValueOne = 1;
+                    this.LogItems.push(logItem);
+                }
+                else {
+                    this.LogItems[this.LogItems.length - 1].ValueOne++;
+                }
+            }
+
+
             this.Ticks.Puzzle++;
             if (this.Active.Falling) {
                 this.FallTick();
@@ -163,6 +190,14 @@ class PuzzleLogic {
     }
     public RequestMoveSelector(row: number, col: number): void  {
         if (col >= 0 && col < (Constants.MAX_COLS - 1) && row >= 1 && row < Constants.MAX_ROWS) {
+            if (this.Log) {
+                let logItem = new LogItem();
+                logItem.Id = this.LogItems.length;
+                logItem.Action = "RequestMoveSelector";
+                logItem.ValueOne = row;
+                logItem.ValueOne = col;
+                this.LogItems.push(logItem);
+            }
             this.Selector.Row = row;
             this.Selector.Col = col;
         }
@@ -170,6 +205,12 @@ class PuzzleLogic {
     public RequestSwitch(): void {
         if (!this.Active.Swap) {
             if ((this.Blocks[this.Selector.Row][this.Selector.Col].State == BlockState.None || this.Blocks[this.Selector.Row][this.Selector.Col].State == BlockState.Exist) && (this.Blocks[this.Selector.Row][this.Selector.Col + 1].State == BlockState.None || this.Blocks[this.Selector.Row][this.Selector.Col + 1].State == BlockState.Exist) && (this.Blocks[this.Selector.Row][this.Selector.Col].State != BlockState.None || this.Blocks[this.Selector.Row][this.Selector.Col + 1].State != BlockState.None)) {
+                if (this.Log) {
+                    let logItem = new LogItem();
+                    logItem.Id = this.LogItems.length;
+                    logItem.Action = "RequestSwitch";
+                    this.LogItems.push(logItem);
+                }
                 this.SoundRequests.push(SoundRequest.Swap);
                 this.WaitForSwap = false;
                 this.Active.Swap = true;
@@ -977,6 +1018,66 @@ class PuzzleView {
         this.score.text = String(score);
     }
 }
+class PuzzleLogPlayer {
+    public CurrentTick: number = 0;
+    public TotalTicks: number = 0;
+    public LogId: number = -1;
+    public TicksPerSecound = 60;
+    public Log: LogItem[] = [];
+    private puzzle: Puzzle;
 
+    constructor(puzzle: Puzzle) {
+        this.puzzle = puzzle;
+        this.Reset();
+    }
+    public Reset() {
+        this.CurrentTick = 0;
+        this.TotalTicks = 0;
+        this.TicksPerSecound = 60;
+        this.LogId = 0;
+        this.Log = [];
+    }
+    public MergeLogItems(logItems: LogItem[]) {
+        if (logItems.length === 0) {
+            return;
+        }
+
+        if (this.LogId === -1) {
+            this.Log = logItems;
+        }
+        else if (logItems[0].Id === this.LogId + 1) {
+            this.Log.concat(logItems);
+            this.LogId = this.Log[this.Log.length - 1].Id;
+        }
+        else if (logItems[0].Id < this.LogId + 1) {
+            this.Log = this.Log.filter(e => e.Id < logItems[0].Id);
+            this.Log.concat(logItems);
+            this.LogId = this.Log[this.Log.length - 1].Id;
+        }
+        else {
+            console.log("Merge Gap");
+        }
+    }
+    public Tick(ticks: number) {
+        for (var i = 0; i < ticks; i++) {
+            this.puzzle.logic.Tick();
+        }
+        this.puzzle.ViewUpdate();
+        this.puzzle.logic.SoundRequests.length = 0;
+    }
+    public GoToTick(tick: number){
+
+    }
+    public Pause(){
+
+    }
+    public Resume(){
+
+    }
+    public ClearLogItems() {
+
+    }
+
+}
 
 export { Puzzle };

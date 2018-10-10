@@ -44,31 +44,31 @@ class Application {
 
     }
     private AddOnePlayer() {
-        this.AddPlayer("Player 1", 0, 0, 1, true);
+        this.AddPlayer("Player 1", 0, 0, 1, true, true);
     }
     private AddSevenPlayers() {
-        this.AddPlayer("Player 1", 0, 0, 1, false);
-        this.AddPlayer("Player 2", 310, 0, .49, true);
-        this.AddPlayer("Player 3", 310, 336, .49, true);
-        this.AddPlayer("Player 4", 310 + 154, 0, .49, true);
-        this.AddPlayer("Player 5", 310 + 154, 336, .49, true);
-        this.AddPlayer("Player 6", 310 + 154 * 2, 0, .49, true);
-        this.AddPlayer("Player 7", 310 + 154 * 2, 336, .49, true);
+        this.AddPlayer("Player 1", 0, 0, 1, true, true);
+        this.AddPlayer("Player 2", 310, 0, .49, true, true);
+        this.AddPlayer("Player 3", 310, 336, .49, true, true);
+        this.AddPlayer("Player 4", 310 + 154, 0, .49, true, true);
+        this.AddPlayer("Player 5", 310 + 154, 336, .49, true, true);
+        this.AddPlayer("Player 6", 310 + 154 * 2, 0, .49, true, true);
+        this.AddPlayer("Player 7", 310 + 154 * 2, 336, .49, true, true);
     }
     private AddAlotOfPlayers() {
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 25; col++) {
-                this.AddPlayer("Player " + row + ", " + col, 80 * col, row * 169, .25, true);
+                this.AddPlayer("Player " + row + ", " + col, 80 * col, row * 169, .25, true, true);
             }
         }
 
     }
-    private AddPlayer(playerName: string, x: number, y: number, scale: number, mute: boolean) {
+    private AddPlayer(playerName: string, x: number, y: number, scale: number, mute: boolean, log: boolean) {
         const container = new PIXI.Container();
         container.x = x;
         container.y = y;
         container.scale.set(scale, scale); 
-        const puzzle = new Puzzle(container, this.soundService, this.viewService.textures, mute);
+        const puzzle = new Puzzle(container, this.soundService, this.viewService.textures, mute, log);
         this.viewService.AddContainer(puzzle.View);
         this.inputService.Subscribe(puzzle.InputAction.bind(puzzle), InputSet.LeftKeyboard);
         this.inputService.Subscribe(puzzle.InputAction.bind(puzzle), InputSet.RightKeyboard);

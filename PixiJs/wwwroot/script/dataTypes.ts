@@ -51,7 +51,12 @@ enum SoundRequest {
     Combo,
     LargeCombo
 }
-
+class LogItem {
+    public Id: number;
+    public Action: string;
+    public ValueOne: number = 0;
+    public ValueTwo: number = 0;
+}
 class Block {
     public Color: BlockColor = BlockColor.Brown;
     public State: BlockState = BlockState.None;
@@ -116,5 +121,5 @@ class Constants {
 
 export {
     SetType, BlockState, KeyState, BlockColor, InputOptions, InputSet, SoundRequest,
-    Block, HoverBlock, FallBlock, RemovalInstance, Effect, Tick, Active, Selector, BlockSet, Constants
+    Block, LogItem, HoverBlock, FallBlock, RemovalInstance, Effect, Tick, Active, Selector, BlockSet, Constants
 }
