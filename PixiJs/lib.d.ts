@@ -1,3 +1,3 @@
 interface Math {
-    seedrandom(seed?: string);
+    seedrandom(string);
 }

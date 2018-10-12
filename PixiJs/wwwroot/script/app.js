@@ -1,18 +1,18 @@
 import { ViewService, SoundService, InputService, GameLoopService } from "./services.js";
 import { InputSet } from "./dataTypes.js";
 import { Puzzle } from "./puzzle.js";
+import { seedRandom } from "./lib/seedrandom.js";
 class Player {
     constructor(playerName, puzzle) {
         this.playerName = playerName;
         this.puzzle = puzzle;
-        // Sets Math.random to a PRNG initialized using the given explicit seed.
-        var myrng = Math.seedrandom('hello.');
     }
 }
 class Application {
     //Services
     constructor(document, viewElement, resolve, reject) {
         this.players = [];
+        this.random = seedRandom.seedrandom(Math.random());
         let viewServicePromise = new Promise(function (resolve, reject) {
             this.viewService = new ViewService(viewElement, resolve, reject);
         }.bind(this));
@@ -24,14 +24,14 @@ class Application {
         }.bind(this));
         this.gameLoopService = new GameLoopService();
         Promise.all([viewServicePromise, soundServicePromise]).then(function (values) {
-            this.AddOnePlayer();
+            this.AddAlotOfPlayers();
             this.gameLoopService.updateView();
             document.getElementById("Loading").style.display = "none";
             resolve();
         }.bind(this));
     }
     AddOnePlayer() {
-        this.AddPlayer("Player 1", 0, 0, 1, true, true);
+        this.AddPlayer("Player 1", 0, 0, 1, true, true, 1234);
     }
     AddSevenPlayers() {
         this.AddPlayer("Player 1", 0, 0, 1, true, true);
@@ -49,13 +49,16 @@ class Application {
             }
         }
     }
-    AddPlayer(playerName, x, y, scale, mute, log) {
+    AddPlayer(playerName, x, y, scale, mute, log, seed = null) {
         const container = new PIXI.Container();
         container.x = x;
         container.y = y;
         container.scale.set(scale, scale);
         //let seed = seedrandom();
-        const puzzle = new Puzzle(container, this.soundService, this.viewService.textures, mute, log, 0);
+        if (seed === null) {
+            seed = this.random();
+        }
+        const puzzle = new Puzzle(container, this.soundService, this.viewService.textures, mute, log, seed, playerName);
         this.viewService.AddContainer(puzzle.View);
         this.inputService.Subscribe(puzzle.InputAction.bind(puzzle), InputSet.LeftKeyboard);
         this.inputService.Subscribe(puzzle.InputAction.bind(puzzle), InputSet.RightKeyboard);

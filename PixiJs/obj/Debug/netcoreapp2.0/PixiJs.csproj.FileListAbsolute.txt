@@ -1,11 +1,11 @@
-C:\Users\marks\Source\Repos\Puzzle\PixiJs\bin\Debug\netcoreapp2.0\PixiJs.deps.json
-C:\Users\marks\Source\Repos\Puzzle\PixiJs\bin\Debug\netcoreapp2.0\PixiJs.runtimeconfig.json
-C:\Users\marks\Source\Repos\Puzzle\PixiJs\bin\Debug\netcoreapp2.0\PixiJs.runtimeconfig.dev.json
-C:\Users\marks\Source\Repos\Puzzle\PixiJs\bin\Debug\netcoreapp2.0\PixiJs.dll
-C:\Users\marks\Source\Repos\Puzzle\PixiJs\bin\Debug\netcoreapp2.0\PixiJs.pdb
-C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.csprojAssemblyReference.cache
-C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.csproj.CoreCompileInputs.cache
-C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.AssemblyInfoInputs.cache
-C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.AssemblyInfo.cs
-C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.dll
-C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.pdb
+C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\PixiJs\bin\Debug\netcoreapp2.0\PixiJs.deps.json
+C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\PixiJs\bin\Debug\netcoreapp2.0\PixiJs.runtimeconfig.json
+C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\PixiJs\bin\Debug\netcoreapp2.0\PixiJs.runtimeconfig.dev.json
+C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\PixiJs\bin\Debug\netcoreapp2.0\PixiJs.dll
+C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\PixiJs\bin\Debug\netcoreapp2.0\PixiJs.pdb
+C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.csproj.CoreCompileInputs.cache
+C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.AssemblyInfoInputs.cache
+C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.AssemblyInfo.cs
+C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.dll
+C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.pdb
+C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.csprojAssemblyReference.cache

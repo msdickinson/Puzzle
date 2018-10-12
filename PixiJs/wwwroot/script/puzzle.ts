@@ -4,7 +4,7 @@ import {
     SetType, InputSet, BlockState, KeyState, BlockColor, InputOptions, SoundRequest,
     Block, HoverBlock, FallBlock, RemovalInstance, Effect, Tick, Active, Selector, BlockSet, Constants, LogItem
 } from './dataTypes.js'
-
+import { seedRandom } from "./lib/seedrandom.js";
 class Puzzle {
     public logic: PuzzleLogic;
     private view: PuzzleView;
@@ -13,21 +13,13 @@ class Puzzle {
     private mute: boolean;
     public View: PIXI.Container;
     private debug: boolean = true;
-    private randomSeed: number;
     private random = null
-    constructor(View: PIXI.Container, soundService: SoundService, textures: PIXI.Texture[], mute: boolean, log: boolean, randomSeed: number) {
-       // this.randomSeed;
-       // this.random = seedrandom(randomSeed);
-        this.logic = new PuzzleLogic(log);
+    constructor(View: PIXI.Container, soundService: SoundService, textures: PIXI.Texture[], mute: boolean, log: boolean, seed: number, name: string) {
+        this.logic = new PuzzleLogic(log, seed);
         this.soundService = soundService;
         this.mute = mute;
         this.View = View;
-        this.view = new PuzzleView(this.View, textures);
-
-
-       // let x = this.random.int32();
-       // x = this.random.int32();
-       // x= this.random.int32();
+        this.view = new PuzzleView(name, this.View, textures);
     }
 
     public Tick() {
@@ -75,10 +67,12 @@ class Puzzle {
 }
 
 class PuzzleLogic {
+    public Paused: Boolean = false;
     public Log: Boolean = false;
     public LogItems: LogItem[] = [];
     public SoundRequests: SoundRequest[];
     public Blocks: Block[][] = [];
+    public Random: Function;
     HoverBlocks: HoverBlock[][] = [];
     FallBlocks: FallBlock[][] = [];
     BlocksMoveFast: boolean = false;
@@ -106,13 +100,31 @@ class PuzzleLogic {
     BlockSetsCount: number;
     BlockSets: number[] = [];
 
-    constructor(log) {
+    public Seed: number;
+    constructor(log, seed) {
         this.Log = log;
-        this.Reset();
+        this.Seed = seed;
+        this.Random = seedRandom.seedrandom(this.Seed, { state: true });
+        this.Reset(this.Seed);
+
+        if (this.Log) {
+            let logItem = new LogItem();
+            logItem.Id = this.LogItems.length;
+            logItem.Action = "Seed";
+            logItem.ValueOne = this.Seed;
+            this.LogItems.push(logItem);
+        }
     }
 
     //|Public|
-    public Reset(): void {
+    public Reset(seed: number = null): void {
+        if (seed != null) {
+            this.Seed = seed;
+        }
+        else {
+            this.Seed = this.Random();
+        }
+        this.Random = seedRandom.seedrandom(this.Seed, { state: true });
         this.LogItems = [];
         this.SoundRequests = [];
         this.Active.Puzzle = true;
@@ -154,14 +166,7 @@ class PuzzleLogic {
     public Tick(): void {
         if (this.Active.Puzzle) {
             if (this.Log) {
-                if (this.LogItems.length === 0) {
-                    let logItem = new LogItem();
-                    logItem.Id = this.LogItems.length;
-                    logItem.Action = "Tick";
-                    logItem.ValueOne = 1;
-                    this.LogItems.push(logItem);
-                }
-                else if(this.LogItems[this.LogItems.length - 1].Action !== "Tick") {
+               if(this.LogItems[this.LogItems.length - 1].Action !== "Tick") {
                     let logItem = new LogItem();
                     logItem.Id = this.LogItems.length;
                     logItem.Action = "Tick";
@@ -258,6 +263,7 @@ class PuzzleLogic {
             }
         }
     }
+
 
     //Private
 
@@ -649,7 +655,7 @@ class PuzzleLogic {
         for (var col: number = 0; col < 6; col++) {
             var blockColor: BlockColor;
             do {
-                blockColor = <BlockColor>(Math.floor(Math.random() * Math.floor(5)));
+                blockColor = <BlockColor>(Math.floor(this.Random() * Math.floor(5)));
             }
             while (!this.IsNewBlockVaild(row, col, blockColor));
             this.Blocks[row][col].Color = blockColor;
@@ -902,10 +908,21 @@ class PuzzleView {
     private score: PIXI.Text;
     private textures: PIXI.Texture[] = [];
     private container: PIXI.Container;
-    
-    constructor(container: PIXI.Container, textures: PIXI.Texture[]) {
+    private name: PIXI.Text;
+    constructor(name: string, container: PIXI.Container, textures: PIXI.Texture[]) {
         this.container = container;
         this.textures = textures;
+
+
+        let nameTextStyle = new PIXI.TextStyle({
+            fontSize: 24,
+            fontWeight: 'bold',
+            fill: "#fdfdfd"
+        });
+        this.name = new PIXI.Text(name, nameTextStyle);
+        this.name.x = 27;
+        this.name.y = 15;
+
         let levelTextStyle = new PIXI.TextStyle({
             fontSize: 24,
             fontWeight: 'bold',
@@ -964,7 +981,7 @@ class PuzzleView {
         this.container.addChild(this.layoutSprite);
         this.container.addChild(this.blocksContainer);
         this.container.addChild(this.level);
-        this.container.addChild(this.score);
+        this.container.addChild(this.name); //score Should be here
     }
     
     public Update(puzzleLogic: PuzzleLogic) {
@@ -1080,7 +1097,7 @@ class PuzzleLogPlayer {
 
     }
     public ClearLogItems() {
-
+        this.Log = [];
     }
 
 }

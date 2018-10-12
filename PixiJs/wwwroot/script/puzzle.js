@@ -1,18 +1,14 @@
 import { SetType, BlockState, BlockColor, InputOptions, SoundRequest, Block, HoverBlock, FallBlock, Tick, Active, Selector, BlockSet, Constants, LogItem } from './dataTypes.js';
+import { seedRandom } from "./lib/seedrandom.js";
 class Puzzle {
-    constructor(View, soundService, textures, mute, log, randomSeed) {
+    constructor(View, soundService, textures, mute, log, seed, name) {
         this.debug = true;
         this.random = null;
-        // this.randomSeed;
-        // this.random = seedrandom(randomSeed);
-        this.logic = new PuzzleLogic(log);
+        this.logic = new PuzzleLogic(log, seed);
         this.soundService = soundService;
         this.mute = mute;
         this.View = View;
-        this.view = new PuzzleView(this.View, textures);
-        // let x = this.random.int32();
-        // x = this.random.int32();
-        // x= this.random.int32();
+        this.view = new PuzzleView(name, this.View, textures);
     }
     Tick() {
         this.logic.Tick();
@@ -58,7 +54,8 @@ class Puzzle {
     }
 }
 class PuzzleLogic {
-    constructor(log) {
+    constructor(log, seed) {
+        this.Paused = false;
         this.Log = false;
         this.LogItems = [];
         this.Blocks = [];
@@ -84,10 +81,26 @@ class PuzzleLogic {
         this.Set = [];
         this.BlockSets = [];
         this.Log = log;
-        this.Reset();
+        this.Seed = seed;
+        this.Random = seedRandom.seedrandom(this.Seed, { state: true });
+        this.Reset(this.Seed);
+        if (this.Log) {
+            let logItem = new LogItem();
+            logItem.Id = this.LogItems.length;
+            logItem.Action = "Seed";
+            logItem.ValueOne = this.Seed;
+            this.LogItems.push(logItem);
+        }
     }
     //|Public|
-    Reset() {
+    Reset(seed = null) {
+        if (seed != null) {
+            this.Seed = seed;
+        }
+        else {
+            this.Seed = this.Random();
+        }
+        this.Random = seedRandom.seedrandom(this.Seed, { state: true });
         this.LogItems = [];
         this.SoundRequests = [];
         this.Active.Puzzle = true;
@@ -129,14 +142,7 @@ class PuzzleLogic {
     Tick() {
         if (this.Active.Puzzle) {
             if (this.Log) {
-                if (this.LogItems.length === 0) {
-                    let logItem = new LogItem();
-                    logItem.Id = this.LogItems.length;
-                    logItem.Action = "Tick";
-                    logItem.ValueOne = 1;
-                    this.LogItems.push(logItem);
-                }
-                else if (this.LogItems[this.LogItems.length - 1].Action !== "Tick") {
+                if (this.LogItems[this.LogItems.length - 1].Action !== "Tick") {
                     let logItem = new LogItem();
                     logItem.Id = this.LogItems.length;
                     logItem.Action = "Tick";
@@ -614,7 +620,7 @@ class PuzzleLogic {
         for (var col = 0; col < 6; col++) {
             var blockColor;
             do {
-                blockColor = (Math.floor(Math.random() * Math.floor(5)));
+                blockColor = (Math.floor(this.Random() * Math.floor(5)));
             } while (!this.IsNewBlockVaild(row, col, blockColor));
             this.Blocks[row][col].Color = blockColor;
             this.Blocks[row][col].State = BlockState.Exist;
@@ -850,11 +856,19 @@ class PuzzleLogic {
     }
 }
 class PuzzleView {
-    constructor(container, textures) {
+    constructor(name, container, textures) {
         this.blocksSprite = [];
         this.textures = [];
         this.container = container;
         this.textures = textures;
+        let nameTextStyle = new PIXI.TextStyle({
+            fontSize: 24,
+            fontWeight: 'bold',
+            fill: "#fdfdfd"
+        });
+        this.name = new PIXI.Text(name, nameTextStyle);
+        this.name.x = 27;
+        this.name.y = 15;
         let levelTextStyle = new PIXI.TextStyle({
             fontSize: 24,
             fontWeight: 'bold',
@@ -905,7 +919,7 @@ class PuzzleView {
         this.container.addChild(this.layoutSprite);
         this.container.addChild(this.blocksContainer);
         this.container.addChild(this.level);
-        this.container.addChild(this.score);
+        this.container.addChild(this.name); //score Should be here
     }
     Update(puzzleLogic) {
         this.UpdateSelector(puzzleLogic.Selector);
@@ -1009,6 +1023,7 @@ class PuzzleLogPlayer {
     Resume() {
     }
     ClearLogItems() {
+        this.Log = [];
     }
 }
 export { Puzzle };

@@ -19,6 +19,7 @@
     <None Remove="wwwroot\js\**" />
   </ItemGroup>
   <ItemGroup>
+    <Content Remove="wwwroot\script\lib\seedrandomC.ts" />
     <Content Remove="wwwroot\script\pixi.js.d.ts" />
     <Content Remove="wwwroot\script\services.ts" />
   </ItemGroup>

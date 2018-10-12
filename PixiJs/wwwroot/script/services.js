@@ -2,9 +2,9 @@ import { InputSet, InputOptions } from './dataTypes.js';
 class ViewService {
     constructor(element, resolve, reject) {
         this.textures = [];
-        this.app = new PIXI.Application(306, 659, { backgroundColor: 0x1099bb });
+        //    this.app = new PIXI.Application(306, 659, { backgroundColor: 0x1099bb });
         //this.app = new PIXI.Application(306 * 3, 659, { backgroundColor: 0x1099bb });
-        //this.app = new PIXI.Application(2000, 1300, { backgroundColor: 0x1099bb });
+        this.app = new PIXI.Application(2000, 1300, { backgroundColor: 0x1099bb });
         // element.appendChild(this.app.view);
         element.insertBefore(this.app.view, element.firstChild);
         PIXI.loader
