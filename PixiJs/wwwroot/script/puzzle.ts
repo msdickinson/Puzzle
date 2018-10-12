@@ -10,12 +10,14 @@ class Puzzle {
     private view: PuzzleView;
     private soundService: SoundService;
     private viewService: ViewService;
+    private PuzzleLoader: PuzzleLoader;
     private mute: boolean;
     public View: PIXI.Container;
     private debug: boolean = true;
     private random = null
     constructor(View: PIXI.Container, soundService: SoundService, textures: PIXI.Texture[], mute: boolean, log: boolean, seed: number, name: string) {
         this.logic = new PuzzleLogic(log, seed);
+        this.PuzzleLoader = new PuzzleLoader(this);
         this.soundService = soundService;
         this.mute = mute;
         this.View = View;
@@ -106,14 +108,8 @@ class PuzzleLogic {
         this.Seed = seed;
         this.Random = seedRandom.seedrandom(this.Seed, { state: true });
         this.Reset(this.Seed);
-
-        if (this.Log) {
-            let logItem = new LogItem();
-            logItem.Id = this.LogItems.length;
-            logItem.Action = "Seed";
-            logItem.ValueOne = this.Seed;
-            this.LogItems.push(logItem);
-        }
+        
+      
     }
 
     //|Public|
@@ -126,6 +122,15 @@ class PuzzleLogic {
         }
         this.Random = seedRandom.seedrandom(this.Seed, { state: true });
         this.LogItems = [];
+        if (this.Log) {
+            let logItem = new LogItem();
+            logItem.Id = this.LogItems.length;
+            logItem.Action = "Seed";
+            logItem.ValueOne = this.Seed;
+            this.LogItems.push(logItem);
+        }
+
+
         this.SoundRequests = [];
         this.Active.Puzzle = true;
         this.Active.Hover = false;
@@ -136,6 +141,8 @@ class PuzzleLogic {
         this.WaitForSwap = false;
         this.Ticks.MoveBlocksUp = 0;
         this.Ticks.Swap = 0;
+        this.BlockInc = 0;
+        this.Blocks = [];
         for (var row: number = 0; row < Constants.MAX_ROWS; row++) {
             this.Blocks[row] = [];
             this.HoverBlocks[row] = [];
@@ -169,7 +176,7 @@ class PuzzleLogic {
                if(this.LogItems[this.LogItems.length - 1].Action !== "Tick") {
                     let logItem = new LogItem();
                     logItem.Id = this.LogItems.length;
-                    logItem.Action = "Tick";
+                    logItem.Action = "Tick"; 
                     logItem.ValueOne = 1;
                     this.LogItems.push(logItem);
                 }
@@ -207,7 +214,7 @@ class PuzzleLogic {
                 logItem.Id = this.LogItems.length;
                 logItem.Action = "RequestMoveSelector";
                 logItem.ValueOne = row;
-                logItem.ValueOne = col;
+                logItem.ValueTwo = col;
                 this.LogItems.push(logItem);
             }
             this.Selector.Row = row;
@@ -323,7 +330,7 @@ class PuzzleLogic {
     private MoveBlocksUpTick(): void {
         this.Ticks.MoveBlocksUp++;
         if (!this.BlocksMoveFast) {
-            this.BlockInc += 50 / (300 - ((this.Level - 1) * 10));
+            this.BlockInc += 50 / (450 - ((this.Level - 1) * 15));
         }
         else {
             if (this.Ticks.MoveBlocksUp % 1 == 0 && this.BlockInc >= 50) {
@@ -642,6 +649,8 @@ class PuzzleLogic {
         this.MoveBlocksUpOneRow();
         this.AddBlockRow(0);
         this.Selector.Row = this.Selector.Row + 1;
+        this.SwitchLeftBlockRow++;
+        this.SwitchRightBlockRow++;
     }
     private MoveBlocksUpOneRow(): void {
         for (var row: number = Constants.MAX_ROWS - 1; row >= 1; row--) {
@@ -909,19 +918,20 @@ class PuzzleView {
     private textures: PIXI.Texture[] = [];
     private container: PIXI.Container;
     private name: PIXI.Text;
+
     constructor(name: string, container: PIXI.Container, textures: PIXI.Texture[]) {
         this.container = container;
         this.textures = textures;
 
 
-        let nameTextStyle = new PIXI.TextStyle({
-            fontSize: 24,
-            fontWeight: 'bold',
-            fill: "#fdfdfd"
-        });
-        this.name = new PIXI.Text(name, nameTextStyle);
-        this.name.x = 27;
-        this.name.y = 15;
+        ////let nameTextStyle = new PIXI.TextStyle({
+        ////    fontSize: 24,
+        ////    fontWeight: 'bold',
+        ////    fill: "#fdfdfd"
+        ////});
+        ////this.name = new PIXI.Text(name, nameTextStyle);
+        ////this.name.x = 27;
+        ////this.name.y = 15;
 
         let levelTextStyle = new PIXI.TextStyle({
             fontSize: 24,
@@ -968,9 +978,10 @@ class PuzzleView {
             this.blocksSprite[row] = [];
             for (let col = 0; col < Constants.MAX_COLS; col++) {
                 this.blocksSprite[row][col] = new PIXI.Sprite(this.textures["BlockBrown.png"]);
-                this.blocksSprite[row][col].x = (col) * 50 + 3;
-                this.blocksSprite[row][col].y = ((Constants.MAX_ROWS - 1) - row) * 50 + 106;
+                this.blocksSprite[row][col].x = (col) * 50 + 3 + 25;
+                this.blocksSprite[row][col].y = ((Constants.MAX_ROWS - 1) - row) * 50 + 106 + 25;
                 this.blocksSprite[row][col].visible = false;
+                this.blocksSprite[row][col].pivot.set(25, 25);
                 this.blocksContainer.addChild(this.blocksSprite[row][col]);
             }
         }
@@ -981,12 +992,12 @@ class PuzzleView {
         this.container.addChild(this.layoutSprite);
         this.container.addChild(this.blocksContainer);
         this.container.addChild(this.level);
-        this.container.addChild(this.name); //score Should be here
+        this.container.addChild(this.score); //score Should be here
     }
     
     public Update(puzzleLogic: PuzzleLogic) {
         this.UpdateSelector(puzzleLogic.Selector);
-        this.UpdateBlockStates(puzzleLogic.Blocks);
+        this.UpdateBlockStates(puzzleLogic.Blocks, puzzleLogic.Ticks.Swap, puzzleLogic.SwitchLeftBlockCol, puzzleLogic.FallBlocks);
         this.UpdateBlockContainerState(puzzleLogic.BlockInc);
         this.UpdateLevel(puzzleLogic.Level);
         this.UpdateScore(puzzleLogic.Score);
@@ -994,9 +1005,15 @@ class PuzzleView {
     private UpdateBlockContainerState(y: number) {
         this.blocksContainer.y = -y;
     }
-    private UpdateBlockStates(Blocks: Block[][]) {
+    private UpdateBlockStates(Blocks: Block[][], swapTick: number, leftSwapCol: number, fallBlocks: FallBlock[][]) {
         for (let row = 0; row < Constants.MAX_ROWS; row++) {
             for (let col = 0; col < Constants.MAX_COLS; col++) {
+                this.blocksSprite[row][col].x = (col) * 50 + 3 + 25;
+                this.blocksSprite[row][col].y = ((Constants.MAX_ROWS - 1) - row) * 50 + 106 + 25;
+                this.blocksSprite[row][col].rotation = 0;
+                this.blocksSprite[row][col].scale.x = 1;
+                this.blocksSprite[row][col].scale.y = 1;
+                
                 if (Blocks[row][col].State == BlockState.None ||
                     Blocks[row][col].State == BlockState.SwitchNone ||
                     Blocks[row][col].State == BlockState.LockedForFall) {
@@ -1005,10 +1022,19 @@ class PuzzleView {
                 }
                 else {
                     this.blocksSprite[row][col].visible = true;
-
-
                 }
+                if (Blocks[row][col].State == BlockState.Switch) {
+                    this.blocksSprite[row][col].x += swapTick / Constants.TICKS_FOR_SWAP * 50 * (leftSwapCol === col ? 1 : -1);
+                }
+                if (Blocks[row][col].State == BlockState.Remove) {
+                    this.blocksSprite[row][col].scale.x = (Constants.TICKS_FOR_REMOVING_BLOCKS - Blocks[row][col].Tick) / Constants.TICKS_FOR_REMOVING_BLOCKS;
+                    this.blocksSprite[row][col].scale.y = (Constants.TICKS_FOR_REMOVING_BLOCKS - Blocks[row][col].Tick) / Constants.TICKS_FOR_REMOVING_BLOCKS;
+                    this.blocksSprite[row][col].rotation = Blocks[row][col].Tick / Constants.TICKS_FOR_REMOVING_BLOCKS * -6.28319;
+                }
+                if (Blocks[row][col].State == BlockState.Falling) {
 
+                    this.blocksSprite[row][col].y += (Blocks[row][col].Tick / Constants.TICKS_FOR_FALL) * (fallBlocks[row][col].Row - row) * -50;
+                }
                 //Set Texture
                 if (Blocks[row][col].Color == BlockColor.Green) {
                     this.blocksSprite[row][col].texture = this.textures["BlockGreen.png"];
@@ -1042,12 +1068,14 @@ class PuzzleView {
         this.score.text = String(score);
     }
 }
-class PuzzleLogPlayer {
+class PuzzleLoader {
     public CurrentTick: number = 0;
     public TotalTicks: number = 0;
     public LogId: number = -1;
     public TicksPerSecound = 60;
     public Log: LogItem[] = [];
+    private currentLogItem = 0;
+    private currentLogItemCount = 0;
     private puzzle: Puzzle;
 
     constructor(puzzle: Puzzle) {
@@ -1056,9 +1084,11 @@ class PuzzleLogPlayer {
     }
     public Reset() {
         this.CurrentTick = 0;
-        this.TotalTicks = 0;
+        //this.TotalTicks = 0;
         this.TicksPerSecound = 60;
-        this.LogId = 0;
+        this.currentLogItem = 0;
+        this.currentLogItemCount = 0;
+        this.LogId = -1;
         this.Log = [];
     }
     public MergeLogItems(logItems: LogItem[]) {
@@ -1079,16 +1109,91 @@ class PuzzleLogPlayer {
             this.LogId = this.Log[this.Log.length - 1].Id;
         }
 
+        //Determine Total Ticks;
     }
-    public Tick(ticks: number) {
-        for (var i = 0; i < ticks; i++) {
-            this.puzzle.logic.Tick();
+    //public Tick(ticks: number) {
+    //    for (var i = 0; i < ticks; i++) {
+    //        this.puzzle.logic.Tick();
+    //    }
+    //    this.puzzle.ViewUpdate();
+    //    this.puzzle.logic.SoundRequests.length = 0;
+    //}
+    public AdvanceTicks(tick: number, useLog: boolean = true) {
+        let log;
+        if (tick === 0) {
+            return;
         }
+        else if (useLog) {
+            log = this.Log;
+            if (tick < 0) {
+                if ((this.CurrentTick + tick) < 0) {
+                    tick = 0;
+                }
+                else {
+                    tick = this.CurrentTick + tick;
+                }
+                this.CurrentTick = 0;
+                this.currentLogItem = 0;
+                this.currentLogItemCount = 0;
+            }
+        }
+        else if (!useLog && this.puzzle.logic.Log && tick < 0) {
+            if ((this.puzzle.logic.Ticks.Puzzle + tick) < 0) {
+                tick = 0;
+            }
+            else {
+                tick = this.puzzle.logic.Ticks.Puzzle + tick;
+            }
+
+            log = JSON.parse(JSON.stringify(this.puzzle.logic.LogItems));
+
+            this.CurrentTick = 0;
+            this.currentLogItem = 0;
+            this.currentLogItemCount = 0;
+        }
+        else if (!useLog) {
+            for (let i = 0; i < tick; i++) {
+                this.puzzle.logic.Tick();
+            }
+            return;
+        }
+        else {
+            return;
+        }
+        let goalTick = this.CurrentTick + tick;
+        while (this.CurrentTick != goalTick && log.length != this.currentLogItem) {
+            let item = log[this.currentLogItem];
+
+            if (item.Action === "Tick") {
+                this.puzzle.logic.Tick();
+                this.CurrentTick++;
+                this.currentLogItemCount++;
+                if (item.ValueOne == this.currentLogItemCount) {
+                    this.currentLogItem++;
+                    this.currentLogItemCount = 0;
+                }
+            }
+            else if (item.Action === "RequestMoveSelector") {
+                this.puzzle.logic.RequestMoveSelector(item.ValueOne, item.ValueTwo);
+                this.currentLogItem++;
+            }
+            else if (item.Action === "RequestSwitch") {
+                this.puzzle.logic.RequestSwitch();
+                this.currentLogItem++;
+            }
+            else if (item.Action === "Seed") {
+                this.puzzle.logic.Reset(item.ValueOne);
+                this.currentLogItem++;
+            }
+
+        };
+
+        if (!useLog) {
+            this.CurrentTick = 0;
+        }
+
         this.puzzle.ViewUpdate();
         this.puzzle.logic.SoundRequests.length = 0;
-    }
-    public GoToTick(tick: number){
-
     }
     public Pause(){
 
@@ -1099,7 +1204,6 @@ class PuzzleLogPlayer {
     public ClearLogItems() {
         this.Log = [];
     }
-
 }
 
 export { Puzzle };

@@ -4,9 +4,9 @@ class ViewService {
     private app: PIXI.Application;
     public textures: PIXI.Texture[] = [];
     constructor(element: HTMLElement, resolve: Function, reject: Function) {
-           //    this.app = new PIXI.Application(306, 659, { backgroundColor: 0x1099bb });
+               this.app = new PIXI.Application(306, 659, { backgroundColor: 0x1099bb });
         //this.app = new PIXI.Application(306 * 3, 659, { backgroundColor: 0x1099bb });
-        this.app = new PIXI.Application(2000, 1300, { backgroundColor: 0x1099bb });
+        //this.app = new PIXI.Application(2000, 1300, { backgroundColor: 0x1099bb });
        // element.appendChild(this.app.view);        element.insertBefore(this.app.view, element.firstChild);
         PIXI.loader
             .add("/images/textures.json")
