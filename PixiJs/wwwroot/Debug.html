@@ -231,7 +231,23 @@
         document.getElementById("GameTicksToHoverSwap").innerHTML = Constants.TICKS_FOR_HOVER_SWAP;
 
         });
+        let gameState = null;
+        window.SaveState = function SaveState(){
+        gameState = App.players[0].puzzle.logic.SaveState();
 
+        }
+
+        window.LoadState = function LoadState(){
+        gameState = App.players[0].puzzle.logic.LoadState(gameState);
+        App.players[0].puzzle.ViewUpdate();
+        }
+
+        window.ApplyTicks = function ApplyTicks() {
+        document.getElementById("ApplyTicksButton").blur();
+        let ticks = Number.parseInt(document.getElementById("Ticks").value);
+        App.players[0].puzzle.PuzzleLoader.AdvanceTicks(ticks, false);
+        UpdateDebugText();
+        }
 
         window.ApplyTicksFromLog = function ApplyTicksFromLog(){
         document.getElementById("ApplyTicksLogButton").blur();

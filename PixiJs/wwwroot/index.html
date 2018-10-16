@@ -12,7 +12,7 @@
     <script src="script/lib/jszip.js"></script>
     <script src="script/lib/seedrandom.js"></script>
 </head>
-<body>
+<body >
     <div id="Loading" class="loading">
         <center>
             <div class="loader"></div>
@@ -237,6 +237,14 @@
 
         });
 
+
+
+        window.ApplyTicksFromLog = function ApplyTicksFromLog(){
+        document.getElementById("ApplyTicksLogButton").blur();
+        let ticks = Number.parseInt(document.getElementById("Ticks").value);
+        App.players[0].puzzle.PuzzleLoader.AdvanceTicks(ticks);
+        UpdateDebugText();
+        }
 
         window.ApplyTicksFromLog = function ApplyTicksFromLog(){
         document.getElementById("ApplyTicksLogButton").blur();

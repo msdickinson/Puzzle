@@ -104,6 +104,9 @@ let seedRandom = {
             // See http://google.com/search?q=rsa+fluhrer+response&btnI
         })(seedRandom.width);
     },
+    getState: function() {
+        return seedRandom.state();
+    },
     copy: function (f, t) {
         t.i = f.i;
         t.j = f.j;

@@ -24,9 +24,6 @@
     <Content Remove="wwwroot\script\services.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="lib.d.ts" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="wwwroot\script\lib\jszip.js" />
     <None Include="wwwroot\script\lib\jszip.min.js" />
   </ItemGroup>

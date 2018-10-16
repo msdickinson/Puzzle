@@ -5,6 +5,7 @@ import {
     Block, HoverBlock, FallBlock, RemovalInstance, Effect, Tick, Active, Selector, BlockSet, Constants, LogItem
 } from './dataTypes.js'
 import { seedRandom } from "./lib/seedrandom.js";
+import { prng } from './lib/index.js';
 class Puzzle {
     public logic: PuzzleLogic;
     private view: PuzzleView;
@@ -74,7 +75,7 @@ class PuzzleLogic {
     public LogItems: LogItem[] = [];
     public SoundRequests: SoundRequest[];
     public Blocks: Block[][] = [];
-    public Random: Function;
+    public Random: prng;
     HoverBlocks: HoverBlock[][] = [];
     FallBlocks: FallBlock[][] = [];
     BlocksMoveFast: boolean = false;
@@ -270,8 +271,67 @@ class PuzzleLogic {
             }
         }
     }
-
-
+    public SaveState(): object {
+        return JSON.parse(JSON.stringify(
+            {
+            Paused: this.Paused,
+            Log: this.Log,
+            LogItems: this.LogItems,
+            SoundRequests: this.SoundRequests,
+            Blocks: this.Blocks,
+            Random: this.Random.state(),
+            HoverBlocks: this.HoverBlocks,
+            FallBlocks: this.FallBlocks,
+            BlocksMoveFast: this.BlocksMoveFast,
+            SwitchLeftBlockRow: this.SwitchLeftBlockRow,
+            SwitchLeftBlockCol: this.SwitchLeftBlockCol,
+            SwitchRightBlockRow: this.SwitchRightBlockRow,
+            SwitchRightBlockCol: this.SwitchRightBlockCol,
+            SwapOverRide: this.SwapOverRide,
+            WaitForSwap: this.WaitForSwap,
+            BlockInc: this.BlockInc,
+            Score: this.Score,
+            Level: this.Level,
+            Chain: this.Chain,
+            groupId: this.groupId,
+            Selector: this.Selector,
+            Active: this.Active,
+            Ticks: this.Ticks,
+            SetCount: this.SetCount,
+            Set: this.Set,
+            BlockSetsCount: this.BlockSetsCount,
+            BlockSets: this.BlockSets
+        }));
+    }
+    public LoadState(state): void {
+        this.Paused = state.Paused;
+        this.Log = state.Log;
+        this.LogItems = state.LogItems;
+        this.SoundRequests = state.SoundRequests;
+        this.Blocks = state.Blocks;
+        this.Random = seedRandom.seedrandom("", { state: state.Random });
+        this.HoverBlocks = state.HoverBlocks;
+        this.FallBlocks = state.FallBlocks;
+        this.BlocksMoveFast = state.BlocksMoveFast;
+        this.SwitchLeftBlockRow = state.SwitchLeftBlockRow;
+        this.SwitchLeftBlockCol = state.SwitchLeftBlockCol;
+        this.SwitchRightBlockRow = state.SwitchRightBlockRow;
+        this.SwitchRightBlockCol = state.SwitchRightBlockCol;
+        this.SwapOverRide = state.SwapOverRide;
+        this.WaitForSwap = state.WaitForSwap;
+        this.BlockInc = state.BlockInc;
+        this.Score = state.Score;
+        this.Level = state.Level;
+        this.Chain = state.Chain;
+        this.groupId = state.groupId;
+        this.Selector = state.Selector;
+        this.Active = state.Active;
+        this.Ticks = state.Ticks;
+        this.SetCount = state.SetCount;
+        this.Set = state.Set;
+        this.BlockSetsCount = state.BlockSetsCount;
+        this.BlockSets = state.BlockSets;
+    }
     //Private
 
     //Ticks
@@ -983,6 +1043,7 @@ class PuzzleView {
                 this.blocksSprite[row][col].visible = false;
                 this.blocksSprite[row][col].pivot.set(25, 25);
                 this.blocksContainer.addChild(this.blocksSprite[row][col]);
+
             }
         }
         this.blocksContainer.addChild(this.selectorSprite);

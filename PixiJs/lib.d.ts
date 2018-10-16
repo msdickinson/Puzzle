@@ -1,3 +1,0 @@
-interface Math {
-    seedrandom(string);
-}
