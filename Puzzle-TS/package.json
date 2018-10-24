@@ -8,5 +8,9 @@
   },
   "devDependencies": {
     "@types/node": "^8.0.14"
+  },
+  "dependencies": {
+    "@types/seedrandom": "^2.4.27",
+    "seedrandom": "^2.4.4"
   }
 }

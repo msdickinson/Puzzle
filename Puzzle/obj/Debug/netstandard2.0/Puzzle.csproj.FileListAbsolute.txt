@@ -15,12 +15,3 @@ C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\Puzzle\obj\Debug\netstandard2.0\P
 C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\Puzzle\obj\Debug\netstandard2.0\Puzzle.AssemblyInfo.cs
 C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\Puzzle\obj\Debug\netstandard2.0\Puzzle.dll
 C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\Puzzle\obj\Debug\netstandard2.0\Puzzle.pdb
-C:\Users\marks\Source\Repos\Puzzle\Puzzle\bin\Debug\netstandard2.0\Puzzle.deps.json
-C:\Users\marks\Source\Repos\Puzzle\Puzzle\bin\Debug\netstandard2.0\Puzzle.dll
-C:\Users\marks\Source\Repos\Puzzle\Puzzle\bin\Debug\netstandard2.0\Puzzle.pdb
-C:\Users\marks\Source\Repos\Puzzle\Puzzle\obj\Debug\netstandard2.0\Puzzle.csprojAssemblyReference.cache
-C:\Users\marks\Source\Repos\Puzzle\Puzzle\obj\Debug\netstandard2.0\Puzzle.csproj.CoreCompileInputs.cache
-C:\Users\marks\Source\Repos\Puzzle\Puzzle\obj\Debug\netstandard2.0\Puzzle.AssemblyInfoInputs.cache
-C:\Users\marks\Source\Repos\Puzzle\Puzzle\obj\Debug\netstandard2.0\Puzzle.AssemblyInfo.cs
-C:\Users\marks\Source\Repos\Puzzle\Puzzle\obj\Debug\netstandard2.0\Puzzle.dll
-C:\Users\marks\Source\Repos\Puzzle\Puzzle\obj\Debug\netstandard2.0\Puzzle.pdb

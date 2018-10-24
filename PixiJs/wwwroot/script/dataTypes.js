@@ -143,5 +143,34 @@ Constants.TICKS_FOR_REMOVING_BLOCKS = 30;
 Constants.TICKS_FOR_HOVER = 5;
 Constants.TICKS_FOR_HOVER_SWAP = 5;
 Constants.TICKS_FOR_FALL = 3;
-export { SetType, BlockState, KeyState, BlockColor, InputOptions, InputSet, SoundRequest, Block, LogItem, HoverBlock, FallBlock, RemovalInstance, Effect, Tick, Active, Selector, BlockSet, Constants };
+class PuzzleLogicState {
+    constructor() {
+        this.Paused = false;
+        this.Log = false;
+        this.LogItems = [];
+        this.Blocks = [];
+        this.HoverBlocks = [];
+        this.FallBlocks = [];
+        this.BlocksMoveFast = false;
+        //Switch
+        this.SwitchLeftBlockRow = 0;
+        this.SwitchLeftBlockCol = 0;
+        this.SwitchRightBlockRow = 0;
+        this.SwitchRightBlockCol = 0;
+        this.SwapOverRide = false;
+        this.WaitForSwap = false;
+        this.BlockInc = 0;
+        this.Score = 0;
+        this.Level = 1;
+        this.Chain = 0;
+        this.groupId = 1;
+        this.Selector = new Selector();
+        this.Active = new Active();
+        this.Ticks = new Tick();
+        this.SetCount = 0;
+        this.Set = [];
+        this.BlockSets = [];
+    }
+}
+export { SetType, BlockState, KeyState, BlockColor, InputOptions, InputSet, SoundRequest, Block, LogItem, HoverBlock, FallBlock, RemovalInstance, Effect, Tick, Active, Selector, BlockSet, Constants, PuzzleLogicState };
 //# sourceMappingURL=dataTypes.js.map

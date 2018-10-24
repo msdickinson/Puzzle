@@ -238,7 +238,6 @@
         });
 
 
-
         window.ApplyTicksFromLog = function ApplyTicksFromLog(){
         document.getElementById("ApplyTicksLogButton").blur();
         let ticks = Number.parseInt(document.getElementById("Ticks").value);
@@ -267,9 +266,9 @@
 
         function UpdateDebugText() {
         let logic = App.players[0].puzzle.logic;
-        updateGame(logic.Active, logic.Ticks);
-        updateRightBlock(logic.Blocks[logic.Selector.Row][logic.Selector.Col + 1]);
-        updateLeftBlock(logic.Blocks[logic.Selector.Row][logic.Selector.Col]);
+        updateGame(logic.State.Active, logic.State.Ticks);
+        updateRightBlock(logic.State.Blocks[logic.State.Selector.Row][logic.State.Selector.Col + 1]);
+        updateLeftBlock(logic.State.Blocks[logic.State.Selector.Row][logic.State.Selector.Col]);
         App.gameLoopService.updateView();
         }
         function updateGame(active, ticks){
@@ -312,7 +311,7 @@
         var zip = new JSZip();
 
         for(let i = 0; i < App.players.length; i++){
-        zip.file(App.players[i].playerName + ".json", JSON.stringify(App.players[i].puzzle.logic.LogItems));
+        zip.file(App.players[i].playerName + ".json", JSON.stringify(App.players[i].puzzle.logic.State.LogItems));
 
         }
         zip.generateAsync({type:"blob"}).then(function(content) {

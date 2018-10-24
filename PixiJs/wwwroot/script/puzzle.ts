@@ -2,7 +2,8 @@
 
 import {
     SetType, InputSet, BlockState, KeyState, BlockColor, InputOptions, SoundRequest,
-    Block, HoverBlock, FallBlock, RemovalInstance, Effect, Tick, Active, Selector, BlockSet, Constants, LogItem
+    Block, HoverBlock, FallBlock, RemovalInstance, Effect, Tick, Active, Selector, BlockSet, Constants, LogItem,
+    PuzzleLogicState
 } from './dataTypes.js'
 import { seedRandom } from "./lib/seedrandom.js";
 import { prng } from './lib/index.js';
@@ -17,7 +18,8 @@ class Puzzle {
     private debug: boolean = true;
     private random = null
     constructor(View: PIXI.Container, soundService: SoundService, textures: PIXI.Texture[], mute: boolean, log: boolean, seed: number, name: string) {
-        this.logic = new PuzzleLogic(log, seed);
+        this.logic = new PuzzleLogic();
+        this.logic.Reset(log, seed);
         this.PuzzleLoader = new PuzzleLoader(this);
         this.soundService = soundService;
         this.mute = mute;
@@ -33,32 +35,32 @@ class Puzzle {
     }
     public SoundUpdate() {
         if (!this.mute) {
-            for (var i = 0; i < this.logic.SoundRequests.length; i++) {
-                if (this.logic.SoundRequests[i] === SoundRequest.Swap) {
+            for (var i = 0; i < this.logic.State.SoundRequests.length; i++) {
+                if (this.logic.State.SoundRequests[i] === SoundRequest.Swap) {
                     this.soundService.swap.play();
                 }
-                if (this.logic.SoundRequests[i] === SoundRequest.Fall) {
+                if (this.logic.State.SoundRequests[i] === SoundRequest.Fall) {
                     this.soundService.swap.play();
                 }
-                if (this.logic.SoundRequests[i] === SoundRequest.Remove) {
+                if (this.logic.State.SoundRequests[i] === SoundRequest.Remove) {
                     this.soundService.swap.play();
                 }
             }
         }
-        this.logic.SoundRequests.length = 0;
+        this.logic.State.SoundRequests.length = 0;
     }
     public InputAction(input: InputOptions) {
         if (input === InputOptions.Up) {
-            this.logic.RequestMoveSelector(this.logic.Selector.Row + 1, this.logic.Selector.Col);
+            this.logic.RequestMoveSelector(this.logic.State.Selector.Row + 1, this.logic.State.Selector.Col);
         }
         else if (input === InputOptions.Left) {
-            this.logic.RequestMoveSelector(this.logic.Selector.Row, this.logic.Selector.Col - 1);
+            this.logic.RequestMoveSelector(this.logic.State.Selector.Row, this.logic.State.Selector.Col - 1);
         }
         else if (input === InputOptions.Down) {
-            this.logic.RequestMoveSelector(this.logic.Selector.Row - 1, this.logic.Selector.Col);
+            this.logic.RequestMoveSelector(this.logic.State.Selector.Row - 1, this.logic.State.Selector.Col);
         }
         else if (input === InputOptions.Right) {
-            this.logic.RequestMoveSelector(this.logic.Selector.Row, this.logic.Selector.Col + 1);
+            this.logic.RequestMoveSelector(this.logic.State.Selector.Row, this.logic.State.Selector.Col + 1);
         }
         else if (input === InputOptions.A) {
             this.logic.RequestSwitch();
@@ -69,85 +71,53 @@ class Puzzle {
     }
 }
 
+
 class PuzzleLogic {
-    public Paused: Boolean = false;
-    public Log: Boolean = false;
-    public LogItems: LogItem[] = [];
-    public SoundRequests: SoundRequest[];
-    public Blocks: Block[][] = [];
-    public Random: prng;
-    HoverBlocks: HoverBlock[][] = [];
-    FallBlocks: FallBlock[][] = [];
-    BlocksMoveFast: boolean = false;
-
-    //Switch
-    SwitchLeftBlockRow: number = 0;
-    SwitchLeftBlockCol: number = 0;
-    SwitchRightBlockRow: number = 0;
-    SwitchRightBlockCol: number = 0;
-    SwapOverRide: boolean = false;
-    WaitForSwap: boolean = false;
-
-    BlockInc: number = 0;
-    public Score: number = 0;
-    Level: number = 1;
-    Chain: number = 0;
-    groupId: number = 1;
-
-    public Selector: Selector = new Selector();
-    public Active: Active = new Active();
-    public Ticks: Tick = new Tick();
-    SetCount: number = 0;
-    Set: BlockSet[] = [];
-
-    BlockSetsCount: number;
-    BlockSets: number[] = [];
-
-    public Seed: number;
-    constructor(log, seed) {
-        this.Log = log;
-        this.Seed = seed;
-        this.Random = seedRandom.seedrandom(this.Seed, { state: true });
-        this.Reset(this.Seed);
+    public State: PuzzleLogicState;
+    constructor() {
         
-      
     }
 
     //|Public|
-    public Reset(seed: number = null): void {
+    public Reset(log = false, seed = null): void {
+        this.State = new PuzzleLogicState();
+        //Seed
         if (seed != null) {
-            this.Seed = seed;
+            this.State.Seed = seed;
         }
         else {
-            this.Seed = this.Random();
+            this.State.Seed = seedRandom.seedrandom(Math.random());
         }
-        this.Random = seedRandom.seedrandom(this.Seed, { state: true });
-        this.LogItems = [];
-        if (this.Log) {
+        this.State.Random = seedRandom.seedrandom(this.State.Seed, { state: true });
+
+        //Log
+        this.State.Log = log;
+        this.State.LogItems = [];
+        if (this.State.Log) {
             let logItem = new LogItem();
-            logItem.Id = this.LogItems.length;
+            logItem.Id = this.State.LogItems.length;
             logItem.Action = "Seed";
-            logItem.ValueOne = this.Seed;
-            this.LogItems.push(logItem);
+            logItem.ValueOne = this.State.Seed;
+            this.State.LogItems.push(logItem);
         }
 
 
-        this.SoundRequests = [];
-        this.Active.Puzzle = true;
-        this.Active.Hover = false;
-        this.Active.Swap = false;
-        this.Active.Falling = false;
-        this.SwapOverRide = false;
-        this.Ticks.Puzzle = 0;
-        this.WaitForSwap = false;
-        this.Ticks.MoveBlocksUp = 0;
-        this.Ticks.Swap = 0;
-        this.BlockInc = 0;
-        this.Blocks = [];
+        this.State.SoundRequests = [];
+        this.State.Active.Puzzle = true;
+        this.State.Active.Hover = false;
+        this.State.Active.Swap = false;
+        this.State.Active.Falling = false;
+        this.State.SwapOverRide = false;
+        this.State.Ticks.Puzzle = 0;
+        this.State.WaitForSwap = false;
+        this.State.Ticks.MoveBlocksUp = 0;
+        this.State.Ticks.Swap = 0;
+        this.State.BlockInc = 0;
+        this.State.Blocks = [];
         for (var row: number = 0; row < Constants.MAX_ROWS; row++) {
-            this.Blocks[row] = [];
-            this.HoverBlocks[row] = [];
-            this.FallBlocks[row] = [];
+            this.State.Blocks[row] = [];
+            this.State.HoverBlocks[row] = [];
+            this.State.FallBlocks[row] = [];
             for (var col: number = 0; col < Constants.MAX_COLS; col++) {
                 const block = new Block();
                 block.State = BlockState.None;
@@ -155,118 +125,118 @@ class PuzzleLogic {
                 block.FallGroupTicks = 0;
                 block.Tick = 0;
                 block.groupId = 0;
-                this.Blocks[row][col] = new Block();
-                this.HoverBlocks[row][col] = new HoverBlock();
-                this.FallBlocks[row][col] = new FallBlock();
+                this.State.Blocks[row][col] = new Block();
+                this.State.HoverBlocks[row][col] = new HoverBlock();
+                this.State.FallBlocks[row][col] = new FallBlock();
             }
         }
         for (var i: number = 0; i < Constants.MAX_ROWS * Constants.MAX_COLS; i++) {
-            this.BlockSets[i] = 0;
-            this.Set[i] = new BlockSet();
+            this.State.BlockSets[i] = 0;
+            this.State.Set[i] = new BlockSet();
         }
-        this.Score = 0;
-        this.Level = 1;
-        this.groupId = 1;
-        this.Selector.Row = 2;
-        this.Selector.Col = 2;
+        this.State.Score = 0;
+        this.State.Level = 1;
+        this.State.groupId = 1;
+        this.State.Selector.Row = 2;
+        this.State.Selector.Col = 2;
         this.CreateSetupBlocks();
     }
     public Tick(): void {
-        if (this.Active.Puzzle) {
-            if (this.Log) {
-               if(this.LogItems[this.LogItems.length - 1].Action !== "Tick") {
+        if (this.State.Active.Puzzle) {
+            if (this.State.Log) {
+               if(this.State.LogItems[this.State.LogItems.length - 1].Action !== "Tick") {
                     let logItem = new LogItem();
-                    logItem.Id = this.LogItems.length;
+                    logItem.Id = this.State.LogItems.length;
                     logItem.Action = "Tick"; 
                     logItem.ValueOne = 1;
-                    this.LogItems.push(logItem);
+                    this.State.LogItems.push(logItem);
                 }
                 else {
-                    this.LogItems[this.LogItems.length - 1].ValueOne++;
+                    this.State.LogItems[this.State.LogItems.length - 1].ValueOne++;
                 }
             }
 
 
-            this.Ticks.Puzzle++;
-            if (this.Active.Falling) {
+            this.State.Ticks.Puzzle++;
+            if (this.State.Active.Falling) {
                 this.FallTick();
             }
-            if (this.Active.Hover) {
+            if (this.State.Active.Hover) {
                 this.HoverTick();
             }
-            if (this.Active.BlocksRemoving) {
+            if (this.State.Active.BlocksRemoving) {
                 this.RemoveBlocksTick();
             }
-            if (this.Active.Swap) {
+            if (this.State.Active.Swap) {
                 this.SwapBlocksTick();
             }
-            if (!this.Active.BlocksRemoving && !this.Active.Hover) {
+            if (!this.State.Active.BlocksRemoving && !this.State.Active.Hover) {
                 this.MoveBlocksUpTick();
             }
-            if (this.Ticks.Puzzle % (60 * 20) == 0)
-                this.Level++;
+            if (this.State.Ticks.Puzzle % (60 * 20) == 0)
+                this.State.Level++;
             this.UpdateActive();
         }
     }
     public RequestMoveSelector(row: number, col: number): void  {
         if (col >= 0 && col < (Constants.MAX_COLS - 1) && row >= 1 && row < Constants.MAX_ROWS) {
-            if (this.Log) {
+            if (this.State.Log) {
                 let logItem = new LogItem();
-                logItem.Id = this.LogItems.length;
+                logItem.Id = this.State.LogItems.length;
                 logItem.Action = "RequestMoveSelector";
                 logItem.ValueOne = row;
                 logItem.ValueTwo = col;
-                this.LogItems.push(logItem);
+                this.State.LogItems.push(logItem);
             }
-            this.Selector.Row = row;
-            this.Selector.Col = col;
+            this.State.Selector.Row = row;
+            this.State.Selector.Col = col;
         }
     }
     public RequestSwitch(): void {
-        if (!this.Active.Swap) {
-            if ((this.Blocks[this.Selector.Row][this.Selector.Col].State == BlockState.None || this.Blocks[this.Selector.Row][this.Selector.Col].State == BlockState.Exist) && (this.Blocks[this.Selector.Row][this.Selector.Col + 1].State == BlockState.None || this.Blocks[this.Selector.Row][this.Selector.Col + 1].State == BlockState.Exist) && (this.Blocks[this.Selector.Row][this.Selector.Col].State != BlockState.None || this.Blocks[this.Selector.Row][this.Selector.Col + 1].State != BlockState.None)) {
-                if (this.Log) {
+        if (!this.State.Active.Swap) {
+            if ((this.State.Blocks[this.State.Selector.Row][this.State.Selector.Col].State == BlockState.None || this.State.Blocks[this.State.Selector.Row][this.State.Selector.Col].State == BlockState.Exist) && (this.State.Blocks[this.State.Selector.Row][this.State.Selector.Col + 1].State == BlockState.None || this.State.Blocks[this.State.Selector.Row][this.State.Selector.Col + 1].State == BlockState.Exist) && (this.State.Blocks[this.State.Selector.Row][this.State.Selector.Col].State != BlockState.None || this.State.Blocks[this.State.Selector.Row][this.State.Selector.Col + 1].State != BlockState.None)) {
+                if (this.State.Log) {
                     let logItem = new LogItem();
-                    logItem.Id = this.LogItems.length;
+                    logItem.Id = this.State.LogItems.length;
                     logItem.Action = "RequestSwitch";
-                    this.LogItems.push(logItem);
+                    this.State.LogItems.push(logItem);
                 }
-                this.SoundRequests.push(SoundRequest.Swap);
-                this.WaitForSwap = false;
-                this.Active.Swap = true;
-                this.SwitchLeftBlockRow = this.Selector.Row;
-                this.SwitchLeftBlockCol = this.Selector.Col;
-                this.SwitchRightBlockRow = this.Selector.Row;
-                this.SwitchRightBlockCol = this.Selector.Col + 1;
-                if (this.Blocks[this.SwitchLeftBlockRow][this.SwitchLeftBlockCol].State == BlockState.Exist) {
-                    this.Blocks[this.SwitchLeftBlockRow][this.SwitchLeftBlockCol].State = BlockState.Switch;
-                }
-                else {
-                    this.Blocks[this.SwitchLeftBlockRow][this.SwitchLeftBlockCol].State = BlockState.SwitchNone;
-                }
-                if (this.Blocks[this.SwitchRightBlockRow][this.SwitchRightBlockCol].State == BlockState.Exist) {
-                    this.Blocks[this.SwitchRightBlockRow][this.SwitchRightBlockCol].State = BlockState.Switch;
+                this.State.SoundRequests.push(SoundRequest.Swap);
+                this.State.WaitForSwap = false;
+                this.State.Active.Swap = true;
+                this.State.SwitchLeftBlockRow = this.State.Selector.Row;
+                this.State.SwitchLeftBlockCol = this.State.Selector.Col;
+                this.State.SwitchRightBlockRow = this.State.Selector.Row;
+                this.State.SwitchRightBlockCol = this.State.Selector.Col + 1;
+                if (this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State == BlockState.Exist) {
+                    this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State = BlockState.Switch;
                 }
                 else {
-                    this.Blocks[this.SwitchRightBlockRow][this.SwitchRightBlockCol].State = BlockState.SwitchNone;
+                    this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State = BlockState.SwitchNone;
+                }
+                if (this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].State == BlockState.Exist) {
+                    this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].State = BlockState.Switch;
+                }
+                else {
+                    this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].State = BlockState.SwitchNone;
                 }
             }
         }
     }
     public UpdateActive(): void {
-        this.Active.BlocksRemoving = false;
-        this.Active.Falling = false;
-        this.Active.Hover = false;
+        this.State.Active.BlocksRemoving = false;
+        this.State.Active.Falling = false;
+        this.State.Active.Hover = false;
         for (var row: number = 0; row < Constants.MAX_ROWS; row++) {
             for (var col: number = 0; col < Constants.MAX_COLS; col++) {
-                if (this.Blocks[row][col].State == BlockState.Falling || this.Blocks[row][col].State == BlockState.LockedForFall) {
-                    this.Active.Falling = true;
+                if (this.State.Blocks[row][col].State == BlockState.Falling || this.State.Blocks[row][col].State == BlockState.LockedForFall) {
+                    this.State.Active.Falling = true;
                 }
-                else if (this.Blocks[row][col].State == BlockState.Hover || this.Blocks[row][col].State == BlockState.HoverSwap) {
-                    this.Active.Hover = true;
+                else if (this.State.Blocks[row][col].State == BlockState.Hover || this.State.Blocks[row][col].State == BlockState.HoverSwap) {
+                    this.State.Active.Hover = true;
                 }
-                else if (this.Blocks[row][col].State == BlockState.Remove) {
-                    this.Active.BlocksRemoving = true;
+                else if (this.State.Blocks[row][col].State == BlockState.Remove) {
+                    this.State.Active.BlocksRemoving = true;
                 }
             }
         }
@@ -274,63 +244,63 @@ class PuzzleLogic {
     public SaveState(): object {
         return JSON.parse(JSON.stringify(
             {
-            Paused: this.Paused,
-            Log: this.Log,
-            LogItems: this.LogItems,
-            SoundRequests: this.SoundRequests,
-            Blocks: this.Blocks,
-            Random: this.Random.state(),
-            HoverBlocks: this.HoverBlocks,
-            FallBlocks: this.FallBlocks,
-            BlocksMoveFast: this.BlocksMoveFast,
-            SwitchLeftBlockRow: this.SwitchLeftBlockRow,
-            SwitchLeftBlockCol: this.SwitchLeftBlockCol,
-            SwitchRightBlockRow: this.SwitchRightBlockRow,
-            SwitchRightBlockCol: this.SwitchRightBlockCol,
-            SwapOverRide: this.SwapOverRide,
-            WaitForSwap: this.WaitForSwap,
-            BlockInc: this.BlockInc,
-            Score: this.Score,
-            Level: this.Level,
-            Chain: this.Chain,
-            groupId: this.groupId,
-            Selector: this.Selector,
-            Active: this.Active,
-            Ticks: this.Ticks,
-            SetCount: this.SetCount,
-            Set: this.Set,
-            BlockSetsCount: this.BlockSetsCount,
-            BlockSets: this.BlockSets
+            Paused: this.State.Paused,
+            Log: this.State.Log,
+            LogItems: this.State.LogItems,
+            SoundRequests: this.State.SoundRequests,
+            Blocks: this.State.Blocks,
+            Random: this.State.Random.state(),
+            HoverBlocks: this.State.HoverBlocks,
+            FallBlocks: this.State.FallBlocks,
+            BlocksMoveFast: this.State.BlocksMoveFast,
+            SwitchLeftBlockRow: this.State.SwitchLeftBlockRow,
+            SwitchLeftBlockCol: this.State.SwitchLeftBlockCol,
+            SwitchRightBlockRow: this.State.SwitchRightBlockRow,
+            SwitchRightBlockCol: this.State.SwitchRightBlockCol,
+            SwapOverRide: this.State.SwapOverRide,
+            WaitForSwap: this.State.WaitForSwap,
+            BlockInc: this.State.BlockInc,
+            Score: this.State.Score,
+            Level: this.State.Level,
+            Chain: this.State.Chain,
+            groupId: this.State.groupId,
+            Selector: this.State.Selector,
+            Active: this.State.Active,
+            Ticks: this.State.Ticks,
+            SetCount: this.State.SetCount,
+            Set: this.State.Set,
+            BlockSetsCount: this.State.BlockSetsCount,
+            BlockSets: this.State.BlockSets
         }));
     }
     public LoadState(state): void {
-        this.Paused = state.Paused;
-        this.Log = state.Log;
-        this.LogItems = state.LogItems;
-        this.SoundRequests = state.SoundRequests;
-        this.Blocks = state.Blocks;
-        this.Random = seedRandom.seedrandom("", { state: state.Random });
-        this.HoverBlocks = state.HoverBlocks;
-        this.FallBlocks = state.FallBlocks;
-        this.BlocksMoveFast = state.BlocksMoveFast;
-        this.SwitchLeftBlockRow = state.SwitchLeftBlockRow;
-        this.SwitchLeftBlockCol = state.SwitchLeftBlockCol;
-        this.SwitchRightBlockRow = state.SwitchRightBlockRow;
-        this.SwitchRightBlockCol = state.SwitchRightBlockCol;
-        this.SwapOverRide = state.SwapOverRide;
-        this.WaitForSwap = state.WaitForSwap;
-        this.BlockInc = state.BlockInc;
-        this.Score = state.Score;
-        this.Level = state.Level;
-        this.Chain = state.Chain;
-        this.groupId = state.groupId;
-        this.Selector = state.Selector;
-        this.Active = state.Active;
-        this.Ticks = state.Ticks;
-        this.SetCount = state.SetCount;
-        this.Set = state.Set;
-        this.BlockSetsCount = state.BlockSetsCount;
-        this.BlockSets = state.BlockSets;
+        this.State.Paused = state.Paused;
+        this.State.Log = state.Log;
+        this.State.LogItems = state.LogItems;
+        this.State.SoundRequests = state.SoundRequests;
+        this.State.Blocks = state.Blocks;
+        this.State.Random = seedRandom.seedrandom("", { state: state.Random });
+        this.State.HoverBlocks = state.HoverBlocks;
+        this.State.FallBlocks = state.FallBlocks;
+        this.State.BlocksMoveFast = state.BlocksMoveFast;
+        this.State.SwitchLeftBlockRow = state.SwitchLeftBlockRow;
+        this.State.SwitchLeftBlockCol = state.SwitchLeftBlockCol;
+        this.State.SwitchRightBlockRow = state.SwitchRightBlockRow;
+        this.State.SwitchRightBlockCol = state.SwitchRightBlockCol;
+        this.State.SwapOverRide = state.SwapOverRide;
+        this.State.WaitForSwap = state.WaitForSwap;
+        this.State.BlockInc = state.BlockInc;
+        this.State.Score = state.Score;
+        this.State.Level = state.Level;
+        this.State.Chain = state.Chain;
+        this.State.groupId = state.groupId;
+        this.State.Selector = state.Selector;
+        this.State.Active = state.Active;
+        this.State.Ticks = state.Ticks;
+        this.State.SetCount = state.SetCount;
+        this.State.Set = state.Set;
+        this.State.BlockSetsCount = state.BlockSetsCount;
+        this.State.BlockSets = state.BlockSets;
     }
     //Private
 
@@ -339,12 +309,12 @@ class PuzzleLogic {
         var falling: boolean = false;
         for (var row: number = 0; row < Constants.MAX_ROWS; row++) {
             for (var col: number = 0; col < Constants.MAX_COLS; col++) {
-                if ((this.Blocks[row][col].State == BlockState.Hover || this.Blocks[row][col].State == BlockState.HoverSwap)) {
-                    this.Blocks[row][col].Tick++;
-                    if ((this.Blocks[row][col].State == BlockState.Hover && this.Blocks[row][col].Tick == Constants.TICKS_FOR_HOVER) || (this.Blocks[row][col].State == BlockState.HoverSwap && this.Blocks[row][col].Tick == Constants.TICKS_FOR_HOVER_SWAP)) {
-                        this.Blocks[row][col].Tick = 0;
-                        this.Blocks[row][col].State = BlockState.Falling;
-                        this.Blocks[row][col].groupId = 0;
+                if ((this.State.Blocks[row][col].State == BlockState.Hover || this.State.Blocks[row][col].State == BlockState.HoverSwap)) {
+                    this.State.Blocks[row][col].Tick++;
+                    if ((this.State.Blocks[row][col].State == BlockState.Hover && this.State.Blocks[row][col].Tick == Constants.TICKS_FOR_HOVER) || (this.State.Blocks[row][col].State == BlockState.HoverSwap && this.State.Blocks[row][col].Tick == Constants.TICKS_FOR_HOVER_SWAP)) {
+                        this.State.Blocks[row][col].Tick = 0;
+                        this.State.Blocks[row][col].State = BlockState.Falling;
+                        this.State.Blocks[row][col].groupId = 0;
                         falling = true;
                     }
                 }
@@ -359,49 +329,49 @@ class PuzzleLogic {
         var largetChain: number = 0;
         for (var row: number = 0; row < Constants.MAX_ROWS; row++) {
             for (var col: number = 0; col < Constants.MAX_COLS; col++) {
-                this.SoundRequests.push(SoundRequest.Fall);
-                if (this.Blocks[row][col].State == BlockState.Falling || this.Blocks[row][col].State == BlockState.LockedForFall) {
-                    this.Blocks[row][col].Tick++;
-                    if (this.Blocks[row][col].Tick == this.Blocks[row][col].FallGroupTicks) {
+                this.State.SoundRequests.push(SoundRequest.Fall);
+                if (this.State.Blocks[row][col].State == BlockState.Falling || this.State.Blocks[row][col].State == BlockState.LockedForFall) {
+                    this.State.Blocks[row][col].Tick++;
+                    if (this.State.Blocks[row][col].Tick == this.State.Blocks[row][col].FallGroupTicks) {
                         blocksFall = true;
-                        this.Blocks[row][col].Tick = 0;
-                        this.Blocks[row][col].FallGroupTicks = 0;
-                        this.Blocks[row][col].groupId = 0;
-                        if (this.Blocks[row][col].State == BlockState.Falling) {
-                            this.Blocks[this.FallBlocks[row][col].Row][col].State = BlockState.Exist;
-                            this.Blocks[this.FallBlocks[row][col].Row][col].Color = this.Blocks[row][col].Color;
-                            this.Blocks[this.FallBlocks[row][col].Row][col].Tick = 0;
-                            this.Blocks[this.FallBlocks[row][col].Row][col].groupId = 0;
-                            if (this.Blocks[row][col].TotalChain > largetChain) {
-                                largetChain = this.Blocks[row][col].TotalChain;
+                        this.State.Blocks[row][col].Tick = 0;
+                        this.State.Blocks[row][col].FallGroupTicks = 0;
+                        this.State.Blocks[row][col].groupId = 0;
+                        if (this.State.Blocks[row][col].State == BlockState.Falling) {
+                            this.State.Blocks[this.State.FallBlocks[row][col].Row][col].State = BlockState.Exist;
+                            this.State.Blocks[this.State.FallBlocks[row][col].Row][col].Color = this.State.Blocks[row][col].Color;
+                            this.State.Blocks[this.State.FallBlocks[row][col].Row][col].Tick = 0;
+                            this.State.Blocks[this.State.FallBlocks[row][col].Row][col].groupId = 0;
+                            if (this.State.Blocks[row][col].TotalChain > largetChain) {
+                                largetChain = this.State.Blocks[row][col].TotalChain;
                             }
-                            this.Blocks[row][col].TotalChain = 0;
-                            this.Blocks[this.FallBlocks[row][col].Row][col].TotalChain = 0;
+                            this.State.Blocks[row][col].TotalChain = 0;
+                            this.State.Blocks[this.State.FallBlocks[row][col].Row][col].TotalChain = 0;
                         }
-                        this.Blocks[row][col].State = BlockState.None;
+                        this.State.Blocks[row][col].State = BlockState.None;
                     }
                 }
             }
         }
-        if (blocksFall && !this.WaitForSwap) {
+        if (blocksFall && !this.State.WaitForSwap) {
             this.CheckForSets(largetChain);
         }
     }
     private MoveBlocksUpTick(): void {
-        this.Ticks.MoveBlocksUp++;
-        if (!this.BlocksMoveFast) {
-            this.BlockInc += 50 / (450 - ((this.Level - 1) * 15));
+        this.State.Ticks.MoveBlocksUp++;
+        if (!this.State.BlocksMoveFast) {
+            this.State.BlockInc += 50 / (450 - ((this.State.Level - 1) * 15));
         }
         else {
-            if (this.Ticks.MoveBlocksUp % 1 == 0 && this.BlockInc >= 50) {
-                this.BlockInc += 2.5;
+            if (this.State.Ticks.MoveBlocksUp % 1 == 0 && this.State.BlockInc >= 50) {
+                this.State.BlockInc += 2.5;
             }
         }
-        if (this.BlockInc >= 50) {
+        if (this.State.BlockInc >= 50) {
             this.CheckForGameOver();
-            if (this.Active.Puzzle) {
-                this.BlockInc = 0;
-                this.Ticks.MoveBlocksUp = 0;
+            if (this.State.Active.Puzzle) {
+                this.State.BlockInc = 0;
+                this.State.Ticks.MoveBlocksUp = 0;
                 this.RowChange();
                 this.CheckForSets(0);
             }
@@ -409,36 +379,36 @@ class PuzzleLogic {
         }
     }
     private SwapBlocksTick(): void {
-        this.Ticks.Swap++;
-        if (this.Ticks.Swap == Constants.TICKS_FOR_SWAP) {
-            var newRightState: BlockState = this.Blocks[this.SwitchLeftBlockRow][this.SwitchLeftBlockCol].State;
-            var newRightColor: BlockColor = this.Blocks[this.SwitchLeftBlockRow][this.SwitchLeftBlockCol].Color;
-            this.Blocks[this.SwitchLeftBlockRow][this.SwitchLeftBlockCol].State = this.Blocks[this.SwitchRightBlockRow][this.SwitchRightBlockCol].State;
-            this.Blocks[this.SwitchLeftBlockRow][this.SwitchLeftBlockCol].Color = this.Blocks[this.SwitchRightBlockRow][this.SwitchRightBlockCol].Color;
-            this.Blocks[this.SwitchRightBlockRow][this.SwitchRightBlockCol].State = newRightState;
-            this.Blocks[this.SwitchRightBlockRow][this.SwitchRightBlockCol].Color = newRightColor;
-            if (this.Blocks[this.SwitchLeftBlockRow][this.SwitchLeftBlockCol].State == BlockState.Switch) {
-                this.Blocks[this.SwitchLeftBlockRow][this.SwitchLeftBlockCol].State = BlockState.Exist;
+        this.State.Ticks.Swap++;
+        if (this.State.Ticks.Swap == Constants.TICKS_FOR_SWAP) {
+            var newRightState: BlockState = this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State;
+            var newRightColor: BlockColor = this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].Color;
+            this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State = this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].State;
+            this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].Color = this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].Color;
+            this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].State = newRightState;
+            this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].Color = newRightColor;
+            if (this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State == BlockState.Switch) {
+                this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State = BlockState.Exist;
             }
             else {
-                this.Blocks[this.SwitchLeftBlockRow][this.SwitchLeftBlockCol].State = BlockState.None;
+                this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State = BlockState.None;
             }
-            if (this.Blocks[this.SwitchRightBlockRow][this.SwitchRightBlockCol].State == BlockState.Switch) {
-                this.Blocks[this.SwitchRightBlockRow][this.SwitchRightBlockCol].State = BlockState.Exist;
+            if (this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].State == BlockState.Switch) {
+                this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].State = BlockState.Exist;
             }
             else {
-                this.Blocks[this.SwitchRightBlockRow][this.SwitchRightBlockCol].State = BlockState.None;
+                this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].State = BlockState.None;
             }
-            this.Ticks.Swap = 0;
-            this.Active.Swap = false;
-            if (!this.SwapOverRide) {
+            this.State.Ticks.Swap = 0;
+            this.State.Active.Swap = false;
+            if (!this.State.SwapOverRide) {
                 this.CheckForSets(0);
             }
-            if (this.Blocks[this.SwitchLeftBlockRow][this.SwitchLeftBlockCol].TotalChain > this.Blocks[this.SwitchRightBlockRow][this.SwitchRightBlockCol].TotalChain) {
-                this.CheckForHover(this.Blocks[this.SwitchLeftBlockRow][this.SwitchLeftBlockCol].TotalChain, !this.SwapOverRide);
+            if (this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].TotalChain > this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].TotalChain) {
+                this.CheckForHover(this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].TotalChain, !this.State.SwapOverRide);
             }
             else {
-                this.CheckForHover(this.Blocks[this.SwitchRightBlockRow][this.SwitchRightBlockCol].TotalChain, !this.SwapOverRide);
+                this.CheckForHover(this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].TotalChain, !this.State.SwapOverRide);
             }
         }
     }
@@ -446,16 +416,16 @@ class PuzzleLogic {
         var totalChain: number = 0;
         for (var row: number = 0; row < Constants.MAX_ROWS; row++) {
             for (var col: number = 0; col < Constants.MAX_COLS; col++) {
-                if (this.Blocks[row][col].State == BlockState.Remove) {
-                    this.Blocks[row][col].Tick++;
-                    if (this.Blocks[row][col].Tick == Constants.TICKS_FOR_REMOVING_BLOCKS) {
-                        if (totalChain < this.Blocks[row][col].TotalChain) {
-                            totalChain = this.Blocks[row][col].TotalChain;
+                if (this.State.Blocks[row][col].State == BlockState.Remove) {
+                    this.State.Blocks[row][col].Tick++;
+                    if (this.State.Blocks[row][col].Tick == Constants.TICKS_FOR_REMOVING_BLOCKS) {
+                        if (totalChain < this.State.Blocks[row][col].TotalChain) {
+                            totalChain = this.State.Blocks[row][col].TotalChain;
                         }
-                        this.Blocks[row][col].State = BlockState.None;
-                        this.Blocks[row][col].TotalChain = 0;
-                        this.Blocks[row][col].Tick = 0;
-                        this.Blocks[row][col].groupId = 0;
+                        this.State.Blocks[row][col].State = BlockState.None;
+                        this.State.Blocks[row][col].TotalChain = 0;
+                        this.State.Blocks[row][col].Tick = 0;
+                        this.State.Blocks[row][col].groupId = 0;
                     }
                 }
             }
@@ -470,34 +440,34 @@ class PuzzleLogic {
         var setCount: number = 0;
         var currentBlockRow: number = 0;
         var currentBlockCol: number = 0;
-        this.SetCount = 0;
+        this.State.SetCount = 0;
         for (var row: number = 1; row < Constants.MAX_ROWS; row++) {
             currentBlockCol = 0;
             setCount = 1;
             for (var col: number = 1; col < Constants.MAX_COLS; col++) {
-                if ((this.Blocks[row][currentBlockCol].State == BlockState.Exist && this.Blocks[row][currentBlockCol].groupId == 0) &&
-                    (this.Blocks[row][col].State == BlockState.Exist && this.Blocks[row][col].groupId == 0) &&
-                    this.Blocks[row][col].Color == this.Blocks[row][currentBlockCol].Color) {
+                if ((this.State.Blocks[row][currentBlockCol].State == BlockState.Exist && this.State.Blocks[row][currentBlockCol].groupId == 0) &&
+                    (this.State.Blocks[row][col].State == BlockState.Exist && this.State.Blocks[row][col].groupId == 0) &&
+                    this.State.Blocks[row][col].Color == this.State.Blocks[row][currentBlockCol].Color) {
                     setCount++;
                 }
                 else {
                     if (setCount >= 3) {
                         for (var k: number = 0; k < setCount; k++) {
-                            this.Blocks[row][currentBlockCol + k].State = BlockState.Remove;
-                            this.Blocks[row][currentBlockCol + k].TotalChain = chain;
-                            this.Blocks[row][currentBlockCol + k].Tick = 0;
-                            this.Blocks[row][currentBlockCol + k].Tick = 0;
+                            this.State.Blocks[row][currentBlockCol + k].State = BlockState.Remove;
+                            this.State.Blocks[row][currentBlockCol + k].TotalChain = chain;
+                            this.State.Blocks[row][currentBlockCol + k].Tick = 0;
+                            this.State.Blocks[row][currentBlockCol + k].Tick = 0;
                         }
-                        this.Set[this.SetCount].Row = row;
-                        this.Set[this.SetCount].Col = currentBlockCol;
-                        this.Set[this.SetCount].Count = setCount;
-                        this.Set[this.SetCount].NewSetIndex = -1;
-                        this.Set[this.SetCount].Intersects = 0;
-                        this.Set[this.SetCount].Type = SetType.Col;
-                        this.SetCount++;
+                        this.State.Set[this.State.SetCount].Row = row;
+                        this.State.Set[this.State.SetCount].Col = currentBlockCol;
+                        this.State.Set[this.State.SetCount].Count = setCount;
+                        this.State.Set[this.State.SetCount].NewSetIndex = -1;
+                        this.State.Set[this.State.SetCount].Intersects = 0;
+                        this.State.Set[this.State.SetCount].Type = SetType.Col;
+                        this.State.SetCount++;
                     }
                     while (col != Constants.MAX_COLS - 1) {
-                        if (this.Blocks[row][col + 1].State == BlockState.Exist) {
+                        if (this.State.Blocks[row][col + 1].State == BlockState.Exist) {
                             currentBlockCol = col;
                             setCount = 1;
                             break;
@@ -510,44 +480,44 @@ class PuzzleLogic {
             }
             if (setCount >= 3) {
                 for (var k: number = 0; k < setCount; k++) {
-                    this.Blocks[row][currentBlockCol + k].State = BlockState.Remove;
-                    this.Blocks[row][currentBlockCol + k].TotalChain = chain;
-                    this.Blocks[row][currentBlockCol + k].Tick = 0;
+                    this.State.Blocks[row][currentBlockCol + k].State = BlockState.Remove;
+                    this.State.Blocks[row][currentBlockCol + k].TotalChain = chain;
+                    this.State.Blocks[row][currentBlockCol + k].Tick = 0;
                 }
-                this.Set[this.SetCount].Row = row;
-                this.Set[this.SetCount].Col = currentBlockCol;
-                this.Set[this.SetCount].Count = setCount;
-                this.Set[this.SetCount].NewSetIndex = -1;
-                this.Set[this.SetCount].Intersects = 0;
-                this.Set[this.SetCount].Type = SetType.Col;
-                this.SetCount++;
+                this.State.Set[this.State.SetCount].Row = row;
+                this.State.Set[this.State.SetCount].Col = currentBlockCol;
+                this.State.Set[this.State.SetCount].Count = setCount;
+                this.State.Set[this.State.SetCount].NewSetIndex = -1;
+                this.State.Set[this.State.SetCount].Intersects = 0;
+                this.State.Set[this.State.SetCount].Type = SetType.Col;
+                this.State.SetCount++;
             }
         }
         for (var col: number = 0; col < Constants.MAX_COLS; col++) {
             currentBlockRow = 1;
             setCount = 1;
             for (var row: number = 2; row < Constants.MAX_ROWS; row++) {
-                if (((this.Blocks[currentBlockRow][col].State == BlockState.Exist || this.Blocks[currentBlockRow][col].State == BlockState.Remove) && this.Blocks[currentBlockRow][col].groupId == 0) && ((this.Blocks[row][col].State == BlockState.Exist || this.Blocks[row][col].State == BlockState.Remove) && this.Blocks[row][col].groupId == 0) && (this.Blocks[row][col].Color == this.Blocks[currentBlockRow][col].Color)) {
+                if (((this.State.Blocks[currentBlockRow][col].State == BlockState.Exist || this.State.Blocks[currentBlockRow][col].State == BlockState.Remove) && this.State.Blocks[currentBlockRow][col].groupId == 0) && ((this.State.Blocks[row][col].State == BlockState.Exist || this.State.Blocks[row][col].State == BlockState.Remove) && this.State.Blocks[row][col].groupId == 0) && (this.State.Blocks[row][col].Color == this.State.Blocks[currentBlockRow][col].Color)) {
                     setCount++;
                 }
                 else {
                     if (setCount >= 3) {
                         for (var k: number = 0; k < setCount; k++) {
-                            this.Blocks[currentBlockRow + k][col].State = BlockState.Remove;
-                            this.Blocks[currentBlockRow + k][col].TotalChain = chain;
-                            this.Blocks[currentBlockRow + k][col].Tick = 0;
+                            this.State.Blocks[currentBlockRow + k][col].State = BlockState.Remove;
+                            this.State.Blocks[currentBlockRow + k][col].TotalChain = chain;
+                            this.State.Blocks[currentBlockRow + k][col].Tick = 0;
                         }
-                        this.Set[this.SetCount].Row = currentBlockRow;
-                        this.Set[this.SetCount].Col = col;
-                        this.Set[this.SetCount].Count = setCount;
-                        this.Set[this.SetCount].NewSetIndex = -1;
-                        this.Set[this.SetCount].Intersects = 0;
-                        this.Set[this.SetCount].Type = SetType.Row;
+                        this.State.Set[this.State.SetCount].Row = currentBlockRow;
+                        this.State.Set[this.State.SetCount].Col = col;
+                        this.State.Set[this.State.SetCount].Count = setCount;
+                        this.State.Set[this.State.SetCount].NewSetIndex = -1;
+                        this.State.Set[this.State.SetCount].Intersects = 0;
+                        this.State.Set[this.State.SetCount].Type = SetType.Row;
 
-                        this.SetCount++;
+                        this.State.SetCount++;
                     }
                     while (row != Constants.MAX_ROWS - 1) {
-                        if (this.Blocks[row + 1][col].State == BlockState.Exist) {
+                        if (this.State.Blocks[row + 1][col].State == BlockState.Exist) {
                             currentBlockRow = row;
                             setCount = 1;
                             break;
@@ -560,61 +530,61 @@ class PuzzleLogic {
             }
             if (setCount >= 3) {
                 for (var k: number = 0; k < setCount; k++) {
-                    this.Blocks[currentBlockRow + k][col].State = BlockState.Remove;
-                    this.Blocks[currentBlockRow + k][col].TotalChain = chain;
-                    this.Blocks[currentBlockRow + k][col].Tick = 0;
+                    this.State.Blocks[currentBlockRow + k][col].State = BlockState.Remove;
+                    this.State.Blocks[currentBlockRow + k][col].TotalChain = chain;
+                    this.State.Blocks[currentBlockRow + k][col].Tick = 0;
                 }
-                this.Set[this.SetCount].Row = currentBlockRow;
-                this.Set[this.SetCount].Col = col;
-                this.Set[this.SetCount].Count = setCount;
-                this.Set[this.SetCount].NewSetIndex = -1;
-                this.Set[this.SetCount].Intersects = 0;
-                this.Set[this.SetCount].Type = SetType.Row;
-                this.SetCount++;
+                this.State.Set[this.State.SetCount].Row = currentBlockRow;
+                this.State.Set[this.State.SetCount].Col = col;
+                this.State.Set[this.State.SetCount].Count = setCount;
+                this.State.Set[this.State.SetCount].NewSetIndex = -1;
+                this.State.Set[this.State.SetCount].Intersects = 0;
+                this.State.Set[this.State.SetCount].Type = SetType.Row;
+                this.State.SetCount++;
             }
         }
-        for (var i: number = 0; i < this.SetCount; i++) {
+        for (var i: number = 0; i < this.State.SetCount; i++) {
             
         }
 
         var NewSetIndex: number = 0;
-        this.BlockSetsCount = this.SetCount;
-        for (var i: number = 0; i < this.SetCount; i++) {
-            if (this.Set[i].NewSetIndex == -1) {
-                this.Set[i].NewSetIndex = NewSetIndex;
-                this.BlockSets[NewSetIndex] = 0;
+        this.State.BlockSetsCount = this.State.SetCount;
+        for (var i: number = 0; i < this.State.SetCount; i++) {
+            if (this.State.Set[i].NewSetIndex == -1) {
+                this.State.Set[i].NewSetIndex = NewSetIndex;
+                this.State.BlockSets[NewSetIndex] = 0;
                 NewSetIndex++;
             }
-            for (var j: number = i; j < this.SetCount; j++) {
-                if (i == j || this.Set[j].NewSetIndex == this.Set[i].NewSetIndex) {
+            for (var j: number = i; j < this.State.SetCount; j++) {
+                if (i == j || this.State.Set[j].NewSetIndex == this.State.Set[i].NewSetIndex) {
                     continue;
                 }
-                if (this.Set[i].Type == SetType.Col && this.Set[j].Type == SetType.Row && this.Set[j].Row == this.Set[i].Row && this.Set[j].Col >= this.Set[i].Col && this.Set[j].Col <= (this.Set[i].Col + this.Set[i].Count)) {
-                    this.Set[j].Intersects++;
-                    this.Set[j].NewSetIndex = this.Set[i].NewSetIndex;
-                    this.BlockSetsCount = this.BlockSetsCount - 1;
+                if (this.State.Set[i].Type == SetType.Col && this.State.Set[j].Type == SetType.Row && this.State.Set[j].Row == this.State.Set[i].Row && this.State.Set[j].Col >= this.State.Set[i].Col && this.State.Set[j].Col <= (this.State.Set[i].Col + this.State.Set[i].Count)) {
+                    this.State.Set[j].Intersects++;
+                    this.State.Set[j].NewSetIndex = this.State.Set[i].NewSetIndex;
+                    this.State.BlockSetsCount = this.State.BlockSetsCount - 1;
                 }
-                if (this.Set[j].Type == SetType.Col && this.Set[i].Type == SetType.Row && this.Set[j].Col >= this.Set[i].Col && this.Set[j].Col <= (this.Set[i].Col + this.Set[i].Count)) {
-                    this.Set[i].Intersects++;
-                    this.Set[i].NewSetIndex = this.Set[j].NewSetIndex;
-                    this.BlockSetsCount = this.BlockSetsCount - 1;
+                if (this.State.Set[j].Type == SetType.Col && this.State.Set[i].Type == SetType.Row && this.State.Set[j].Col >= this.State.Set[i].Col && this.State.Set[j].Col <= (this.State.Set[i].Col + this.State.Set[i].Count)) {
+                    this.State.Set[i].Intersects++;
+                    this.State.Set[i].NewSetIndex = this.State.Set[j].NewSetIndex;
+                    this.State.BlockSetsCount = this.State.BlockSetsCount - 1;
                 }
             }
         }
-        for (var i: number = 0; i < this.SetCount; i++) {
-            this.BlockSets[this.Set[i].NewSetIndex] += this.Set[i].Count - this.Set[i].Intersects;
+        for (var i: number = 0; i < this.State.SetCount; i++) {
+            this.State.BlockSets[this.State.Set[i].NewSetIndex] += this.State.Set[i].Count - this.State.Set[i].Intersects;
         }
-        if (this.SetCount > 0) {
-            this.SoundRequests.push(SoundRequest.Remove);
-            this.groupId++;
+        if (this.State.SetCount > 0) {
+            this.State.SoundRequests.push(SoundRequest.Remove);
+            this.State.groupId++;
             for (var row: number = 0; row < Constants.MAX_ROWS; row++) {
                 for (var col: number = 0; col < Constants.MAX_COLS; col++) {
-                    if (this.Blocks[row][col].State == BlockState.Remove && this.Blocks[row][col].groupId == 0) {
-                        this.Blocks[row][col].groupId = this.groupId;
+                    if (this.State.Blocks[row][col].State == BlockState.Remove && this.State.Blocks[row][col].groupId == 0) {
+                        this.State.Blocks[row][col].groupId = this.State.groupId;
                     }
                 }
             }
-            this.Active.BlocksRemoving = true;
+            this.State.Active.BlocksRemoving = true;
             this.GetScore(chain);
         }
     }
@@ -622,27 +592,27 @@ class PuzzleLogic {
         var oneHoverFound: boolean = false;
         for (var row: number = 1; row < Constants.MAX_ROWS; row++) {
             for (var col: number = 0; col < Constants.MAX_COLS; col++) {
-                if (this.Blocks[row][col].State == BlockState.Exist && this.Blocks[row][col].State != BlockState.Hover && this.Blocks[row][col].State != BlockState.HoverSwap) {
-                    if (this.Blocks[row - 1][col].State == BlockState.None || this.Blocks[row - 1][col].State == BlockState.Hover || this.Blocks[row - 1][col].State == BlockState.HoverSwap) {
+                if (this.State.Blocks[row][col].State == BlockState.Exist && this.State.Blocks[row][col].State != BlockState.Hover && this.State.Blocks[row][col].State != BlockState.HoverSwap) {
+                    if (this.State.Blocks[row - 1][col].State == BlockState.None || this.State.Blocks[row - 1][col].State == BlockState.Hover || this.State.Blocks[row - 1][col].State == BlockState.HoverSwap) {
                         if (oneHoverFound == false) {
-                            this.groupId++;
+                            this.State.groupId++;
                             oneHoverFound = true;
                         }
-                        this.Blocks[row][col].groupId = this.groupId;
-                        this.Blocks[row][col].Tick = 0;
-                        this.Blocks[row][col].TotalChain = chain;
+                        this.State.Blocks[row][col].groupId = this.State.groupId;
+                        this.State.Blocks[row][col].Tick = 0;
+                        this.State.Blocks[row][col].TotalChain = chain;
                         if (switchedBlocks) {
-                            this.Blocks[row][col].State = BlockState.HoverSwap;
+                            this.State.Blocks[row][col].State = BlockState.HoverSwap;
                         }
                         else {
-                            this.Blocks[row][col].State = BlockState.Hover;
+                            this.State.Blocks[row][col].State = BlockState.Hover;
                         }
                         for (var k: number = row; k > 0; k--) {
-                            if (this.Blocks[k - 1][col].State == BlockState.None) {
-                                this.HoverBlocks[row][col].Row = k - 1;
+                            if (this.State.Blocks[k - 1][col].State == BlockState.None) {
+                                this.State.HoverBlocks[row][col].Row = k - 1;
                             }
-                            if (this.Blocks[k - 1][col].State == BlockState.Hover || this.Blocks[k - 1][col].State == BlockState.HoverSwap) {
-                                this.HoverBlocks[row][col].Row = this.HoverBlocks[k - 1][col].Row + 1;
+                            if (this.State.Blocks[k - 1][col].State == BlockState.Hover || this.State.Blocks[k - 1][col].State == BlockState.HoverSwap) {
+                                this.State.HoverBlocks[row][col].Row = this.State.HoverBlocks[k - 1][col].Row + 1;
                                 break;
                             }
                         }
@@ -655,46 +625,46 @@ class PuzzleLogic {
         var chain: number = 0;
         for (var row: number = 1; row < Constants.MAX_ROWS; row++) {
             for (var col: number = 0; col < Constants.MAX_COLS; col++) {
-                if (this.Blocks[row][col].State == BlockState.Falling) {
-                    if (this.Blocks[row - 1][col].State == BlockState.None || this.Blocks[row - 1][col].State == BlockState.Falling || this.Blocks[row - 1][col].State == BlockState.LockedForFall) {
-                        if (this.Blocks[row][col].TotalChain > chain) {
-                            chain = this.Blocks[row][col].TotalChain;
+                if (this.State.Blocks[row][col].State == BlockState.Falling) {
+                    if (this.State.Blocks[row - 1][col].State == BlockState.None || this.State.Blocks[row - 1][col].State == BlockState.Falling || this.State.Blocks[row - 1][col].State == BlockState.LockedForFall) {
+                        if (this.State.Blocks[row][col].TotalChain > chain) {
+                            chain = this.State.Blocks[row][col].TotalChain;
                         }
-                        this.Blocks[row][col].FallGroupTicks = Constants.TICKS_FOR_FALL;
+                        this.State.Blocks[row][col].FallGroupTicks = Constants.TICKS_FOR_FALL;
                         for (var k: number = row; k > 0; k--) {
-                            if (this.Active.Swap && k - 2 >= 0 && this.Blocks[k - 1][col].State == BlockState.Switch || this.Blocks[k - 1][col].State == BlockState.SwitchNone && this.Blocks[k - 2][col].State == BlockState.None) {
-                                this.WaitForSwap = true;
+                            if (this.State.Active.Swap && k - 2 >= 0 && this.State.Blocks[k - 1][col].State == BlockState.Switch || this.State.Blocks[k - 1][col].State == BlockState.SwitchNone && this.State.Blocks[k - 2][col].State == BlockState.None) {
+                                this.State.WaitForSwap = true;
                             }
-                            if (this.Blocks[k - 1][col].State == BlockState.None) {
-                                this.FallBlocks[row][col].Row = k - 1;
-                                this.Blocks[k - 1][col].State = BlockState.LockedForFall;
-                                this.Blocks[k - 1][col].FallGroupTicks = Constants.TICKS_FOR_FALL;
-                                this.Blocks[k - 1][col].groupId = this.Blocks[row][col].groupId;
+                            if (this.State.Blocks[k - 1][col].State == BlockState.None) {
+                                this.State.FallBlocks[row][col].Row = k - 1;
+                                this.State.Blocks[k - 1][col].State = BlockState.LockedForFall;
+                                this.State.Blocks[k - 1][col].FallGroupTicks = Constants.TICKS_FOR_FALL;
+                                this.State.Blocks[k - 1][col].groupId = this.State.Blocks[row][col].groupId;
                             }
-                            if (this.Blocks[k - 1][col].State == BlockState.LockedForFall) {
-                                this.FallBlocks[row][col].Row = k - 1;
+                            if (this.State.Blocks[k - 1][col].State == BlockState.LockedForFall) {
+                                this.State.FallBlocks[row][col].Row = k - 1;
                             }
-                            if (this.Blocks[k - 1][col].State == BlockState.Falling) {
-                                this.FallBlocks[row][col].Row = this.FallBlocks[k - 1][col].Row + 1;
+                            if (this.State.Blocks[k - 1][col].State == BlockState.Falling) {
+                                this.State.FallBlocks[row][col].Row = this.State.FallBlocks[k - 1][col].Row + 1;
                                 break;
                             }
                         }
                     }
                     else {
-                        this.Blocks[row][col].State = BlockState.Exist;
-                        this.Blocks[row][col].groupId = 0;
-                        this.Blocks[row][col].Tick = 0;
+                        this.State.Blocks[row][col].State = BlockState.Exist;
+                        this.State.Blocks[row][col].groupId = 0;
+                        this.State.Blocks[row][col].Tick = 0;
                     }
                 }
             }
         }
-        if (this.WaitForSwap) {
-            this.SwapOverRide = true;
-            if (this.Blocks[this.SwitchLeftBlockRow][this.SwitchLeftBlockCol].State == BlockState.Switch) {
-                this.Blocks[this.SwitchLeftBlockRow][this.SwitchLeftBlockCol].TotalChain = chain;
+        if (this.State.WaitForSwap) {
+            this.State.SwapOverRide = true;
+            if (this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State == BlockState.Switch) {
+                this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].TotalChain = chain;
             }
             else {
-                this.Blocks[this.SwitchRightBlockRow][this.SwitchRightBlockCol].TotalChain = chain;
+                this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].TotalChain = chain;
             }
         }
     }
@@ -708,15 +678,15 @@ class PuzzleLogic {
     private RowChange(): void {
         this.MoveBlocksUpOneRow();
         this.AddBlockRow(0);
-        this.Selector.Row = this.Selector.Row + 1;
-        this.SwitchLeftBlockRow++;
-        this.SwitchRightBlockRow++;
+        this.State.Selector.Row = this.State.Selector.Row + 1;
+        this.State.SwitchLeftBlockRow++;
+        this.State.SwitchRightBlockRow++;
     }
     private MoveBlocksUpOneRow(): void {
         for (var row: number = Constants.MAX_ROWS - 1; row >= 1; row--) {
             for (var col: number = 0; col < Constants.MAX_COLS; col++) {
-                this.Blocks[row][col].Color = this.Blocks[row - 1][col].Color;
-                this.Blocks[row][col].State = this.Blocks[row - 1][col].State;
+                this.State.Blocks[row][col].Color = this.State.Blocks[row - 1][col].Color;
+                this.State.Blocks[row][col].State = this.State.Blocks[row - 1][col].State;
             }
         }
     }
@@ -724,22 +694,22 @@ class PuzzleLogic {
         for (var col: number = 0; col < 6; col++) {
             var blockColor: BlockColor;
             do {
-                blockColor = <BlockColor>(Math.floor(this.Random() * Math.floor(5)));
+                blockColor = <BlockColor>(Math.floor(this.State.Random() * Math.floor(5)));
             }
             while (!this.IsNewBlockVaild(row, col, blockColor));
-            this.Blocks[row][col].Color = blockColor;
-            this.Blocks[row][col].State = BlockState.Exist;
-            this.Blocks[row][col].groupId = 0;
-            this.Blocks[row][col].Tick = 0;
-            this.Blocks[row][col].FallGroupTicks = 0;
+            this.State.Blocks[row][col].Color = blockColor;
+            this.State.Blocks[row][col].State = BlockState.Exist;
+            this.State.Blocks[row][col].groupId = 0;
+            this.State.Blocks[row][col].Tick = 0;
+            this.State.Blocks[row][col].FallGroupTicks = 0;
         }
     }
 
     //Condtional
     private CheckForGameOver(): void {
         for (var col: number = 0; col < Constants.MAX_COLS; col++) {
-            if (this.Blocks[Constants.MAX_ROWS - 1][col].State == BlockState.Exist) {
-                this.Active.Puzzle = false;
+            if (this.State.Blocks[Constants.MAX_ROWS - 1][col].State == BlockState.Exist) {
+                this.State.Active.Puzzle = false;
             }
         }
     }
@@ -750,7 +720,7 @@ class PuzzleLogic {
         i = 1;
         do {
             foundValue = false;
-            if ((blockRow - i) >= 0 && this.Blocks[blockRow - i][blockCol].State == BlockState.Exist && this.Blocks[blockRow - i][blockCol].Color == blockColor) {
+            if ((blockRow - i) >= 0 && this.State.Blocks[blockRow - i][blockCol].State == BlockState.Exist && this.State.Blocks[blockRow - i][blockCol].Color == blockColor) {
                 rowSameColor++;
                 foundValue = true;
             }
@@ -760,7 +730,7 @@ class PuzzleLogic {
         i = 1;
         do {
             foundValue = false;
-            if ((blockRow + i) <= (Constants.MAX_ROWS - 1) && this.Blocks[blockRow + i][blockCol].State == BlockState.Exist && this.Blocks[blockRow + i][blockCol].Color == blockColor) {
+            if ((blockRow + i) <= (Constants.MAX_ROWS - 1) && this.State.Blocks[blockRow + i][blockCol].State == BlockState.Exist && this.State.Blocks[blockRow + i][blockCol].Color == blockColor) {
                 rowSameColor++;
                 foundValue = true;
             }
@@ -775,7 +745,7 @@ class PuzzleLogic {
         i = 1;
         do {
             foundValue = false;
-            if ((blockCol - i) >= 0 && this.Blocks[blockRow][blockCol - i].State == BlockState.Exist && this.Blocks[blockRow][blockCol - i].Color == blockColor) {
+            if ((blockCol - i) >= 0 && this.State.Blocks[blockRow][blockCol - i].State == BlockState.Exist && this.State.Blocks[blockRow][blockCol - i].Color == blockColor) {
                 colSameColor++;
                 foundValue = true;
             }
@@ -785,7 +755,7 @@ class PuzzleLogic {
         i = 1;
         do {
             foundValue = false;
-            if ((blockCol + i) <= (Constants.MAX_COLS - 1) && this.Blocks[blockRow][blockCol + i].State == BlockState.Exist && this.Blocks[blockRow][blockCol + i].Color == blockColor) {
+            if ((blockCol + i) <= (Constants.MAX_COLS - 1) && this.State.Blocks[blockRow][blockCol + i].State == BlockState.Exist && this.State.Blocks[blockRow][blockCol + i].Color == blockColor) {
                 colSameColor++;
                 foundValue = true;
             }
@@ -801,8 +771,8 @@ class PuzzleLogic {
     //Score
     private GetScore(chain: number): void {
         this.ChainScore(chain);
-        for (var i: number = 0; i < this.SetCount; i++) {
-            this.TotalBlockScore(this.BlockSets[i]);
+        for (var i: number = 0; i < this.State.SetCount; i++) {
+            this.TotalBlockScore(this.State.BlockSets[i]);
         }
     }
     private ChainScore(chain: number): void {
@@ -843,7 +813,7 @@ class PuzzleLogic {
         if (chain > 12) {
             addtionalScore = 6980 + ((chain - 12) * 1800);
         }
-        this.Score += addtionalScore;
+        this.State.Score += addtionalScore;
     }
     private TotalBlockScore(totalBlocks: number): void {
         var addtionalScore: number = 0;
@@ -964,7 +934,7 @@ class PuzzleLogic {
         if (totalBlocks > 40) {
             addtionalScore = 20400 + ((totalBlocks - 40) * 800) + (totalBlocks * 10);
         }
-        this.Score += addtionalScore;
+        this.State.Score += addtionalScore;
     }
 }
 class PuzzleView {
@@ -1057,11 +1027,11 @@ class PuzzleView {
     }
     
     public Update(puzzleLogic: PuzzleLogic) {
-        this.UpdateSelector(puzzleLogic.Selector);
-        this.UpdateBlockStates(puzzleLogic.Blocks, puzzleLogic.Ticks.Swap, puzzleLogic.SwitchLeftBlockCol, puzzleLogic.FallBlocks);
-        this.UpdateBlockContainerState(puzzleLogic.BlockInc);
-        this.UpdateLevel(puzzleLogic.Level);
-        this.UpdateScore(puzzleLogic.Score);
+        this.UpdateSelector(puzzleLogic.State.Selector);
+        this.UpdateBlockStates(puzzleLogic.State.Blocks, puzzleLogic.State.Ticks.Swap, puzzleLogic.State.SwitchLeftBlockCol, puzzleLogic.State.FallBlocks);
+        this.UpdateBlockContainerState(puzzleLogic.State.BlockInc);
+        this.UpdateLevel(puzzleLogic.State.Level);
+        this.UpdateScore(puzzleLogic.State.Score);
     }
     private UpdateBlockContainerState(y: number) {
         this.blocksContainer.y = -y;
@@ -1198,15 +1168,15 @@ class PuzzleLoader {
                 this.currentLogItemCount = 0;
             }
         }
-        else if (!useLog && this.puzzle.logic.Log && tick < 0) {
-            if ((this.puzzle.logic.Ticks.Puzzle + tick) < 0) {
+        else if (!useLog && this.puzzle.logic.State.Log && tick < 0) {
+            if ((this.puzzle.logic.State.Ticks.Puzzle + tick) < 0) {
                 tick = 0;
             }
             else {
-                tick = this.puzzle.logic.Ticks.Puzzle + tick;
+                tick = this.puzzle.logic.State.Ticks.Puzzle + tick;
             }
 
-            log = JSON.parse(JSON.stringify(this.puzzle.logic.LogItems));
+            log = JSON.parse(JSON.stringify(this.puzzle.logic.State.LogItems));
 
             this.CurrentTick = 0;
             this.currentLogItem = 0;
@@ -1254,7 +1224,7 @@ class PuzzleLoader {
         }
 
         this.puzzle.ViewUpdate();
-        this.puzzle.logic.SoundRequests.length = 0;
+        this.puzzle.logic.State.SoundRequests.length = 0;
     }
     public Pause(){
 

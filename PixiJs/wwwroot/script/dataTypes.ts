@@ -1,4 +1,5 @@
-﻿enum SetType {
+﻿import { prng } from './lib/index.js';
+enum SetType {
     Mixed,
     Row,
     Col
@@ -118,8 +119,45 @@ class Constants {
     public static TICKS_FOR_HOVER_SWAP: number = 5;
     public static TICKS_FOR_FALL: number = 3;
 }
+class PuzzleLogicState {
+    public Paused: Boolean = false;
+    public Log: Boolean = false;
+    public LogItems: LogItem[] = [];
+    public SoundRequests: SoundRequest[];
+    public Blocks: Block[][] = [];
+    public Random: prng;
+    public HoverBlocks: HoverBlock[][] = [];
+    public FallBlocks: FallBlock[][] = [];
+    public BlocksMoveFast: boolean = false;
+
+    //Switch
+    public SwitchLeftBlockRow: number = 0;
+    public SwitchLeftBlockCol: number = 0;
+    public SwitchRightBlockRow: number = 0;
+    public SwitchRightBlockCol: number = 0;
+    public SwapOverRide: boolean = false;
+    public WaitForSwap: boolean = false;
+
+    public BlockInc: number = 0;
+    public Score: number = 0;
+    public Level: number = 1;
+    public Chain: number = 0;
+    public groupId: number = 1;
+
+    public Selector: Selector = new Selector();
+    public Active: Active = new Active();
+    public Ticks: Tick = new Tick();
+    public SetCount: number = 0;
+    public Set: BlockSet[] = [];
+
+    public BlockSetsCount: number;
+    public BlockSets: number[] = [];
+
+    public Seed: number;
+
+}
 
 export {
     SetType, BlockState, KeyState, BlockColor, InputOptions, InputSet, SoundRequest,
-    Block, LogItem, HoverBlock, FallBlock, RemovalInstance, Effect, Tick, Active, Selector, BlockSet, Constants
+    Block, LogItem, HoverBlock, FallBlock, RemovalInstance, Effect, Tick, Active, Selector, BlockSet, Constants, PuzzleLogicState
 }

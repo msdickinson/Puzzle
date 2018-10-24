@@ -117,7 +117,7 @@ let seedRandom = {
         var result = [], typ = (typeof obj), prop;
         if (depth && typ === 'object') {
             for (prop in obj) {
-                try { result.push(seedRandom.flatten(obj[prop], depth - 1)); } catch (e) { }
+                 result.push(seedRandom.flatten(obj[prop], depth - 1)); 
             }
         }
         return (result.length ? result : typ === 'string' ? obj : obj + '\0');
