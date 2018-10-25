@@ -6,8 +6,10 @@ const puzzleLoader_js_1 = require("./puzzleLoader.js");
 const seedrandom = require("seedrandom");
 class Application {
     constructor() {
+        this.NetworkCallsOut = [];
         this.Rooms = [];
         this.Players = [];
+        this.NetworkCallsOut = [];
         this.Random = seedrandom(null, { state: true });
         this.PuzzleLogic = new puzzleLogic_js_1.PuzzleLogic();
         this.PuzzleLoader = new puzzleLoader_js_1.PuzzleLoader();
@@ -15,7 +17,7 @@ class Application {
     }
     CreateRoom() {
         let room = new dataTypes_js_1.Room();
-        room.Active = dataTypes_js_1.GameActive.WaitingNoPlayers;
+        room.Active = dataTypes_js_1.GameActive.WaitingForPlayers;
         room.ActiveTime = new Date();
         room.Random = seedrandom(null, { state: true });
         room.Id = room.Random();
@@ -26,22 +28,21 @@ class Application {
         if (state.Active !== dataTypes_js_1.GameActive.GameRunning || logItems.length === 0) {
             return;
         }
-        let newLog = [];
-        this.PuzzleLogic.State = player.PuzzleLogicState;
+        let desync = false;
         let userTick = logItems[logItems.length - 1].Tick;
         let currentTick = this.CurrentTick(state);
         let serverLogId = player.PuzzleLogState.Log[player.PuzzleLogState.Log.length - 1].Id;
-        let serverTick = player.PuzzleLogState.Log[player.PuzzleLogState.Log.length - 1].Tick;
+        let serverTick = player.PuzzleLogState.CurrentTick;
         if ((currentTick - userTick) <= 180) {
             this.PuzzleLoader.MergeLogItems(player.PuzzleLogState, logItems);
-            this.PuzzleLoader.AdvanceToEndOfLog(this.PuzzleLogic, player.PuzzleLogState, serverLogId + 1);
-            newLog = logItems;
+            this.PuzzleLoader.AdvanceToEndOfLog(this.PuzzleLogic, player.PuzzleLogicState, player.PuzzleLogState, serverLogId + 1);
         }
         else {
-            this.PuzzleLoader.AdvanceTicks(this.PuzzleLogic, player.PuzzleLogState, (currentTick - userTick), true);
+            desync = true;
+            this.PuzzleLoader.AdvanceTicks(this.PuzzleLogic, player.PuzzleLogicState, player.PuzzleLogState, (currentTick - serverTick), true);
         }
         for (let i = 0; state.Players.length; i++) {
-            if (state.Players[i].player.Id !== player.player.Id) {
+            if (desync || state.Players[i].player.Id !== player.player.Id) {
                 this.PlayerLog(state.Players[i].player.Id, player.player.Id, player.PuzzleLogState.Log.slice(serverLogId));
             }
         }
@@ -53,12 +54,14 @@ class Application {
         }
         for (let i = 0; state.Players.length; i++) {
             let player = state.Players[i];
-            this.PuzzleLogic.State = player.PuzzleLogicState;
-            let userTick = 0;
-            let currentTick = 0;
-            let MoveFowardTicks = 0;
-            if ((currentTick - userTick) > 180) {
-                this.PuzzleLoader.AdvanceTicks(this.PuzzleLogic, player.PuzzleLogState, MoveFowardTicks, true);
+            let serverTick = state.Players[i].PuzzleLogState.CurrentTick;
+            let serverLogId = player.PuzzleLogState.Log[player.PuzzleLogState.Log.length - 1].Id;
+            let currentTick = this.CurrentTick(state);
+            if ((currentTick - serverTick) > 180) {
+                this.PuzzleLoader.AdvanceTicks(this.PuzzleLogic, player.PuzzleLogicState, player.PuzzleLogState, (currentTick - serverTick), true);
+            }
+            for (let j = 0; state.Players.length; j++) {
+                this.PlayerLog(state.Players[i].player.Id, player.player.Id, player.PuzzleLogState.Log.slice(serverLogId));
             }
         }
         this.CheckGameEnd(state);
@@ -67,14 +70,17 @@ class Application {
         state.GameStarted = new Date();
         state.Timer = setTimeout(this.AutoPlayCheck, 250);
         state.Active = dataTypes_js_1.GameActive.GameRunning;
+        for (let i = 0; i < state.Players.length; i++) {
+            this.PuzzleLogic.Reset(state.Players[i].PuzzleLogicState, true);
+        }
         let playersSeedData = state.Players.map(e => {
             let item = new dataTypes_js_1.PlayersSeedData();
             item.Id = e.player.Id,
                 item.Seed = e.PuzzleLogicState.Seed;
             return item;
         });
-        for (let j = 0; state.Players.length; j++) {
-            this.Start(state.Players[j].player.Id, playersSeedData);
+        for (let i = 0; i < state.Players.length; i++) {
+            this.Start(state.Players[i].player.Id, playersSeedData);
         }
     }
     Join(player, state = null) {
@@ -97,14 +103,10 @@ class Application {
         if (state.Players.length < 2) {
             let playerState = new dataTypes_js_1.PlayerState();
             playerState.player = player;
-            this.PuzzleLogic.State = playerState.PuzzleLogicState;
-            this.PuzzleLogic.Reset(true, this.Random());
+            this.PuzzleLogic.Reset(playerState.PuzzleLogicState, true, this.Random());
             state.Players.push(playerState);
-            if (state.Players.length == 1) {
-                state.Active = dataTypes_js_1.GameActive.WaitingOnePlayer;
-            }
             if (state.Players.length == 2) {
-                state.Active = dataTypes_js_1.GameActive.Ready;
+                this.StartGame(state);
             }
             return {
                 RoomId: state.Id,
@@ -149,13 +151,13 @@ class Application {
         let currentDateTime = new Date().getTime();
         for (let i = 0; this.Rooms.length; i++) {
             if (((currentDateTime - this.Rooms[i].ActiveTime.getTime()) / 1000) > (180 * 1000)) {
-                this.Rooms[i].Active = dataTypes_js_1.GameActive.InActive;
+                this.Rooms[i].Active = dataTypes_js_1.GameActive.Inactive;
                 for (let j = 0; this.Rooms[i].Players.length; j++) {
-                    this.RoomActiveUpdate(this.Rooms[i].Players[j].player.Id, this.Rooms[i].Id, dataTypes_js_1.GameActive.InActive);
+                    this.RoomActiveUpdate(this.Rooms[i].Players[j].player.Id, this.Rooms[i].Id, dataTypes_js_1.GameActive.Inactive);
                 }
             }
         }
-        this.Rooms = this.Rooms.filter(e => e.Active !== dataTypes_js_1.GameActive.InActive);
+        this.Rooms = this.Rooms.filter(e => e.Active !== dataTypes_js_1.GameActive.Inactive);
     }
     CheckGameEnd(state) {
         let puzzlesActive = state.Players.filter(e => e.PuzzleLogicState.Active.Puzzle === true);
@@ -223,7 +225,9 @@ class Application {
         }
         if (playerState != null && room != null) {
             this.MergeLog(room, playerState, logItems);
+            return 1;
         }
+        return 0;
     }
     JoinRoom(key, roomId = null) {
         let player = this.Players.find(e => e.Key === key);
@@ -278,31 +282,45 @@ class Application {
     }
     //Server Sends
     PlayerLog(sendToPlayerId, playerId, playerLog) {
+        this.LogNetworkCall("PlayerLog", sendToPlayerId, {
+            playerId: playerId,
+            playerLog: playerLog
+        });
         return {
             playerId: playerId,
             playerLog: playerLog
         };
     }
     Start(sendToPlayerId, PlayersSeedData) {
+        this.LogNetworkCall("Start", sendToPlayerId, PlayersSeedData);
         return PlayersSeedData;
     }
     RoomActiveUpdate(sendToPlayerId, roomId, active) {
+        this.LogNetworkCall("RoomActiveUpdate", sendToPlayerId, active);
         return active;
     }
     UpdatePlayerName(sendToPlayerId, playerNameUpdate) {
+        this.LogNetworkCall("UpdatePlayerName", sendToPlayerId, playerNameUpdate);
         return playerNameUpdate;
     }
     ReceiveMessage(sendToPlayerId, message) {
+        this.LogNetworkCall("ReceiveMessage", sendToPlayerId, message);
         return message;
     }
-    PlayerJoinedRoom(sendToPlayId, player) {
+    PlayerJoinedRoom(sendToPlayerId, player) {
+        this.LogNetworkCall("PlayerJoinedRoom", sendToPlayerId, player);
         return player;
     }
-    PlayerLeftRoom(sendToPlayId, player) {
+    PlayerLeftRoom(sendToPlayerId, player) {
+        this.LogNetworkCall("PlayerLeftRoom", sendToPlayerId, player);
         return player;
     }
     GameEnded(sendToPlayerId, winningPlayerId) {
+        this.LogNetworkCall("GameEnded", sendToPlayerId, winningPlayerId);
         return winningPlayerId;
+    }
+    LogNetworkCall(action, sendToPlayerId, data) {
+        this.NetworkCallsOut.push({ action: action, playerId: sendToPlayerId, data: data });
     }
 }
 exports.Application = Application;

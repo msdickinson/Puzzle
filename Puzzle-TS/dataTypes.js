@@ -69,13 +69,10 @@ var SoundRequest;
 exports.SoundRequest = SoundRequest;
 var GameActive;
 (function (GameActive) {
-    GameActive[GameActive["WaitingNoPlayers"] = 0] = "WaitingNoPlayers";
-    GameActive[GameActive["WaitingOnePlayer"] = 1] = "WaitingOnePlayer";
-    GameActive[GameActive["GameRunning"] = 2] = "GameRunning";
-    GameActive[GameActive["GameEnded"] = 3] = "GameEnded";
-    GameActive[GameActive["RoomClosed"] = 4] = "RoomClosed";
-    GameActive[GameActive["InActive"] = 5] = "InActive";
-    GameActive[GameActive["Ready"] = 6] = "Ready";
+    GameActive[GameActive["WaitingForPlayers"] = 0] = "WaitingForPlayers";
+    GameActive[GameActive["GameRunning"] = 1] = "GameRunning";
+    GameActive[GameActive["GameEnded"] = 2] = "GameEnded";
+    GameActive[GameActive["Inactive"] = 3] = "Inactive";
 })(GameActive || (GameActive = {}));
 exports.GameActive = GameActive;
 class LogItem {

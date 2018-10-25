@@ -57,13 +57,10 @@ enum SoundRequest {
     LargeCombo
 }
 enum GameActive {
-    WaitingNoPlayers,
-    WaitingOnePlayer,
+    WaitingForPlayers,
     GameRunning,
     GameEnded,
-    RoomClosed,
-    InActive,
-    Ready
+    Inactive
 }
 class LogItem {
     public Tick: number;

@@ -6,42 +6,41 @@ class PuzzleLogic {
     constructor() {
     }
     //|Public|
-    Reset(log = false, seed = null) {
-        this.State = new dataTypes_js_1.PuzzleLogicState();
+    Reset(state, log = false, seed = null) {
         //Seed
         if (seed != null) {
-            this.State.Seed = seed;
+            state.Seed = seed;
         }
         else {
-            this.State.Seed = seedrandom()();
+            state.Seed = seedrandom()();
         }
-        this.State.Random = seedrandom(this.State.Seed.toString(), { state: true });
+        state.Random = seedrandom(state.Seed.toString(), { state: true });
         //Log
-        this.State.Log = log;
-        this.State.LogItems = [];
-        if (this.State.Log) {
+        state.Log = log;
+        state.LogItems = [];
+        if (state.Log) {
             let logItem = new dataTypes_js_1.LogItem();
-            logItem.Id = this.State.LogItems.length;
+            logItem.Id = state.LogItems.length;
             logItem.Action = "Seed";
-            logItem.ValueOne = this.State.Seed;
-            this.State.LogItems.push(logItem);
+            logItem.ValueOne = state.Seed;
+            state.LogItems.push(logItem);
         }
-        this.State.SoundRequests = [];
-        this.State.Active.Puzzle = true;
-        this.State.Active.Hover = false;
-        this.State.Active.Swap = false;
-        this.State.Active.Falling = false;
-        this.State.SwapOverRide = false;
-        this.State.Ticks.Puzzle = 0;
-        this.State.WaitForSwap = false;
-        this.State.Ticks.MoveBlocksUp = 0;
-        this.State.Ticks.Swap = 0;
-        this.State.BlockInc = 0;
-        this.State.Blocks = [];
+        state.SoundRequests = [];
+        state.Active.Puzzle = true;
+        state.Active.Hover = false;
+        state.Active.Swap = false;
+        state.Active.Falling = false;
+        state.SwapOverRide = false;
+        state.Ticks.Puzzle = 0;
+        state.WaitForSwap = false;
+        state.Ticks.MoveBlocksUp = 0;
+        state.Ticks.Swap = 0;
+        state.BlockInc = 0;
+        state.Blocks = [];
         for (var row = 0; row < dataTypes_js_1.Constants.MAX_ROWS; row++) {
-            this.State.Blocks[row] = [];
-            this.State.HoverBlocks[row] = [];
-            this.State.FallBlocks[row] = [];
+            state.Blocks[row] = [];
+            state.HoverBlocks[row] = [];
+            state.FallBlocks[row] = [];
             for (var col = 0; col < dataTypes_js_1.Constants.MAX_COLS; col++) {
                 const block = new dataTypes_js_1.Block();
                 block.State = dataTypes_js_1.BlockState.None;
@@ -49,343 +48,343 @@ class PuzzleLogic {
                 block.FallGroupTicks = 0;
                 block.Tick = 0;
                 block.groupId = 0;
-                this.State.Blocks[row][col] = new dataTypes_js_1.Block();
-                this.State.HoverBlocks[row][col] = new dataTypes_js_1.HoverBlock();
-                this.State.FallBlocks[row][col] = new dataTypes_js_1.FallBlock();
+                state.Blocks[row][col] = new dataTypes_js_1.Block();
+                state.HoverBlocks[row][col] = new dataTypes_js_1.HoverBlock();
+                state.FallBlocks[row][col] = new dataTypes_js_1.FallBlock();
             }
         }
         for (var i = 0; i < dataTypes_js_1.Constants.MAX_ROWS * dataTypes_js_1.Constants.MAX_COLS; i++) {
-            this.State.BlockSets[i] = 0;
-            this.State.Set[i] = new dataTypes_js_1.BlockSet();
+            state.BlockSets[i] = 0;
+            state.Set[i] = new dataTypes_js_1.BlockSet();
         }
-        this.State.Score = 0;
-        this.State.Level = 1;
-        this.State.groupId = 1;
-        this.State.Selector.Row = 2;
-        this.State.Selector.Col = 2;
-        this.CreateSetupBlocks();
+        state.Score = 0;
+        state.Level = 1;
+        state.groupId = 1;
+        state.Selector.Row = 2;
+        state.Selector.Col = 2;
+        this.CreateSetupBlocks(state);
     }
-    Tick() {
-        if (this.State.Active.Puzzle) {
-            if (this.State.Log) {
-                if (this.State.LogItems[this.State.LogItems.length - 1].Action !== "Tick") {
+    Tick(state) {
+        if (state.Active.Puzzle) {
+            if (state.Log) {
+                if (state.LogItems[state.LogItems.length - 1].Action !== "Tick") {
                     let logItem = new dataTypes_js_1.LogItem();
-                    logItem.Id = this.State.LogItems.length;
+                    logItem.Id = state.LogItems.length;
                     logItem.Action = "Tick";
                     logItem.ValueOne = 1;
-                    this.State.LogItems.push(logItem);
+                    state.LogItems.push(logItem);
                 }
                 else {
-                    this.State.LogItems[this.State.LogItems.length - 1].ValueOne++;
+                    state.LogItems[state.LogItems.length - 1].ValueOne++;
                 }
             }
-            this.State.Ticks.Puzzle++;
-            if (this.State.Active.Falling) {
-                this.FallTick();
+            state.Ticks.Puzzle++;
+            if (state.Active.Falling) {
+                this.FallTick(state);
             }
-            if (this.State.Active.Hover) {
-                this.HoverTick();
+            if (state.Active.Hover) {
+                this.HoverTick(state);
             }
-            if (this.State.Active.BlocksRemoving) {
-                this.RemoveBlocksTick();
+            if (state.Active.BlocksRemoving) {
+                this.RemoveBlocksTick(state);
             }
-            if (this.State.Active.Swap) {
-                this.SwapBlocksTick();
+            if (state.Active.Swap) {
+                this.SwapBlocksTick(state);
             }
-            if (!this.State.Active.BlocksRemoving && !this.State.Active.Hover) {
-                this.MoveBlocksUpTick();
+            if (!state.Active.BlocksRemoving && !state.Active.Hover) {
+                this.MoveBlocksUpTick(state);
             }
-            if (this.State.Ticks.Puzzle % (60 * 20) == 0)
-                this.State.Level++;
-            this.UpdateActive();
+            if (state.Ticks.Puzzle % (60 * 20) == 0)
+                state.Level++;
+            this.UpdateActive(state);
         }
     }
-    RequestMoveSelector(row, col) {
+    RequestMoveSelector(state, row, col) {
         if (col >= 0 && col < (dataTypes_js_1.Constants.MAX_COLS - 1) && row >= 1 && row < dataTypes_js_1.Constants.MAX_ROWS) {
-            if (this.State.Log) {
+            if (state.Log) {
                 let logItem = new dataTypes_js_1.LogItem();
-                logItem.Id = this.State.LogItems.length;
+                logItem.Id = state.LogItems.length;
                 logItem.Action = "RequestMoveSelector";
                 logItem.ValueOne = row;
                 logItem.ValueTwo = col;
-                this.State.LogItems.push(logItem);
+                state.LogItems.push(logItem);
             }
-            this.State.Selector.Row = row;
-            this.State.Selector.Col = col;
+            state.Selector.Row = row;
+            state.Selector.Col = col;
         }
     }
-    RequestSwitch() {
-        if (!this.State.Active.Swap) {
-            if ((this.State.Blocks[this.State.Selector.Row][this.State.Selector.Col].State == dataTypes_js_1.BlockState.None || this.State.Blocks[this.State.Selector.Row][this.State.Selector.Col].State == dataTypes_js_1.BlockState.Exist) && (this.State.Blocks[this.State.Selector.Row][this.State.Selector.Col + 1].State == dataTypes_js_1.BlockState.None || this.State.Blocks[this.State.Selector.Row][this.State.Selector.Col + 1].State == dataTypes_js_1.BlockState.Exist) && (this.State.Blocks[this.State.Selector.Row][this.State.Selector.Col].State != dataTypes_js_1.BlockState.None || this.State.Blocks[this.State.Selector.Row][this.State.Selector.Col + 1].State != dataTypes_js_1.BlockState.None)) {
-                if (this.State.Log) {
+    RequestSwitch(state) {
+        if (!state.Active.Swap) {
+            if ((state.Blocks[state.Selector.Row][state.Selector.Col].State == dataTypes_js_1.BlockState.None || state.Blocks[state.Selector.Row][state.Selector.Col].State == dataTypes_js_1.BlockState.Exist) && (state.Blocks[state.Selector.Row][state.Selector.Col + 1].State == dataTypes_js_1.BlockState.None || state.Blocks[state.Selector.Row][state.Selector.Col + 1].State == dataTypes_js_1.BlockState.Exist) && (state.Blocks[state.Selector.Row][state.Selector.Col].State != dataTypes_js_1.BlockState.None || state.Blocks[state.Selector.Row][state.Selector.Col + 1].State != dataTypes_js_1.BlockState.None)) {
+                if (state.Log) {
                     let logItem = new dataTypes_js_1.LogItem();
-                    logItem.Id = this.State.LogItems.length;
+                    logItem.Id = state.LogItems.length;
                     logItem.Action = "RequestSwitch";
-                    this.State.LogItems.push(logItem);
+                    state.LogItems.push(logItem);
                 }
-                this.State.SoundRequests.push(dataTypes_js_1.SoundRequest.Swap);
-                this.State.WaitForSwap = false;
-                this.State.Active.Swap = true;
-                this.State.SwitchLeftBlockRow = this.State.Selector.Row;
-                this.State.SwitchLeftBlockCol = this.State.Selector.Col;
-                this.State.SwitchRightBlockRow = this.State.Selector.Row;
-                this.State.SwitchRightBlockCol = this.State.Selector.Col + 1;
-                if (this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State == dataTypes_js_1.BlockState.Exist) {
-                    this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State = dataTypes_js_1.BlockState.Switch;
-                }
-                else {
-                    this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State = dataTypes_js_1.BlockState.SwitchNone;
-                }
-                if (this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].State == dataTypes_js_1.BlockState.Exist) {
-                    this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].State = dataTypes_js_1.BlockState.Switch;
+                state.SoundRequests.push(dataTypes_js_1.SoundRequest.Swap);
+                state.WaitForSwap = false;
+                state.Active.Swap = true;
+                state.SwitchLeftBlockRow = state.Selector.Row;
+                state.SwitchLeftBlockCol = state.Selector.Col;
+                state.SwitchRightBlockRow = state.Selector.Row;
+                state.SwitchRightBlockCol = state.Selector.Col + 1;
+                if (state.Blocks[state.SwitchLeftBlockRow][state.SwitchLeftBlockCol].State == dataTypes_js_1.BlockState.Exist) {
+                    state.Blocks[state.SwitchLeftBlockRow][state.SwitchLeftBlockCol].State = dataTypes_js_1.BlockState.Switch;
                 }
                 else {
-                    this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].State = dataTypes_js_1.BlockState.SwitchNone;
+                    state.Blocks[state.SwitchLeftBlockRow][state.SwitchLeftBlockCol].State = dataTypes_js_1.BlockState.SwitchNone;
+                }
+                if (state.Blocks[state.SwitchRightBlockRow][state.SwitchRightBlockCol].State == dataTypes_js_1.BlockState.Exist) {
+                    state.Blocks[state.SwitchRightBlockRow][state.SwitchRightBlockCol].State = dataTypes_js_1.BlockState.Switch;
+                }
+                else {
+                    state.Blocks[state.SwitchRightBlockRow][state.SwitchRightBlockCol].State = dataTypes_js_1.BlockState.SwitchNone;
                 }
             }
         }
     }
-    UpdateActive() {
-        this.State.Active.BlocksRemoving = false;
-        this.State.Active.Falling = false;
-        this.State.Active.Hover = false;
+    UpdateActive(state) {
+        state.Active.BlocksRemoving = false;
+        state.Active.Falling = false;
+        state.Active.Hover = false;
         for (var row = 0; row < dataTypes_js_1.Constants.MAX_ROWS; row++) {
             for (var col = 0; col < dataTypes_js_1.Constants.MAX_COLS; col++) {
-                if (this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.Falling || this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.LockedForFall) {
-                    this.State.Active.Falling = true;
+                if (state.Blocks[row][col].State == dataTypes_js_1.BlockState.Falling || state.Blocks[row][col].State == dataTypes_js_1.BlockState.LockedForFall) {
+                    state.Active.Falling = true;
                 }
-                else if (this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.Hover || this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.HoverSwap) {
-                    this.State.Active.Hover = true;
+                else if (state.Blocks[row][col].State == dataTypes_js_1.BlockState.Hover || state.Blocks[row][col].State == dataTypes_js_1.BlockState.HoverSwap) {
+                    state.Active.Hover = true;
                 }
-                else if (this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.Remove) {
-                    this.State.Active.BlocksRemoving = true;
+                else if (state.Blocks[row][col].State == dataTypes_js_1.BlockState.Remove) {
+                    state.Active.BlocksRemoving = true;
                 }
             }
         }
     }
-    SaveState() {
+    SaveState(state) {
         return JSON.parse(JSON.stringify({
-            Paused: this.State.Paused,
-            Log: this.State.Log,
-            LogItems: this.State.LogItems,
-            SoundRequests: this.State.SoundRequests,
-            Blocks: this.State.Blocks,
-            Random: this.State.Random.state(),
-            HoverBlocks: this.State.HoverBlocks,
-            FallBlocks: this.State.FallBlocks,
-            BlocksMoveFast: this.State.BlocksMoveFast,
-            SwitchLeftBlockRow: this.State.SwitchLeftBlockRow,
-            SwitchLeftBlockCol: this.State.SwitchLeftBlockCol,
-            SwitchRightBlockRow: this.State.SwitchRightBlockRow,
-            SwitchRightBlockCol: this.State.SwitchRightBlockCol,
-            SwapOverRide: this.State.SwapOverRide,
-            WaitForSwap: this.State.WaitForSwap,
-            BlockInc: this.State.BlockInc,
-            Score: this.State.Score,
-            Level: this.State.Level,
-            Chain: this.State.Chain,
-            groupId: this.State.groupId,
-            Selector: this.State.Selector,
-            Active: this.State.Active,
-            Ticks: this.State.Ticks,
-            SetCount: this.State.SetCount,
-            Set: this.State.Set,
-            BlockSetsCount: this.State.BlockSetsCount,
-            BlockSets: this.State.BlockSets
+            Paused: state.Paused,
+            Log: state.Log,
+            LogItems: state.LogItems,
+            SoundRequests: state.SoundRequests,
+            Blocks: state.Blocks,
+            Random: state.Random.state(),
+            HoverBlocks: state.HoverBlocks,
+            FallBlocks: state.FallBlocks,
+            BlocksMoveFast: state.BlocksMoveFast,
+            SwitchLeftBlockRow: state.SwitchLeftBlockRow,
+            SwitchLeftBlockCol: state.SwitchLeftBlockCol,
+            SwitchRightBlockRow: state.SwitchRightBlockRow,
+            SwitchRightBlockCol: state.SwitchRightBlockCol,
+            SwapOverRide: state.SwapOverRide,
+            WaitForSwap: state.WaitForSwap,
+            BlockInc: state.BlockInc,
+            Score: state.Score,
+            Level: state.Level,
+            Chain: state.Chain,
+            groupId: state.groupId,
+            Selector: state.Selector,
+            Active: state.Active,
+            Ticks: state.Ticks,
+            SetCount: state.SetCount,
+            Set: state.Set,
+            BlockSetsCount: state.BlockSetsCount,
+            BlockSets: state.BlockSets
         }));
     }
-    LoadState(state) {
-        this.State.Paused = state.Paused;
-        this.State.Log = state.Log;
-        this.State.LogItems = state.LogItems;
-        this.State.SoundRequests = state.SoundRequests;
-        this.State.Blocks = state.Blocks;
-        this.State.Random = seedrandom("", { state: state.Random });
-        this.State.HoverBlocks = state.HoverBlocks;
-        this.State.FallBlocks = state.FallBlocks;
-        this.State.BlocksMoveFast = state.BlocksMoveFast;
-        this.State.SwitchLeftBlockRow = state.SwitchLeftBlockRow;
-        this.State.SwitchLeftBlockCol = state.SwitchLeftBlockCol;
-        this.State.SwitchRightBlockRow = state.SwitchRightBlockRow;
-        this.State.SwitchRightBlockCol = state.SwitchRightBlockCol;
-        this.State.SwapOverRide = state.SwapOverRide;
-        this.State.WaitForSwap = state.WaitForSwap;
-        this.State.BlockInc = state.BlockInc;
-        this.State.Score = state.Score;
-        this.State.Level = state.Level;
-        this.State.Chain = state.Chain;
-        this.State.groupId = state.groupId;
-        this.State.Selector = state.Selector;
-        this.State.Active = state.Active;
-        this.State.Ticks = state.Ticks;
-        this.State.SetCount = state.SetCount;
-        this.State.Set = state.Set;
-        this.State.BlockSetsCount = state.BlockSetsCount;
-        this.State.BlockSets = state.BlockSets;
+    LoadState(state, loadState) {
+        state.Paused = loadState.Paused;
+        state.Log = loadState.Log;
+        state.LogItems = loadState.LogItems;
+        state.SoundRequests = loadState.SoundRequests;
+        state.Blocks = loadState.Blocks;
+        state.Random = seedrandom("", { state: loadState.Random });
+        state.HoverBlocks = loadState.HoverBlocks;
+        state.FallBlocks = loadState.FallBlocks;
+        state.BlocksMoveFast = loadState.BlocksMoveFast;
+        state.SwitchLeftBlockRow = loadState.SwitchLeftBlockRow;
+        state.SwitchLeftBlockCol = loadState.SwitchLeftBlockCol;
+        state.SwitchRightBlockRow = loadState.SwitchRightBlockRow;
+        state.SwitchRightBlockCol = loadState.SwitchRightBlockCol;
+        state.SwapOverRide = loadState.SwapOverRide;
+        state.WaitForSwap = loadState.WaitForSwap;
+        state.BlockInc = loadState.BlockInc;
+        state.Score = loadState.Score;
+        state.Level = loadState.Level;
+        state.Chain = loadState.Chain;
+        state.groupId = loadState.groupId;
+        state.Selector = loadState.Selector;
+        state.Active = loadState.Active;
+        state.Ticks = loadState.Ticks;
+        state.SetCount = loadState.SetCount;
+        state.Set = loadState.Set;
+        state.BlockSetsCount = loadState.BlockSetsCount;
+        state.BlockSets = loadState.BlockSets;
     }
     //Private
     //Ticks
-    HoverTick() {
+    HoverTick(state) {
         var falling = false;
         for (var row = 0; row < dataTypes_js_1.Constants.MAX_ROWS; row++) {
             for (var col = 0; col < dataTypes_js_1.Constants.MAX_COLS; col++) {
-                if ((this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.Hover || this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.HoverSwap)) {
-                    this.State.Blocks[row][col].Tick++;
-                    if ((this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.Hover && this.State.Blocks[row][col].Tick == dataTypes_js_1.Constants.TICKS_FOR_HOVER) || (this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.HoverSwap && this.State.Blocks[row][col].Tick == dataTypes_js_1.Constants.TICKS_FOR_HOVER_SWAP)) {
-                        this.State.Blocks[row][col].Tick = 0;
-                        this.State.Blocks[row][col].State = dataTypes_js_1.BlockState.Falling;
-                        this.State.Blocks[row][col].groupId = 0;
+                if ((state.Blocks[row][col].State == dataTypes_js_1.BlockState.Hover || state.Blocks[row][col].State == dataTypes_js_1.BlockState.HoverSwap)) {
+                    state.Blocks[row][col].Tick++;
+                    if ((state.Blocks[row][col].State == dataTypes_js_1.BlockState.Hover && state.Blocks[row][col].Tick == dataTypes_js_1.Constants.TICKS_FOR_HOVER) || (state.Blocks[row][col].State == dataTypes_js_1.BlockState.HoverSwap && state.Blocks[row][col].Tick == dataTypes_js_1.Constants.TICKS_FOR_HOVER_SWAP)) {
+                        state.Blocks[row][col].Tick = 0;
+                        state.Blocks[row][col].State = dataTypes_js_1.BlockState.Falling;
+                        state.Blocks[row][col].groupId = 0;
                         falling = true;
                     }
                 }
             }
         }
         if (falling) {
-            this.CheckForFalling();
+            this.CheckForFalling(state);
         }
     }
-    FallTick() {
+    FallTick(state) {
         var blocksFall = false;
         var largetChain = 0;
         for (var row = 0; row < dataTypes_js_1.Constants.MAX_ROWS; row++) {
             for (var col = 0; col < dataTypes_js_1.Constants.MAX_COLS; col++) {
-                this.State.SoundRequests.push(dataTypes_js_1.SoundRequest.Fall);
-                if (this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.Falling || this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.LockedForFall) {
-                    this.State.Blocks[row][col].Tick++;
-                    if (this.State.Blocks[row][col].Tick == this.State.Blocks[row][col].FallGroupTicks) {
+                state.SoundRequests.push(dataTypes_js_1.SoundRequest.Fall);
+                if (state.Blocks[row][col].State == dataTypes_js_1.BlockState.Falling || state.Blocks[row][col].State == dataTypes_js_1.BlockState.LockedForFall) {
+                    state.Blocks[row][col].Tick++;
+                    if (state.Blocks[row][col].Tick == state.Blocks[row][col].FallGroupTicks) {
                         blocksFall = true;
-                        this.State.Blocks[row][col].Tick = 0;
-                        this.State.Blocks[row][col].FallGroupTicks = 0;
-                        this.State.Blocks[row][col].groupId = 0;
-                        if (this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.Falling) {
-                            this.State.Blocks[this.State.FallBlocks[row][col].Row][col].State = dataTypes_js_1.BlockState.Exist;
-                            this.State.Blocks[this.State.FallBlocks[row][col].Row][col].Color = this.State.Blocks[row][col].Color;
-                            this.State.Blocks[this.State.FallBlocks[row][col].Row][col].Tick = 0;
-                            this.State.Blocks[this.State.FallBlocks[row][col].Row][col].groupId = 0;
-                            if (this.State.Blocks[row][col].TotalChain > largetChain) {
-                                largetChain = this.State.Blocks[row][col].TotalChain;
+                        state.Blocks[row][col].Tick = 0;
+                        state.Blocks[row][col].FallGroupTicks = 0;
+                        state.Blocks[row][col].groupId = 0;
+                        if (state.Blocks[row][col].State == dataTypes_js_1.BlockState.Falling) {
+                            state.Blocks[state.FallBlocks[row][col].Row][col].State = dataTypes_js_1.BlockState.Exist;
+                            state.Blocks[state.FallBlocks[row][col].Row][col].Color = state.Blocks[row][col].Color;
+                            state.Blocks[state.FallBlocks[row][col].Row][col].Tick = 0;
+                            state.Blocks[state.FallBlocks[row][col].Row][col].groupId = 0;
+                            if (state.Blocks[row][col].TotalChain > largetChain) {
+                                largetChain = state.Blocks[row][col].TotalChain;
                             }
-                            this.State.Blocks[row][col].TotalChain = 0;
-                            this.State.Blocks[this.State.FallBlocks[row][col].Row][col].TotalChain = 0;
+                            state.Blocks[row][col].TotalChain = 0;
+                            state.Blocks[state.FallBlocks[row][col].Row][col].TotalChain = 0;
                         }
-                        this.State.Blocks[row][col].State = dataTypes_js_1.BlockState.None;
+                        state.Blocks[row][col].State = dataTypes_js_1.BlockState.None;
                     }
                 }
             }
         }
-        if (blocksFall && !this.State.WaitForSwap) {
-            this.CheckForSets(largetChain);
+        if (blocksFall && !state.WaitForSwap) {
+            this.CheckForSets(state, largetChain);
         }
     }
-    MoveBlocksUpTick() {
-        this.State.Ticks.MoveBlocksUp++;
-        if (!this.State.BlocksMoveFast) {
-            this.State.BlockInc += 50 / (450 - ((this.State.Level - 1) * 15));
+    MoveBlocksUpTick(state) {
+        state.Ticks.MoveBlocksUp++;
+        if (!state.BlocksMoveFast) {
+            state.BlockInc += 50 / (450 - ((state.Level - 1) * 15));
         }
         else {
-            if (this.State.Ticks.MoveBlocksUp % 1 == 0 && this.State.BlockInc >= 50) {
-                this.State.BlockInc += 2.5;
+            if (state.Ticks.MoveBlocksUp % 1 == 0 && state.BlockInc >= 50) {
+                state.BlockInc += 2.5;
             }
         }
-        if (this.State.BlockInc >= 50) {
-            this.CheckForGameOver();
-            if (this.State.Active.Puzzle) {
-                this.State.BlockInc = 0;
-                this.State.Ticks.MoveBlocksUp = 0;
-                this.RowChange();
-                this.CheckForSets(0);
-            }
-        }
-    }
-    SwapBlocksTick() {
-        this.State.Ticks.Swap++;
-        if (this.State.Ticks.Swap == dataTypes_js_1.Constants.TICKS_FOR_SWAP) {
-            var newRightState = this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State;
-            var newRightColor = this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].Color;
-            this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State = this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].State;
-            this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].Color = this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].Color;
-            this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].State = newRightState;
-            this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].Color = newRightColor;
-            if (this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State == dataTypes_js_1.BlockState.Switch) {
-                this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State = dataTypes_js_1.BlockState.Exist;
-            }
-            else {
-                this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State = dataTypes_js_1.BlockState.None;
-            }
-            if (this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].State == dataTypes_js_1.BlockState.Switch) {
-                this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].State = dataTypes_js_1.BlockState.Exist;
-            }
-            else {
-                this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].State = dataTypes_js_1.BlockState.None;
-            }
-            this.State.Ticks.Swap = 0;
-            this.State.Active.Swap = false;
-            if (!this.State.SwapOverRide) {
-                this.CheckForSets(0);
-            }
-            if (this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].TotalChain > this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].TotalChain) {
-                this.CheckForHover(this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].TotalChain, !this.State.SwapOverRide);
-            }
-            else {
-                this.CheckForHover(this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].TotalChain, !this.State.SwapOverRide);
+        if (state.BlockInc >= 50) {
+            this.CheckForGameOver(state);
+            if (state.Active.Puzzle) {
+                state.BlockInc = 0;
+                state.Ticks.MoveBlocksUp = 0;
+                this.RowChange(state);
+                this.CheckForSets(state, 0);
             }
         }
     }
-    RemoveBlocksTick() {
+    SwapBlocksTick(state) {
+        state.Ticks.Swap++;
+        if (state.Ticks.Swap == dataTypes_js_1.Constants.TICKS_FOR_SWAP) {
+            var newRightState = state.Blocks[state.SwitchLeftBlockRow][state.SwitchLeftBlockCol].State;
+            var newRightColor = state.Blocks[state.SwitchLeftBlockRow][state.SwitchLeftBlockCol].Color;
+            state.Blocks[state.SwitchLeftBlockRow][state.SwitchLeftBlockCol].State = state.Blocks[state.SwitchRightBlockRow][state.SwitchRightBlockCol].State;
+            state.Blocks[state.SwitchLeftBlockRow][state.SwitchLeftBlockCol].Color = state.Blocks[state.SwitchRightBlockRow][state.SwitchRightBlockCol].Color;
+            state.Blocks[state.SwitchRightBlockRow][state.SwitchRightBlockCol].State = newRightState;
+            state.Blocks[state.SwitchRightBlockRow][state.SwitchRightBlockCol].Color = newRightColor;
+            if (state.Blocks[state.SwitchLeftBlockRow][state.SwitchLeftBlockCol].State == dataTypes_js_1.BlockState.Switch) {
+                state.Blocks[state.SwitchLeftBlockRow][state.SwitchLeftBlockCol].State = dataTypes_js_1.BlockState.Exist;
+            }
+            else {
+                state.Blocks[state.SwitchLeftBlockRow][state.SwitchLeftBlockCol].State = dataTypes_js_1.BlockState.None;
+            }
+            if (state.Blocks[state.SwitchRightBlockRow][state.SwitchRightBlockCol].State == dataTypes_js_1.BlockState.Switch) {
+                state.Blocks[state.SwitchRightBlockRow][state.SwitchRightBlockCol].State = dataTypes_js_1.BlockState.Exist;
+            }
+            else {
+                state.Blocks[state.SwitchRightBlockRow][state.SwitchRightBlockCol].State = dataTypes_js_1.BlockState.None;
+            }
+            state.Ticks.Swap = 0;
+            state.Active.Swap = false;
+            if (!state.SwapOverRide) {
+                this.CheckForSets(state, 0);
+            }
+            if (state.Blocks[state.SwitchLeftBlockRow][state.SwitchLeftBlockCol].TotalChain > state.Blocks[state.SwitchRightBlockRow][state.SwitchRightBlockCol].TotalChain) {
+                this.CheckForHover(state, state.Blocks[state.SwitchLeftBlockRow][state.SwitchLeftBlockCol].TotalChain, !state.SwapOverRide);
+            }
+            else {
+                this.CheckForHover(state, state.Blocks[state.SwitchRightBlockRow][state.SwitchRightBlockCol].TotalChain, !state.SwapOverRide);
+            }
+        }
+    }
+    RemoveBlocksTick(state) {
         var totalChain = 0;
         for (var row = 0; row < dataTypes_js_1.Constants.MAX_ROWS; row++) {
             for (var col = 0; col < dataTypes_js_1.Constants.MAX_COLS; col++) {
-                if (this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.Remove) {
-                    this.State.Blocks[row][col].Tick++;
-                    if (this.State.Blocks[row][col].Tick == dataTypes_js_1.Constants.TICKS_FOR_REMOVING_BLOCKS) {
-                        if (totalChain < this.State.Blocks[row][col].TotalChain) {
-                            totalChain = this.State.Blocks[row][col].TotalChain;
+                if (state.Blocks[row][col].State == dataTypes_js_1.BlockState.Remove) {
+                    state.Blocks[row][col].Tick++;
+                    if (state.Blocks[row][col].Tick == dataTypes_js_1.Constants.TICKS_FOR_REMOVING_BLOCKS) {
+                        if (totalChain < state.Blocks[row][col].TotalChain) {
+                            totalChain = state.Blocks[row][col].TotalChain;
                         }
-                        this.State.Blocks[row][col].State = dataTypes_js_1.BlockState.None;
-                        this.State.Blocks[row][col].TotalChain = 0;
-                        this.State.Blocks[row][col].Tick = 0;
-                        this.State.Blocks[row][col].groupId = 0;
+                        state.Blocks[row][col].State = dataTypes_js_1.BlockState.None;
+                        state.Blocks[row][col].TotalChain = 0;
+                        state.Blocks[row][col].Tick = 0;
+                        state.Blocks[row][col].groupId = 0;
                     }
                 }
             }
         }
-        this.UpdateActive();
-        this.CheckForHover(totalChain, false);
+        this.UpdateActive(state);
+        this.CheckForHover(state, totalChain, false);
     }
     //Checks
-    CheckForSets(chain) {
+    CheckForSets(state, chain) {
         chain++;
         var setCount = 0;
         var currentBlockRow = 0;
         var currentBlockCol = 0;
-        this.State.SetCount = 0;
+        state.SetCount = 0;
         for (var row = 1; row < dataTypes_js_1.Constants.MAX_ROWS; row++) {
             currentBlockCol = 0;
             setCount = 1;
             for (var col = 1; col < dataTypes_js_1.Constants.MAX_COLS; col++) {
-                if ((this.State.Blocks[row][currentBlockCol].State == dataTypes_js_1.BlockState.Exist && this.State.Blocks[row][currentBlockCol].groupId == 0) &&
-                    (this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.Exist && this.State.Blocks[row][col].groupId == 0) &&
-                    this.State.Blocks[row][col].Color == this.State.Blocks[row][currentBlockCol].Color) {
+                if ((state.Blocks[row][currentBlockCol].State == dataTypes_js_1.BlockState.Exist && state.Blocks[row][currentBlockCol].groupId == 0) &&
+                    (state.Blocks[row][col].State == dataTypes_js_1.BlockState.Exist && state.Blocks[row][col].groupId == 0) &&
+                    state.Blocks[row][col].Color == state.Blocks[row][currentBlockCol].Color) {
                     setCount++;
                 }
                 else {
                     if (setCount >= 3) {
                         for (var k = 0; k < setCount; k++) {
-                            this.State.Blocks[row][currentBlockCol + k].State = dataTypes_js_1.BlockState.Remove;
-                            this.State.Blocks[row][currentBlockCol + k].TotalChain = chain;
-                            this.State.Blocks[row][currentBlockCol + k].Tick = 0;
-                            this.State.Blocks[row][currentBlockCol + k].Tick = 0;
+                            state.Blocks[row][currentBlockCol + k].State = dataTypes_js_1.BlockState.Remove;
+                            state.Blocks[row][currentBlockCol + k].TotalChain = chain;
+                            state.Blocks[row][currentBlockCol + k].Tick = 0;
+                            state.Blocks[row][currentBlockCol + k].Tick = 0;
                         }
-                        this.State.Set[this.State.SetCount].Row = row;
-                        this.State.Set[this.State.SetCount].Col = currentBlockCol;
-                        this.State.Set[this.State.SetCount].Count = setCount;
-                        this.State.Set[this.State.SetCount].NewSetIndex = -1;
-                        this.State.Set[this.State.SetCount].Intersects = 0;
-                        this.State.Set[this.State.SetCount].Type = dataTypes_js_1.SetType.Col;
-                        this.State.SetCount++;
+                        state.Set[state.SetCount].Row = row;
+                        state.Set[state.SetCount].Col = currentBlockCol;
+                        state.Set[state.SetCount].Count = setCount;
+                        state.Set[state.SetCount].NewSetIndex = -1;
+                        state.Set[state.SetCount].Intersects = 0;
+                        state.Set[state.SetCount].Type = dataTypes_js_1.SetType.Col;
+                        state.SetCount++;
                     }
                     while (col != dataTypes_js_1.Constants.MAX_COLS - 1) {
-                        if (this.State.Blocks[row][col + 1].State == dataTypes_js_1.BlockState.Exist) {
+                        if (state.Blocks[row][col + 1].State == dataTypes_js_1.BlockState.Exist) {
                             currentBlockCol = col;
                             setCount = 1;
                             break;
@@ -398,43 +397,43 @@ class PuzzleLogic {
             }
             if (setCount >= 3) {
                 for (var k = 0; k < setCount; k++) {
-                    this.State.Blocks[row][currentBlockCol + k].State = dataTypes_js_1.BlockState.Remove;
-                    this.State.Blocks[row][currentBlockCol + k].TotalChain = chain;
-                    this.State.Blocks[row][currentBlockCol + k].Tick = 0;
+                    state.Blocks[row][currentBlockCol + k].State = dataTypes_js_1.BlockState.Remove;
+                    state.Blocks[row][currentBlockCol + k].TotalChain = chain;
+                    state.Blocks[row][currentBlockCol + k].Tick = 0;
                 }
-                this.State.Set[this.State.SetCount].Row = row;
-                this.State.Set[this.State.SetCount].Col = currentBlockCol;
-                this.State.Set[this.State.SetCount].Count = setCount;
-                this.State.Set[this.State.SetCount].NewSetIndex = -1;
-                this.State.Set[this.State.SetCount].Intersects = 0;
-                this.State.Set[this.State.SetCount].Type = dataTypes_js_1.SetType.Col;
-                this.State.SetCount++;
+                state.Set[state.SetCount].Row = row;
+                state.Set[state.SetCount].Col = currentBlockCol;
+                state.Set[state.SetCount].Count = setCount;
+                state.Set[state.SetCount].NewSetIndex = -1;
+                state.Set[state.SetCount].Intersects = 0;
+                state.Set[state.SetCount].Type = dataTypes_js_1.SetType.Col;
+                state.SetCount++;
             }
         }
         for (var col = 0; col < dataTypes_js_1.Constants.MAX_COLS; col++) {
             currentBlockRow = 1;
             setCount = 1;
             for (var row = 2; row < dataTypes_js_1.Constants.MAX_ROWS; row++) {
-                if (((this.State.Blocks[currentBlockRow][col].State == dataTypes_js_1.BlockState.Exist || this.State.Blocks[currentBlockRow][col].State == dataTypes_js_1.BlockState.Remove) && this.State.Blocks[currentBlockRow][col].groupId == 0) && ((this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.Exist || this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.Remove) && this.State.Blocks[row][col].groupId == 0) && (this.State.Blocks[row][col].Color == this.State.Blocks[currentBlockRow][col].Color)) {
+                if (((state.Blocks[currentBlockRow][col].State == dataTypes_js_1.BlockState.Exist || state.Blocks[currentBlockRow][col].State == dataTypes_js_1.BlockState.Remove) && state.Blocks[currentBlockRow][col].groupId == 0) && ((state.Blocks[row][col].State == dataTypes_js_1.BlockState.Exist || state.Blocks[row][col].State == dataTypes_js_1.BlockState.Remove) && state.Blocks[row][col].groupId == 0) && (state.Blocks[row][col].Color == state.Blocks[currentBlockRow][col].Color)) {
                     setCount++;
                 }
                 else {
                     if (setCount >= 3) {
                         for (var k = 0; k < setCount; k++) {
-                            this.State.Blocks[currentBlockRow + k][col].State = dataTypes_js_1.BlockState.Remove;
-                            this.State.Blocks[currentBlockRow + k][col].TotalChain = chain;
-                            this.State.Blocks[currentBlockRow + k][col].Tick = 0;
+                            state.Blocks[currentBlockRow + k][col].State = dataTypes_js_1.BlockState.Remove;
+                            state.Blocks[currentBlockRow + k][col].TotalChain = chain;
+                            state.Blocks[currentBlockRow + k][col].Tick = 0;
                         }
-                        this.State.Set[this.State.SetCount].Row = currentBlockRow;
-                        this.State.Set[this.State.SetCount].Col = col;
-                        this.State.Set[this.State.SetCount].Count = setCount;
-                        this.State.Set[this.State.SetCount].NewSetIndex = -1;
-                        this.State.Set[this.State.SetCount].Intersects = 0;
-                        this.State.Set[this.State.SetCount].Type = dataTypes_js_1.SetType.Row;
-                        this.State.SetCount++;
+                        state.Set[state.SetCount].Row = currentBlockRow;
+                        state.Set[state.SetCount].Col = col;
+                        state.Set[state.SetCount].Count = setCount;
+                        state.Set[state.SetCount].NewSetIndex = -1;
+                        state.Set[state.SetCount].Intersects = 0;
+                        state.Set[state.SetCount].Type = dataTypes_js_1.SetType.Row;
+                        state.SetCount++;
                     }
                     while (row != dataTypes_js_1.Constants.MAX_ROWS - 1) {
-                        if (this.State.Blocks[row + 1][col].State == dataTypes_js_1.BlockState.Exist) {
+                        if (state.Blocks[row + 1][col].State == dataTypes_js_1.BlockState.Exist) {
                             currentBlockRow = row;
                             setCount = 1;
                             break;
@@ -447,87 +446,87 @@ class PuzzleLogic {
             }
             if (setCount >= 3) {
                 for (var k = 0; k < setCount; k++) {
-                    this.State.Blocks[currentBlockRow + k][col].State = dataTypes_js_1.BlockState.Remove;
-                    this.State.Blocks[currentBlockRow + k][col].TotalChain = chain;
-                    this.State.Blocks[currentBlockRow + k][col].Tick = 0;
+                    state.Blocks[currentBlockRow + k][col].State = dataTypes_js_1.BlockState.Remove;
+                    state.Blocks[currentBlockRow + k][col].TotalChain = chain;
+                    state.Blocks[currentBlockRow + k][col].Tick = 0;
                 }
-                this.State.Set[this.State.SetCount].Row = currentBlockRow;
-                this.State.Set[this.State.SetCount].Col = col;
-                this.State.Set[this.State.SetCount].Count = setCount;
-                this.State.Set[this.State.SetCount].NewSetIndex = -1;
-                this.State.Set[this.State.SetCount].Intersects = 0;
-                this.State.Set[this.State.SetCount].Type = dataTypes_js_1.SetType.Row;
-                this.State.SetCount++;
+                state.Set[state.SetCount].Row = currentBlockRow;
+                state.Set[state.SetCount].Col = col;
+                state.Set[state.SetCount].Count = setCount;
+                state.Set[state.SetCount].NewSetIndex = -1;
+                state.Set[state.SetCount].Intersects = 0;
+                state.Set[state.SetCount].Type = dataTypes_js_1.SetType.Row;
+                state.SetCount++;
             }
         }
-        for (var i = 0; i < this.State.SetCount; i++) {
+        for (var i = 0; i < state.SetCount; i++) {
         }
         var NewSetIndex = 0;
-        this.State.BlockSetsCount = this.State.SetCount;
-        for (var i = 0; i < this.State.SetCount; i++) {
-            if (this.State.Set[i].NewSetIndex == -1) {
-                this.State.Set[i].NewSetIndex = NewSetIndex;
-                this.State.BlockSets[NewSetIndex] = 0;
+        state.BlockSetsCount = state.SetCount;
+        for (var i = 0; i < state.SetCount; i++) {
+            if (state.Set[i].NewSetIndex == -1) {
+                state.Set[i].NewSetIndex = NewSetIndex;
+                state.BlockSets[NewSetIndex] = 0;
                 NewSetIndex++;
             }
-            for (var j = i; j < this.State.SetCount; j++) {
-                if (i == j || this.State.Set[j].NewSetIndex == this.State.Set[i].NewSetIndex) {
+            for (var j = i; j < state.SetCount; j++) {
+                if (i == j || state.Set[j].NewSetIndex == state.Set[i].NewSetIndex) {
                     continue;
                 }
-                if (this.State.Set[i].Type == dataTypes_js_1.SetType.Col && this.State.Set[j].Type == dataTypes_js_1.SetType.Row && this.State.Set[j].Row == this.State.Set[i].Row && this.State.Set[j].Col >= this.State.Set[i].Col && this.State.Set[j].Col <= (this.State.Set[i].Col + this.State.Set[i].Count)) {
-                    this.State.Set[j].Intersects++;
-                    this.State.Set[j].NewSetIndex = this.State.Set[i].NewSetIndex;
-                    this.State.BlockSetsCount = this.State.BlockSetsCount - 1;
+                if (state.Set[i].Type == dataTypes_js_1.SetType.Col && state.Set[j].Type == dataTypes_js_1.SetType.Row && state.Set[j].Row == state.Set[i].Row && state.Set[j].Col >= state.Set[i].Col && state.Set[j].Col <= (state.Set[i].Col + state.Set[i].Count)) {
+                    state.Set[j].Intersects++;
+                    state.Set[j].NewSetIndex = state.Set[i].NewSetIndex;
+                    state.BlockSetsCount = state.BlockSetsCount - 1;
                 }
-                if (this.State.Set[j].Type == dataTypes_js_1.SetType.Col && this.State.Set[i].Type == dataTypes_js_1.SetType.Row && this.State.Set[j].Col >= this.State.Set[i].Col && this.State.Set[j].Col <= (this.State.Set[i].Col + this.State.Set[i].Count)) {
-                    this.State.Set[i].Intersects++;
-                    this.State.Set[i].NewSetIndex = this.State.Set[j].NewSetIndex;
-                    this.State.BlockSetsCount = this.State.BlockSetsCount - 1;
+                if (state.Set[j].Type == dataTypes_js_1.SetType.Col && state.Set[i].Type == dataTypes_js_1.SetType.Row && state.Set[j].Col >= state.Set[i].Col && state.Set[j].Col <= (state.Set[i].Col + state.Set[i].Count)) {
+                    state.Set[i].Intersects++;
+                    state.Set[i].NewSetIndex = state.Set[j].NewSetIndex;
+                    state.BlockSetsCount = state.BlockSetsCount - 1;
                 }
             }
         }
-        for (var i = 0; i < this.State.SetCount; i++) {
-            this.State.BlockSets[this.State.Set[i].NewSetIndex] += this.State.Set[i].Count - this.State.Set[i].Intersects;
+        for (var i = 0; i < state.SetCount; i++) {
+            state.BlockSets[state.Set[i].NewSetIndex] += state.Set[i].Count - state.Set[i].Intersects;
         }
-        if (this.State.SetCount > 0) {
-            this.State.SoundRequests.push(dataTypes_js_1.SoundRequest.Remove);
-            this.State.groupId++;
+        if (state.SetCount > 0) {
+            state.SoundRequests.push(dataTypes_js_1.SoundRequest.Remove);
+            state.groupId++;
             for (var row = 0; row < dataTypes_js_1.Constants.MAX_ROWS; row++) {
                 for (var col = 0; col < dataTypes_js_1.Constants.MAX_COLS; col++) {
-                    if (this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.Remove && this.State.Blocks[row][col].groupId == 0) {
-                        this.State.Blocks[row][col].groupId = this.State.groupId;
+                    if (state.Blocks[row][col].State == dataTypes_js_1.BlockState.Remove && state.Blocks[row][col].groupId == 0) {
+                        state.Blocks[row][col].groupId = state.groupId;
                     }
                 }
             }
-            this.State.Active.BlocksRemoving = true;
-            this.GetScore(chain);
+            state.Active.BlocksRemoving = true;
+            this.GetScore(state, chain);
         }
     }
-    CheckForHover(chain, switchedBlocks) {
+    CheckForHover(state, chain, switchedBlocks) {
         var oneHoverFound = false;
         for (var row = 1; row < dataTypes_js_1.Constants.MAX_ROWS; row++) {
             for (var col = 0; col < dataTypes_js_1.Constants.MAX_COLS; col++) {
-                if (this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.Exist && this.State.Blocks[row][col].State != dataTypes_js_1.BlockState.Hover && this.State.Blocks[row][col].State != dataTypes_js_1.BlockState.HoverSwap) {
-                    if (this.State.Blocks[row - 1][col].State == dataTypes_js_1.BlockState.None || this.State.Blocks[row - 1][col].State == dataTypes_js_1.BlockState.Hover || this.State.Blocks[row - 1][col].State == dataTypes_js_1.BlockState.HoverSwap) {
+                if (state.Blocks[row][col].State == dataTypes_js_1.BlockState.Exist && state.Blocks[row][col].State != dataTypes_js_1.BlockState.Hover && state.Blocks[row][col].State != dataTypes_js_1.BlockState.HoverSwap) {
+                    if (state.Blocks[row - 1][col].State == dataTypes_js_1.BlockState.None || state.Blocks[row - 1][col].State == dataTypes_js_1.BlockState.Hover || state.Blocks[row - 1][col].State == dataTypes_js_1.BlockState.HoverSwap) {
                         if (oneHoverFound == false) {
-                            this.State.groupId++;
+                            state.groupId++;
                             oneHoverFound = true;
                         }
-                        this.State.Blocks[row][col].groupId = this.State.groupId;
-                        this.State.Blocks[row][col].Tick = 0;
-                        this.State.Blocks[row][col].TotalChain = chain;
+                        state.Blocks[row][col].groupId = state.groupId;
+                        state.Blocks[row][col].Tick = 0;
+                        state.Blocks[row][col].TotalChain = chain;
                         if (switchedBlocks) {
-                            this.State.Blocks[row][col].State = dataTypes_js_1.BlockState.HoverSwap;
+                            state.Blocks[row][col].State = dataTypes_js_1.BlockState.HoverSwap;
                         }
                         else {
-                            this.State.Blocks[row][col].State = dataTypes_js_1.BlockState.Hover;
+                            state.Blocks[row][col].State = dataTypes_js_1.BlockState.Hover;
                         }
                         for (var k = row; k > 0; k--) {
-                            if (this.State.Blocks[k - 1][col].State == dataTypes_js_1.BlockState.None) {
-                                this.State.HoverBlocks[row][col].Row = k - 1;
+                            if (state.Blocks[k - 1][col].State == dataTypes_js_1.BlockState.None) {
+                                state.HoverBlocks[row][col].Row = k - 1;
                             }
-                            if (this.State.Blocks[k - 1][col].State == dataTypes_js_1.BlockState.Hover || this.State.Blocks[k - 1][col].State == dataTypes_js_1.BlockState.HoverSwap) {
-                                this.State.HoverBlocks[row][col].Row = this.State.HoverBlocks[k - 1][col].Row + 1;
+                            if (state.Blocks[k - 1][col].State == dataTypes_js_1.BlockState.Hover || state.Blocks[k - 1][col].State == dataTypes_js_1.BlockState.HoverSwap) {
+                                state.HoverBlocks[row][col].Row = state.HoverBlocks[k - 1][col].Row + 1;
                                 break;
                             }
                         }
@@ -536,103 +535,103 @@ class PuzzleLogic {
             }
         }
     }
-    CheckForFalling() {
+    CheckForFalling(state) {
         var chain = 0;
         for (var row = 1; row < dataTypes_js_1.Constants.MAX_ROWS; row++) {
             for (var col = 0; col < dataTypes_js_1.Constants.MAX_COLS; col++) {
-                if (this.State.Blocks[row][col].State == dataTypes_js_1.BlockState.Falling) {
-                    if (this.State.Blocks[row - 1][col].State == dataTypes_js_1.BlockState.None || this.State.Blocks[row - 1][col].State == dataTypes_js_1.BlockState.Falling || this.State.Blocks[row - 1][col].State == dataTypes_js_1.BlockState.LockedForFall) {
-                        if (this.State.Blocks[row][col].TotalChain > chain) {
-                            chain = this.State.Blocks[row][col].TotalChain;
+                if (state.Blocks[row][col].State == dataTypes_js_1.BlockState.Falling) {
+                    if (state.Blocks[row - 1][col].State == dataTypes_js_1.BlockState.None || state.Blocks[row - 1][col].State == dataTypes_js_1.BlockState.Falling || state.Blocks[row - 1][col].State == dataTypes_js_1.BlockState.LockedForFall) {
+                        if (state.Blocks[row][col].TotalChain > chain) {
+                            chain = state.Blocks[row][col].TotalChain;
                         }
-                        this.State.Blocks[row][col].FallGroupTicks = dataTypes_js_1.Constants.TICKS_FOR_FALL;
+                        state.Blocks[row][col].FallGroupTicks = dataTypes_js_1.Constants.TICKS_FOR_FALL;
                         for (var k = row; k > 0; k--) {
-                            if (this.State.Active.Swap && k - 2 >= 0 && this.State.Blocks[k - 1][col].State == dataTypes_js_1.BlockState.Switch || this.State.Blocks[k - 1][col].State == dataTypes_js_1.BlockState.SwitchNone && this.State.Blocks[k - 2][col].State == dataTypes_js_1.BlockState.None) {
-                                this.State.WaitForSwap = true;
+                            if (state.Active.Swap && k - 2 >= 0 && state.Blocks[k - 1][col].State == dataTypes_js_1.BlockState.Switch || state.Blocks[k - 1][col].State == dataTypes_js_1.BlockState.SwitchNone && state.Blocks[k - 2][col].State == dataTypes_js_1.BlockState.None) {
+                                state.WaitForSwap = true;
                             }
-                            if (this.State.Blocks[k - 1][col].State == dataTypes_js_1.BlockState.None) {
-                                this.State.FallBlocks[row][col].Row = k - 1;
-                                this.State.Blocks[k - 1][col].State = dataTypes_js_1.BlockState.LockedForFall;
-                                this.State.Blocks[k - 1][col].FallGroupTicks = dataTypes_js_1.Constants.TICKS_FOR_FALL;
-                                this.State.Blocks[k - 1][col].groupId = this.State.Blocks[row][col].groupId;
+                            if (state.Blocks[k - 1][col].State == dataTypes_js_1.BlockState.None) {
+                                state.FallBlocks[row][col].Row = k - 1;
+                                state.Blocks[k - 1][col].State = dataTypes_js_1.BlockState.LockedForFall;
+                                state.Blocks[k - 1][col].FallGroupTicks = dataTypes_js_1.Constants.TICKS_FOR_FALL;
+                                state.Blocks[k - 1][col].groupId = state.Blocks[row][col].groupId;
                             }
-                            if (this.State.Blocks[k - 1][col].State == dataTypes_js_1.BlockState.LockedForFall) {
-                                this.State.FallBlocks[row][col].Row = k - 1;
+                            if (state.Blocks[k - 1][col].State == dataTypes_js_1.BlockState.LockedForFall) {
+                                state.FallBlocks[row][col].Row = k - 1;
                             }
-                            if (this.State.Blocks[k - 1][col].State == dataTypes_js_1.BlockState.Falling) {
-                                this.State.FallBlocks[row][col].Row = this.State.FallBlocks[k - 1][col].Row + 1;
+                            if (state.Blocks[k - 1][col].State == dataTypes_js_1.BlockState.Falling) {
+                                state.FallBlocks[row][col].Row = state.FallBlocks[k - 1][col].Row + 1;
                                 break;
                             }
                         }
                     }
                     else {
-                        this.State.Blocks[row][col].State = dataTypes_js_1.BlockState.Exist;
-                        this.State.Blocks[row][col].groupId = 0;
-                        this.State.Blocks[row][col].Tick = 0;
+                        state.Blocks[row][col].State = dataTypes_js_1.BlockState.Exist;
+                        state.Blocks[row][col].groupId = 0;
+                        state.Blocks[row][col].Tick = 0;
                     }
                 }
             }
         }
-        if (this.State.WaitForSwap) {
-            this.State.SwapOverRide = true;
-            if (this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].State == dataTypes_js_1.BlockState.Switch) {
-                this.State.Blocks[this.State.SwitchLeftBlockRow][this.State.SwitchLeftBlockCol].TotalChain = chain;
+        if (state.WaitForSwap) {
+            state.SwapOverRide = true;
+            if (state.Blocks[state.SwitchLeftBlockRow][state.SwitchLeftBlockCol].State == dataTypes_js_1.BlockState.Switch) {
+                state.Blocks[state.SwitchLeftBlockRow][state.SwitchLeftBlockCol].TotalChain = chain;
             }
             else {
-                this.State.Blocks[this.State.SwitchRightBlockRow][this.State.SwitchRightBlockCol].TotalChain = chain;
+                state.Blocks[state.SwitchRightBlockRow][state.SwitchRightBlockCol].TotalChain = chain;
             }
         }
     }
     //Other
-    CreateSetupBlocks() {
+    CreateSetupBlocks(state) {
         for (var i = 0; i < dataTypes_js_1.Constants.STARTING_ROWS; i++) {
-            this.AddBlockRow(i);
+            this.AddBlockRow(state, i);
         }
     }
-    RowChange() {
-        this.MoveBlocksUpOneRow();
-        this.AddBlockRow(0);
-        this.State.Selector.Row = this.State.Selector.Row + 1;
-        this.State.SwitchLeftBlockRow++;
-        this.State.SwitchRightBlockRow++;
+    RowChange(state) {
+        this.MoveBlocksUpOneRow(state);
+        this.AddBlockRow(state, 0);
+        state.Selector.Row = state.Selector.Row + 1;
+        state.SwitchLeftBlockRow++;
+        state.SwitchRightBlockRow++;
     }
-    MoveBlocksUpOneRow() {
+    MoveBlocksUpOneRow(state) {
         for (var row = dataTypes_js_1.Constants.MAX_ROWS - 1; row >= 1; row--) {
             for (var col = 0; col < dataTypes_js_1.Constants.MAX_COLS; col++) {
-                this.State.Blocks[row][col].Color = this.State.Blocks[row - 1][col].Color;
-                this.State.Blocks[row][col].State = this.State.Blocks[row - 1][col].State;
+                state.Blocks[row][col].Color = state.Blocks[row - 1][col].Color;
+                state.Blocks[row][col].State = state.Blocks[row - 1][col].State;
             }
         }
     }
-    AddBlockRow(row) {
+    AddBlockRow(state, row) {
         for (var col = 0; col < 6; col++) {
             var blockColor;
             do {
-                blockColor = (Math.floor(this.State.Random() * Math.floor(5)));
-            } while (!this.IsNewBlockVaild(row, col, blockColor));
-            this.State.Blocks[row][col].Color = blockColor;
-            this.State.Blocks[row][col].State = dataTypes_js_1.BlockState.Exist;
-            this.State.Blocks[row][col].groupId = 0;
-            this.State.Blocks[row][col].Tick = 0;
-            this.State.Blocks[row][col].FallGroupTicks = 0;
+                blockColor = (Math.floor(state.Random() * Math.floor(5)));
+            } while (!this.IsNewBlockVaild(state, row, col, blockColor));
+            state.Blocks[row][col].Color = blockColor;
+            state.Blocks[row][col].State = dataTypes_js_1.BlockState.Exist;
+            state.Blocks[row][col].groupId = 0;
+            state.Blocks[row][col].Tick = 0;
+            state.Blocks[row][col].FallGroupTicks = 0;
         }
     }
     //Condtional
-    CheckForGameOver() {
+    CheckForGameOver(state) {
         for (var col = 0; col < dataTypes_js_1.Constants.MAX_COLS; col++) {
-            if (this.State.Blocks[dataTypes_js_1.Constants.MAX_ROWS - 1][col].State == dataTypes_js_1.BlockState.Exist) {
-                this.State.Active.Puzzle = false;
+            if (state.Blocks[dataTypes_js_1.Constants.MAX_ROWS - 1][col].State == dataTypes_js_1.BlockState.Exist) {
+                state.Active.Puzzle = false;
             }
         }
     }
-    IsNewBlockVaild(blockRow, blockCol, blockColor) {
+    IsNewBlockVaild(state, blockRow, blockCol, blockColor) {
         var foundValue = false;
         var i = 0;
         var rowSameColor = 0;
         i = 1;
         do {
             foundValue = false;
-            if ((blockRow - i) >= 0 && this.State.Blocks[blockRow - i][blockCol].State == dataTypes_js_1.BlockState.Exist && this.State.Blocks[blockRow - i][blockCol].Color == blockColor) {
+            if ((blockRow - i) >= 0 && state.Blocks[blockRow - i][blockCol].State == dataTypes_js_1.BlockState.Exist && state.Blocks[blockRow - i][blockCol].Color == blockColor) {
                 rowSameColor++;
                 foundValue = true;
             }
@@ -641,7 +640,7 @@ class PuzzleLogic {
         i = 1;
         do {
             foundValue = false;
-            if ((blockRow + i) <= (dataTypes_js_1.Constants.MAX_ROWS - 1) && this.State.Blocks[blockRow + i][blockCol].State == dataTypes_js_1.BlockState.Exist && this.State.Blocks[blockRow + i][blockCol].Color == blockColor) {
+            if ((blockRow + i) <= (dataTypes_js_1.Constants.MAX_ROWS - 1) && state.Blocks[blockRow + i][blockCol].State == dataTypes_js_1.BlockState.Exist && state.Blocks[blockRow + i][blockCol].Color == blockColor) {
                 rowSameColor++;
                 foundValue = true;
             }
@@ -654,7 +653,7 @@ class PuzzleLogic {
         i = 1;
         do {
             foundValue = false;
-            if ((blockCol - i) >= 0 && this.State.Blocks[blockRow][blockCol - i].State == dataTypes_js_1.BlockState.Exist && this.State.Blocks[blockRow][blockCol - i].Color == blockColor) {
+            if ((blockCol - i) >= 0 && state.Blocks[blockRow][blockCol - i].State == dataTypes_js_1.BlockState.Exist && state.Blocks[blockRow][blockCol - i].Color == blockColor) {
                 colSameColor++;
                 foundValue = true;
             }
@@ -663,7 +662,7 @@ class PuzzleLogic {
         i = 1;
         do {
             foundValue = false;
-            if ((blockCol + i) <= (dataTypes_js_1.Constants.MAX_COLS - 1) && this.State.Blocks[blockRow][blockCol + i].State == dataTypes_js_1.BlockState.Exist && this.State.Blocks[blockRow][blockCol + i].Color == blockColor) {
+            if ((blockCol + i) <= (dataTypes_js_1.Constants.MAX_COLS - 1) && state.Blocks[blockRow][blockCol + i].State == dataTypes_js_1.BlockState.Exist && state.Blocks[blockRow][blockCol + i].Color == blockColor) {
                 colSameColor++;
                 foundValue = true;
             }
@@ -675,13 +674,13 @@ class PuzzleLogic {
         return true;
     }
     //Score
-    GetScore(chain) {
-        this.ChainScore(chain);
-        for (var i = 0; i < this.State.SetCount; i++) {
-            this.TotalBlockScore(this.State.BlockSets[i]);
+    GetScore(state, chain) {
+        this.ChainScore(state, chain);
+        for (var i = 0; i < state.SetCount; i++) {
+            this.TotalBlockScore(state, state.BlockSets[i]);
         }
     }
-    ChainScore(chain) {
+    ChainScore(state, chain) {
         let addtionalScore = 0;
         if (chain == 2) {
             addtionalScore = 50;
@@ -719,9 +718,9 @@ class PuzzleLogic {
         if (chain > 12) {
             addtionalScore = 6980 + ((chain - 12) * 1800);
         }
-        this.State.Score += addtionalScore;
+        state.Score += addtionalScore;
     }
-    TotalBlockScore(totalBlocks) {
+    TotalBlockScore(state, totalBlocks) {
         var addtionalScore = 0;
         if (totalBlocks == 3) {
             addtionalScore = 30;
@@ -840,7 +839,7 @@ class PuzzleLogic {
         if (totalBlocks > 40) {
             addtionalScore = 20400 + ((totalBlocks - 40) * 800) + (totalBlocks * 10);
         }
-        this.State.Score += addtionalScore;
+        state.Score += addtionalScore;
     }
 }
 exports.PuzzleLogic = PuzzleLogic;
