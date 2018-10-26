@@ -214,26 +214,34 @@ class PuzzleLogicState {
 exports.PuzzleLogicState = PuzzleLogicState;
 class PlayerState {
     constructor() {
-        this.PuzzleLogState = new PuzzleLogState();
         this.PuzzleLogicState = new PuzzleLogicState();
     }
 }
 exports.PlayerState = PlayerState;
 class Player {
+    constructor() {
+        this.Name = null;
+        this.Id = null;
+        this.Key = null;
+    }
 }
 exports.Player = Player;
 class PlayersSeedData {
 }
 exports.PlayersSeedData = PlayersSeedData;
-class PlayerNameUpdate {
+class PlayerIdAndName {
 }
-exports.PlayerNameUpdate = PlayerNameUpdate;
-class PlayerJoined {
-}
-exports.PlayerJoined = PlayerJoined;
+exports.PlayerIdAndName = PlayerIdAndName;
 class Message {
 }
 exports.Message = Message;
+class RoomClient {
+    constructor() {
+        this.Players = [];
+        this.Messeages = [];
+    }
+}
+exports.RoomClient = RoomClient;
 class Room {
     constructor() {
         this.Players = [];
@@ -241,4 +249,119 @@ class Room {
     }
 }
 exports.Room = Room;
+class JoinGameRequest {
+    constructor() {
+        this.Name = null;
+    }
+}
+exports.JoinGameRequest = JoinGameRequest;
+class LeaveGameRequest {
+    constructor() {
+        this.RoomId = null;
+    }
+}
+exports.LeaveGameRequest = LeaveGameRequest;
+class JoinRoomRequest {
+    constructor() {
+        this.RoomId = null;
+    }
+}
+exports.JoinRoomRequest = JoinRoomRequest;
+class LeaveRoomRequest {
+    constructor() {
+        this.RoomId = null;
+    }
+}
+exports.LeaveRoomRequest = LeaveRoomRequest;
+class UpdateNameRequest {
+    constructor() {
+        this.RoomId = null;
+        this.Name = null;
+    }
+}
+exports.UpdateNameRequest = UpdateNameRequest;
+class SendMessageRequest {
+    constructor() {
+        this.RoomId = null;
+        this.Message = null;
+    }
+}
+exports.SendMessageRequest = SendMessageRequest;
+class SendLogRequest {
+}
+exports.SendLogRequest = SendLogRequest;
+class JoinGameResponse {
+    constructor() {
+        this.Name = null;
+        this.Id = null;
+    }
+}
+exports.JoinGameResponse = JoinGameResponse;
+class JoinRoomResponse {
+    constructor() {
+        this.RoomId = null;
+        this.Spectator = null;
+        this.Active = null;
+        this.Players = null;
+    }
+}
+exports.JoinRoomResponse = JoinRoomResponse;
+class PlayerJoinedRoomData {
+    constructor() {
+        this.Id = null;
+        this.Name = null;
+    }
+}
+exports.PlayerJoinedRoomData = PlayerJoinedRoomData;
+class PlayerLeftRoomData {
+    constructor() {
+        this.Id = null;
+    }
+}
+exports.PlayerLeftRoomData = PlayerLeftRoomData;
+class UpdatePlayerNameData {
+    constructor() {
+        this.Id = null;
+        this.Name = null;
+    }
+}
+exports.UpdatePlayerNameData = UpdatePlayerNameData;
+class SendMessageData {
+    constructor() {
+        this.Id = null;
+        this.Message = null;
+    }
+}
+exports.SendMessageData = SendMessageData;
+class UpdateLogData {
+    constructor() {
+        this.Id = null;
+        this.LogItems = null;
+    }
+}
+exports.UpdateLogData = UpdateLogData;
+class StartData {
+    constructor() {
+        this.PlayersSeedData = null;
+    }
+}
+exports.StartData = StartData;
+class RoomClosedData {
+    constructor() {
+        this.RoomId = null;
+    }
+}
+exports.RoomClosedData = RoomClosedData;
+class GameActiveChange {
+    constructor() {
+        this.GameActive = null;
+    }
+}
+exports.GameActiveChange = GameActiveChange;
+class GameEnded {
+    constructor() {
+        this.WinnerIds = null;
+    }
+}
+exports.GameEnded = GameEnded;
 //# sourceMappingURL=dataTypes.js.map

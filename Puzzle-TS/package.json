@@ -7,10 +7,14 @@
     "name": ""
   },
   "devDependencies": {
-    "@types/node": "^8.0.14"
+    "@types/node": "^8.0.14",
+    "express": "^4.16.4",
+    "simple-node-logger": "^0.93.40",
+    "uuid": "^3.3.2"
   },
   "dependencies": {
     "@types/seedrandom": "^2.4.27",
-    "seedrandom": "^2.4.4"
+    "seedrandom": "^2.4.4",
+    "ws": "^6.1.0"
   }
 }

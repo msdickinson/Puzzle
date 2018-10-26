@@ -176,45 +176,116 @@ class PuzzleLogicState {
 
 }
 class PlayerState {
-    public PuzzleLogState: PuzzleLogState = new PuzzleLogState();
     public PuzzleLogicState: PuzzleLogicState = new PuzzleLogicState();
     public player: Player;
 }
 class Player {
-    public Name: string;
-    public Id: number;
-    public Key: number;
+    public Name: string = null;
+    public Id: string = null;
+    public Key: string = null;
 }
 
 class PlayersSeedData {
-    public Id: number;
+    public Id: string;
     public Seed: number;
 }
-class PlayerNameUpdate {
-    public Id: number;
-    public Name: string;
-}
-class PlayerJoined {
-    public Id: number;
+class PlayerIdAndName {
+    public Id: string;
     public Name: string;
 }
 
+
 class Message {
-    public playerId: number;
+    public playerId: string;
     public messeage: string;
+}
+class RoomClient {
+    public Active: GameActive;
+    public Id: string;
+    public Players: PlayerIdAndName[] = [];
+    public Messeages: Message[] = [];
+    Spectator: any;
 }
 class Room {
     public Active: GameActive;
     public ActiveTime: Date;
-    public Id: number;
+    public Id: string;
     public Players: PlayerState[] = [];
     public GameStarted: Date;
     public Timer;
     public Random: prng;
     public Messeages: Message[] = [];
 }
+class JoinGameRequest {
+    public Name: string = null;
+}
+class LeaveGameRequest {
+    public RoomId: string = null;
+}
+class JoinRoomRequest {
+    public RoomId: string = null;
+}
+class LeaveRoomRequest {
+    public RoomId: string = null;
+}
+class UpdateNameRequest {
+    public RoomId: string = null;
+    public Name: string = null;
+}
+class SendMessageRequest {
+    public RoomId: string = null;
+    public Message: string = null;
+}
+class SendLogRequest {
+    public RoomId: string;
+    public LogItems: LogItem[];
+}
+class JoinGameResponse {
+    public Name: string = null;
+    public Id: string = null;
+}
+class JoinRoomResponse {
+    public RoomId: string = null;
+    public Spectator: boolean = null;
+    public Active: GameActive = null;
+    public Players: PlayerIdAndName[] = null;
+}
+class PlayerJoinedRoomData {
+    public Id: string = null;
+    public Name: string = null;
+}
+class PlayerLeftRoomData {
+    public Id: string = null;
+}
+class UpdatePlayerNameData {
+    public Id: string = null;
+    public Name: string = null;
+}
+class SendMessageData {
+    public Id: string = null;
+    public Message: string = null;
+}
+class UpdateLogData {
+    public Id: string = null;
+    public LogItems: LogItem[] = null;
+}
+class StartData {
+    public PlayersSeedData: PlayersSeedData[] = null;
+}
+class RoomClosedData {
+    public RoomId: string = null;
+}
+class GameActiveChange {
+    public GameActive: GameActive = null;
+}
+class GameEnded {
+    public WinnerIds: string[] = null;
+}
 export {
     SetType, BlockState, KeyState, BlockColor, InputOptions, InputSet, SoundRequest, GameActive,
     Block, LogItem, HoverBlock, FallBlock, RemovalInstance, Effect, Tick, Active,
-    Selector, BlockSet, Constants, PlayerState, PuzzleLogicState, PuzzleLogState, Room, Player, PlayersSeedData, Message, PlayerNameUpdate, PlayerJoined
+    Selector, BlockSet, Constants, PlayerState, PuzzleLogicState, PuzzleLogState, Room, Player, PlayersSeedData, Message, PlayerIdAndName, RoomClient,
+    JoinGameRequest, LeaveGameRequest, JoinRoomRequest, LeaveRoomRequest, UpdateNameRequest, SendMessageRequest, SendLogRequest,
+    JoinGameResponse, JoinRoomResponse,
+    PlayerJoinedRoomData, PlayerLeftRoomData, UpdatePlayerNameData, SendMessageData, UpdateLogData, StartData, RoomClosedData, GameActiveChange, GameEnded
 }

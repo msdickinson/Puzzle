@@ -39,12 +39,18 @@
     <Content Include="tsconfig.json" />
     <TypeScriptCompile Include="dataTypes.ts" />
     <TypeScriptCompile Include="puzzleLoader.ts" />
-    <TypeScriptCompile Include="gameLogic.ts" />
+    <TypeScriptCompile Include="ClientApplication.ts" />
+    <TypeScriptCompile Include="ServerApplication.ts" />
     <TypeScriptCompile Include="puzzleLogic.ts" />
     <TypeScriptCompile Include=".ts" />
     <TypeScriptCompile Include="main.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ClientSocket.ts">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
