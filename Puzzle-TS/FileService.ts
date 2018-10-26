@@ -1,0 +1,6 @@
+﻿class FileService {
+  
+}
+
+
+export { FileService };

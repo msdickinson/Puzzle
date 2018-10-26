@@ -212,20 +212,40 @@ class PuzzleLogicState {
     }
 }
 exports.PuzzleLogicState = PuzzleLogicState;
-class PlayerState {
+class InputState {
     constructor() {
-        this.PuzzleLogicState = new PuzzleLogicState();
+        this.InputSet = null;
     }
 }
-exports.PlayerState = PlayerState;
+class SoundState {
+    constructor() {
+        this.SoundMute = true;
+    }
+}
+exports.SoundState = SoundState;
 class Player {
+    constructor() {
+        this.ViewState = null;
+        this.SoundState = null;
+        this.InputState = null;
+        this.LogicState = null;
+        this.NetworkState = null;
+        this.Socket = null;
+    }
+}
+exports.Player = Player;
+class NetworkState {
     constructor() {
         this.Name = null;
         this.Id = null;
         this.Key = null;
+        this.TickSentServer = null;
+        this.Spectator = false;
+        this.LocalPlayer = false;
+        this.Room = null;
     }
 }
-exports.Player = Player;
+exports.NetworkState = NetworkState;
 class PlayersSeedData {
 }
 exports.PlayersSeedData = PlayersSeedData;
@@ -364,4 +384,6 @@ class GameEnded {
     }
 }
 exports.GameEnded = GameEnded;
+class PuzzleViewState {
+}
 //# sourceMappingURL=dataTypes.js.map

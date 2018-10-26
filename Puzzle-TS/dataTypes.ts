@@ -1,7 +1,8 @@
 ﻿import { PuzzleLogic } from './PuzzleLogic.js';
-import { PuzzleLoader } from './PuzzleLoader.js';
+import * as WebSocket from 'ws';
 import seedrandom = require('seedrandom');
 import { prng } from 'seedrandom';
+import { Socket } from 'dgram';
 
 enum SetType {
     Mixed,
@@ -175,14 +176,29 @@ class PuzzleLogicState {
     public Seed: number;
 
 }
-class PlayerState {
-    public PuzzleLogicState: PuzzleLogicState = new PuzzleLogicState();
-    public player: Player;
+class InputState {
+    public InputSet: InputSet[] = null;
+}
+class SoundState {
+    public SoundMute: boolean = true;
 }
 class Player {
+    public ViewState: PuzzleViewState = null;
+    public SoundState: SoundState = null;
+    public InputState: InputState = null;
+    public LogicState: PuzzleLogicState = null;
+    public NetworkState: NetworkState = null;
+    public Socket: WebSocket = null;
+}
+class NetworkState {
     public Name: string = null;
     public Id: string = null;
     public Key: string = null;
+    public TickSentServer: number = null;
+    public Spectator: boolean = false;
+    public LocalPlayer: boolean = false;
+    public Room: RoomClient = null;
+    public JoinedGameCallBack: Function;
 }
 
 class PlayersSeedData {
@@ -204,13 +220,13 @@ class RoomClient {
     public Id: string;
     public Players: PlayerIdAndName[] = [];
     public Messeages: Message[] = [];
-    Spectator: any;
+    public Spectator: boolean;
 }
 class Room {
     public Active: GameActive;
     public ActiveTime: Date;
     public Id: string;
-    public Players: PlayerState[] = [];
+    public Players: Player[] = [];
     public GameStarted: Date;
     public Timer;
     public Random: prng;
@@ -281,11 +297,23 @@ class GameActiveChange {
 class GameEnded {
     public WinnerIds: string[] = null;
 }
+class PuzzleViewState {
+    //public LayoutSprite: PIXI.Sprite;
+    //public BlocksContainer: PIXI.Container;
+    //public SelectorSprite: PIXI.Sprite;
+    //public BlocksSprite: PIXI.Sprite[][] = [];
+    //public Resolve: Function;
+    //public Level: PIXI.Text;
+    //public Score: PIXI.Text;
+    //public Textures: PIXI.Texture[] = [];
+    //public Container: PIXI.Container;
+    //public Name: PIXI.Text;
+}
 export {
     SetType, BlockState, KeyState, BlockColor, InputOptions, InputSet, SoundRequest, GameActive,
     Block, LogItem, HoverBlock, FallBlock, RemovalInstance, Effect, Tick, Active,
-    Selector, BlockSet, Constants, PlayerState, PuzzleLogicState, PuzzleLogState, Room, Player, PlayersSeedData, Message, PlayerIdAndName, RoomClient,
-    JoinGameRequest, LeaveGameRequest, JoinRoomRequest, LeaveRoomRequest, UpdateNameRequest, SendMessageRequest, SendLogRequest,
+    Selector, BlockSet, Constants, PuzzleLogicState, PuzzleLogState, Room, Player, PlayersSeedData, Message, PlayerIdAndName, RoomClient,
+    JoinGameRequest, LeaveGameRequest, JoinRoomRequest, LeaveRoomRequest, UpdateNameRequest, SendMessageRequest, SendLogRequest, SoundState, NetworkState,
     JoinGameResponse, JoinRoomResponse,
     PlayerJoinedRoomData, PlayerLeftRoomData, UpdatePlayerNameData, SendMessageData, UpdateLogData, StartData, RoomClosedData, GameActiveChange, GameEnded
 }
