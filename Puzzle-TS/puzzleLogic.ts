@@ -1,6 +1,6 @@
 ﻿
 import {
-    SetType, InputSet, BlockState, BlockColor, SoundRequest,
+    SetType, BlockState, BlockColor, SoundRequest,
     Block, HoverBlock, FallBlock, BlockSet, Constants, LogItem,
     PuzzleLogicState
 } from './dataTypes.js'

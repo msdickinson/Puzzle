@@ -1,0 +1,2 @@
+C:\Users\marks\Source\Repos\Puzzle\Puzzle-TS\obj\Release\Puzzle-TS.njsproj.CoreCompileInputs.cache
+C:\Users\marks\Source\Repos\Puzzle\Puzzle-TS\bin\Microsoft.NodejsTools.WebRole.dll

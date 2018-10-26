@@ -3,7 +3,6 @@ C:\Users\marks\Source\Repos\Puzzle\PixiJs\bin\Debug\netcoreapp2.0\PixiJs.runtime
 C:\Users\marks\Source\Repos\Puzzle\PixiJs\bin\Debug\netcoreapp2.0\PixiJs.runtimeconfig.dev.json
 C:\Users\marks\Source\Repos\Puzzle\PixiJs\bin\Debug\netcoreapp2.0\PixiJs.dll
 C:\Users\marks\Source\Repos\Puzzle\PixiJs\bin\Debug\netcoreapp2.0\PixiJs.pdb
-C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.csprojAssemblyReference.cache
 C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.csproj.CoreCompileInputs.cache
 C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.AssemblyInfoInputs.cache
 C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.AssemblyInfo.cs
