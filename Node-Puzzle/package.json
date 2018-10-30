@@ -1,0 +1,27 @@
+{
+  "name": "node-puzzle",
+  "version": "0.0.0",
+  "description": "Node-Puzzle",
+  "main": "server.js",
+  "author": {
+    "name": ""
+  },
+  "devDependencies": {
+    "@types/node": "^8.0.14",
+    "express": "^4.16.4",
+    "finalhandler": "^1.1.1",
+    "http-server": "^0.11.1",
+    "serve-static": "^1.13.2"
+  },
+  "dependencies": {
+    "@types/mainloop.js": "^1.0.5",
+    "@types/seedrandom": "^2.4.27",
+    "@types/ws": "^6.0.1",
+    "class-transformer": "^0.1.10",
+    "howler": "^2.0.15",
+    "mainloop.js": "^1.0.4",
+    "pixi.js": "^4.8.2",
+    "seedrandom": "^2.4.4",
+    "ws": "^6.1.0"
+  }
+}

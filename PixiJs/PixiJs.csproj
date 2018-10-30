@@ -18,18 +18,6 @@
     <EmbeddedResource Remove="wwwroot\js\**" />
     <None Remove="wwwroot\js\**" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Remove="wwwroot\script\lib\seedrandomC.ts" />
-    <Content Remove="wwwroot\script\pixi.js.d.ts" />
-    <Content Remove="wwwroot\script\services.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="wwwroot\script\lib\jszip.js" />
-    <None Include="wwwroot\script\lib\jszip.min.js" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptCompile Include="wwwroot\script\services.ts" />
-  </ItemGroup>
 
 
 </Project>
