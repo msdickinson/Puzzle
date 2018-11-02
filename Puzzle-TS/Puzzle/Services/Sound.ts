@@ -1,4 +1,5 @@
-﻿class Sound {
+﻿import { Howl, Howler } from 'howler';
+class Sound {
     public swap = null;
     public fall = null;
     public remove = null;

@@ -1,6 +1,5 @@
-﻿import * as WebSocket from 'ws';
-import { prng } from 'seedrandom';
-
+﻿
+import { prng } from "../lib/seedrandom/index";
 enum SetType {
     Mixed,
     Row,
@@ -185,7 +184,6 @@ class Player {
     public InputState: InputState = null;
     public LogicState: LogicState = null;
     public NetworkState: NetworkState = null;
-    public Socket: WebSocket = null;
 }
 class NetworkState {
     public Name: string = null;

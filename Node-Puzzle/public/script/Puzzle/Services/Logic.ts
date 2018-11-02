@@ -5,7 +5,7 @@ import {
     LogicState
 } from '../DataTypes'
 
-import seedrandom = require('seedrandom');
+import * as seedrandom from "../../Lib/seedrandom/seedrandom.js";
 class Logic {
 
     constructor() {

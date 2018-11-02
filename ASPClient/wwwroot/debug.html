@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <link href="css/main.css" rel="stylesheet" />
+    <link href="css/pure.css" rel="stylesheet" />
+    <title></title>
+    <script src="script/Lib/mainloop/mainloop.js"></script>
+
+</head>
+<body>
+    <div id="Loading" class="loading">
+        <center>
+            <div class="loader"></div>
+
+        </center>
+    </div>
+
+
+    <div id="Game">
+        <div class="pure-form">
+            <fieldset>
+                <button onclick="CreateZip()" class="pure-button pure-button-primary" style="width: 307px">Save Log</button>
+            </fieldset>
+        </div>
+
+    </div>
+
+    <div class="pure-form " style="margin: 20px;display:none">
+        <fieldset>
+            <h2>Ticks</h2>
+            <div>
+                <input id="Ticks" type="number" step="1" min="-1000000" max="1000000" value="1" style="width: 307px; text-align: center;">
+            </div>
+            <br />
+            <button id="ApplyTicksButton" onclick="ApplyTicks()" class="pure-button pure-button-primary" style="width: 151px">Game</button>
+            <button id="ApplyTicksLogButton" onclick="ApplyTicksLog()" class="pure-button pure-button-primary" style="width: 151px" disabled>Log</button>
+
+        </fieldset>
+        <h2>File</h2>
+        <span class="upload-btn-wrapper" style="    margin-bottom: 5px;">
+            <button class="pure-button pure-button-primary" style="width: 307px">Load</button>
+            <input id="File" type="file" name="myfile" accept="application/json" onchange="readFile()" />
+        </span>
+        <div>
+            <!--<button onclick="CreateZip()" class="pure-button pure-button-primary" style="width: 307px">Save</button>-->
+        </div>
+    </div>
+    <div style="display:none">
+        <div class="pure-table pure-table-bordered" style="
+margin: 20px;
+background-color: floralwhite;">
+            <table style="width:257px;">
+                <caption>Game</caption>
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th style="width: 80px;">Value</th>
+                    </tr>
+                </thead>
+                <tr>
+                    <td>Game</td>
+                    <td id="GamePuzzleActive"></td>
+                </tr>
+                <tr>
+                    <td>Hovering</td>
+                    <td id="GameHoverActive"></td>
+                </tr>
+                <tr>
+                    <td>Swaping</td>
+                    <td id="GameSwapActive"></td>
+                </tr>
+                <tr>
+                    <td>Removing</td>
+                    <td id="GameBlocksRemovingActive"></td>
+                </tr>
+                <tr>
+                    <td>Falling</td>
+                    <td id="GameFallingActive"></td>
+                </tr>
+                <tr>
+                    <td>Ticks</td>
+                    <td id="GameTicks"></td>
+                </tr>
+                <tr>
+                    <td>New Row</td>
+                    <td id="GameNewRow"></td>
+                </tr>
+                <tr>
+                    <td>Swap</td>
+                    <td id="GameSwap"></td>
+                </tr>
+
+            </table>
+        </div>
+        <div class="pure-table pure-table-bordered" style="
+margin: 20px;
+background-color: floralwhite">
+            <table style="width:257px;">
+                <caption>Constants</caption>
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th style="width: 80px;">Value</th>
+                    </tr>
+                </thead>
+                <tr>
+                    <td>Ticks To Hover</td>
+                    <td id="GameTicksToHover"></td>
+                </tr>
+                <tr>
+                    <td>Ticks To Hover Swap</td>
+                    <td id="GameTicksToHoverSwap"></td>
+                </tr>
+                <tr>
+                    <td>Ticks To Fall</td>
+                    <td id="GameTicksToFall"></td>
+                </tr>
+                <tr>
+                    <td>Ticks To Remove</td>
+                    <td id="GameTicksToRemove"></td>
+                </tr>
+            </table>
+
+        </div>
+    </div>
+    <div style="display:none">
+        <div class="pure-table pure-table-bordered" style="
+margin: 20px;
+background-color: floralwhite;">
+
+
+            <table style="width:257px;">
+                <caption>Left Block</caption>
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th style="width: 80px;">Value</th>
+                    </tr>
+                </thead>
+                <tr>
+                    <td>Color</td>
+                    <td id="LeftBlockColor"></td>
+                </tr>
+                <tr>
+                    <td>State</td>
+                    <td id="LeftBlockState"></td>
+                </tr>
+                <tr>
+                    <td>TotalChain</td>
+                    <td id="LeftBlockTotalChain"></td>
+                </tr>
+                <tr>
+                    <td>Tick</td>
+                    <td id="LeftBlockTick"></td>
+                </tr>
+                <tr>
+                    <td>FallGroup Ticks</td>
+                    <td id="LeftBlockFallGroupTicks"></td>
+                </tr>
+                <tr>
+                    <td>GroupId</td>
+                    <td id="LeftBlockGroupId"></td>
+                </tr>
+            </table>
+
+
+        </div>
+        <div class="pure-table pure-table-bordered" style="
+margin: 20px;
+background-color: floralwhite">
+
+            <table style="width:257px;">
+                <caption>Right Block</caption>
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th style="width: 80px;">Value</th>
+                    </tr>
+                </thead>
+                <tr>
+                    <td>Color</td>
+                    <td id="RightBlockColor"></td>
+                </tr>
+                <tr>
+                    <td>State</td>
+                    <td id="RightBlockState"></td>
+                </tr>
+                <tr>
+                    <td>TotalChain</td>
+                    <td id="RightBlockTotalChain"></td>
+                </tr>
+                <tr>
+                    <td>Tick</td>
+                    <td id="RightBlockTick"></td>
+                </tr>
+                <tr>
+                    <td>FallGroup Ticks</td>
+                    <td id="RightBlockFallGroupTicks"></td>
+                </tr>
+                <tr>
+                    <td>GroupId</td>
+                    <td id="RightBlockGroupId"></td>
+                </tr>
+            </table>
+
+
+        </div>
+    </div>
+    <script type="module">
+        import { App } from "/script/Puzzle/App.js";
+
+        let app;
+
+        let ApplicationPromise = new Promise(function (resolve, reject) {
+        app = new App(resolve);
+        }.bind(this));
+
+        ApplicationPromise.then(
+        (res) => {
+        MainLoop.setUpdate(app.client.Tick.bind(app.client)).setDraw(app.client.UpdateView.bind(app.client)).start();
+        });
+
+    </script>
+</body>
+
+</html>

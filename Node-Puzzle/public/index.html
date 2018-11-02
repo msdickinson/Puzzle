@@ -4,8 +4,23 @@
 <head>
     <meta charset="utf-8" />
     <title></title>
+    <script src="/script/Lib/seedrandom/seedrandom.js"></script>
+    <script src="/script/Puzzle/App.js"></script>
 </head>
 <body>
     Hello
 </body>
+<script>
+    let app = new App();
+    let appPromise = new Promise(function (resolve) {
+        console.log('Load');
+        app = new App(resolve);
+    }.bind(this));
+
+    appPromise.then(() => {
+        p1.then(() => {
+            console.log('Loaded');
+        });
+    });
+</script>
 </html>

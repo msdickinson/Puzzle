@@ -1,0 +1,2 @@
+C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\Node-Server\obj\Debug\Node-Server.njsproj.CoreCompileInputs.cache
+C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\Node-Server\bin\Microsoft.NodejsTools.WebRole.dll

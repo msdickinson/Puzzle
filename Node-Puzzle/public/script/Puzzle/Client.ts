@@ -1,5 +1,4 @@
-﻿
-import {
+﻿import {
     Player,
     JoinGameRequest, 
     JoinRoomResponse,
@@ -9,26 +8,26 @@ import {
 
 import { Logic } from './Services/Logic';
 import { Log } from './Services/Log';
-import { Network } from './Services/Network';
 import { UserInput } from './Services/UserInput';
 import { Sound } from './Services/Sound';
 import { View } from './Services/View';
-import * as WebSocket from 'ws';
-import seedrandom = require('seedrandom');
-import { deserialize } from "class-transformer";
+//import { prng, seedrandom_prng } from "../lib/seedrandom/index";
+import * as seedrandom  from "../lib/seedrandom/seedrandom";
+import * as WebSocket from '../Lib/ws/index';
+import { deserialize } from '../Lib/class-transformer/index';
+import { prng } from '../Lib/seedrandom/index.js';
 
 class Client {
     public Players: Player[];
-    public Random: seedrandom.prng;
+    public Random: prng;
     public Logic: Logic;
     public Log: Log;
     public View: View;
     public UserInput: UserInput;
-    public Network: Network;
     public Sound: Sound;
     public UIState: string; //Home, SinglePlayer, TwoPlayer, NetworkPlayerHome, NetworkPlayReady, NetworkPlay
 
-    constructor(logic: Logic, log: Log, view: View, userInput: UserInput, network: Network, sound: Sound) {
+    constructor(logic: Logic, log: Log, view: View, userInput: UserInput, sound: Sound) {
         this.Players = [];
         this.Random = seedrandom(null, { state: false });
 
@@ -36,7 +35,6 @@ class Client {
         this.Log = log;
         this.View = view;
         this.UserInput = userInput;
-        this.Network = network;
         this.Sound = sound;
 
         this.UIState = "TwoPlayer";
@@ -111,7 +109,6 @@ class Client {
         for (let i = 0; i < this.Players.length; i++) {
             if (this.Players[i].LogicState.Active) {
                 this.Logic.Tick(this.Players[i].LogicState);
-                this.NetworkHandler(this.Players[i]);
             }
         }
     }
@@ -159,103 +156,6 @@ class Client {
             }
         }
         player.LogicState.SoundRequests.length = 0;
-    }
-
-    public ConnectToServer(player: Player, resolver: Function, name: string = null) {
-        let URL = "ws://localhost:8080";
-        let classContext = this;
-        if (player.Socket) return;
-        player.Socket = new WebSocket(URL);
-        player.Socket.onopen = function (e) {
-            player.NetworkState = new NetworkState();
-            player.NetworkState.JoinedGameCallBack = resolver;
-            this.Network.JoinGame(player.Socket, name);
-        }.bind(this);
-        player.Socket.onmessage = function (data) {
-           // this = classContext;
-            let request = this.Network.ReadRequest(data.data);
-            // this.OnMessage.call(this, data, socket);
-            this.ReciveNetworkRequest(player, request.Request, request.Data);
-        }.bind(this);
-        player.Socket.onerror = function (e) {
-            console.log("Socket Error: " + e);
-        };
-    }
-    public NetworkHandler(player: Player) {
-        if (player.NetworkState === null) {
-            return;
-        }
-        if (!player.NetworkState.Spectator) {
-            if (player.LogicState.Ticks.Puzzle < player.NetworkState.TickSentServer + 15) {
-                this.Network.SendLog(player.Socket, []);
-            }
-        }
-        else {
-
-        }   
-    }
-    public ReciveNetworkRequest(player: Player, request: string, requestData: any) {
-        switch (request) {
-            case "JoinGameResponse": {
-                let data = deserialize(JoinGameResponse, requestData);
-                player.NetworkState.Name = data.Name;
-                player.NetworkState.Id = data.Id;
-                player.NetworkState.JoinedGameCallBack();
-                break;
-            }
-            case "Inactive": {
-                player.NetworkState.Inactive = true;
-                break;
-            }
-            case "Start": {
-                let data = deserialize(StartData, requestData);
-
-                break;
-            }
-            case "PlayerJoinedRoom": {
-                let data = deserialize(PlayerJoinedRoomData, requestData);
-
-                break;
-            }
-            case "PlayerJoinedRoomResponse": {
-                let data = deserialize(JoinRoomResponse, requestData);
-
-                break;
-            }
-            case "PlayerLeftRoom": {
-                let data = deserialize(PlayerLeftRoomData, requestData);
-
-                break;
-            }
-            case "RoomClosed": {
-                let data = deserialize(RoomClosedData, requestData);
-
-                break;
-            }
-            case "GameEnded": {
-                let data = deserialize(GameEnded, requestData);
-
-                break;
-            }
-            case "SendMessage": {
-                let data = deserialize(SendMessageData, requestData);
-
-                break;
-            }
-            case "UpdatePlayerName": {
-                let data = deserialize(UpdatePlayerNameData, requestData);
-
-                break;
-            }
-            case "JoinGameResponse": {
-                let data = deserialize(JoinGameRequest, requestData);
-
-                break;
-            }
-            default: {
-                break;
-            }
-        }
     }
 }
 
