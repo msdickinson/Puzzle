@@ -6,11 +6,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\components\HighScores\main.ts" />
     <Content Remove="wwwroot\script\Lib\seedrandom\seedrandom.js" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="wwwroot\css\" />
+    <Folder Include="wwwroot\components\InGameChat\" />
+    <Folder Include="wwwroot\components\Chat\" />
+    <Folder Include="wwwroot\components\MenuBar\" />
+    <Folder Include="wwwroot\components\TwoPlayerPlayArea\" />
+    <Folder Include="wwwroot\components\SinglePlayerPlayArea\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="wwwroot\components\HighScores\main.ts" />
     <TypeScriptCompile Include="wwwroot\script\Lib\seedrandom\seedrandom.js" />
   </ItemGroup>
 

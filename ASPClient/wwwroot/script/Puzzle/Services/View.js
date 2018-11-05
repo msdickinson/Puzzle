@@ -1,15 +1,17 @@
 import { ViewState, Constants, BlockState, BlockColor } from "../dataTypes.js";
 class View {
-    constructor(element, resolve) {
+    constructor(resolve) {
         this.textures = [];
         this.app = new PIXI.Application(306, 659, { backgroundColor: 0x1099bb });
-        element.appendChild(this.app.view);
         PIXI.loader
             .add("/images/textures.json")
             .load((() => {
             this.textures = PIXI.loader.resources["/images/textures.json"].spritesheet.textures;
             resolve();
         }).bind(this));
+    }
+    SetContainer(element) {
+        element.appendChild(this.app.view);
     }
     AddContainer(container) {
         this.app.stage.addChild(container);

@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <link href="css/main.css" rel="stylesheet" />
+    <link href="css/pure.css" rel="stylesheet" />
+    <title></title>
+    <script src="script/Lib/howler/howler.js"></script>
+    <script src="script/Lib/mainloop/mainloop.js"></script>
+    <script src="script/Lib/pixi/pixi.js"></script>
+    <script src="script/Lib/react/react.development.js"></script>
+    <script src="script/Lib/react-dom/react-dom.development.js"></script>
+
+    <script src="script/React/main.js"></script>
+    <script>var __React = React;</script>
+</head>
+<body>
+
+    <div id="Loading" class="loading">
+        <center>
+            <div class="loader"></div>
+        </center>
+    </div>
+    <div id="Game" hidden>
+
+    </div>
+    <div id="render-target"></div>
+    <high-scores></high-scores>
+    <script type="module">
+        //import { App } from "/script/Puzzle/App.js";
+
+        //let app;
+        //let ApplicationPromise = new Promise(function (resolve, reject) {
+        //app = new App(document, document.querySelector('#Game'), resolve);
+        //}.bind(this));
+
+        //ApplicationPromise.then((res) => {
+        //MainLoop.setUpdate(app.client.Tick.bind(app.client)).setDraw(app.client.UpdateView.bind(app.client)).start();
+        //document.querySelector('#Loading').hidden = true;
+        //document.querySelector('#Game').hidden = false;
+        //});
+
+        document.querySelector('#Loading').hidden = true;
+    </script>
+</body>
+
+</html>

@@ -18,23 +18,36 @@ class App {
     private log: Log;
     private client: Client;
 
-    constructor(document: HTMLDocument, div: HTMLDivElement, r: Function) {
+    constructor(document: HTMLDocument, r: Function) {
         this.logic = new Logic();
         this.userInput = new UserInput(document);
         this.network = new Network();
         let viewPromise = new Promise(function (resolve) {
-            this.view = new View(div, resolve);
+            this.view = new View(resolve);
         }.bind(this));
         let soundPromise = new Promise(function (resolve) {
             this.sound = new Sound(resolve);
         }.bind(this));
-     
-            
+
+                    
 
         Promise.all([viewPromise, soundPromise]).then(function (values) {
-            this.client = new Client(this.logic, this.log, this.view, this.userInput, this.sound, this.network);
             r();
         }.bind(this));
+    }
+    public Tick() {
+        if (this.client != null) {
+            this.client.Tick();
+        }
+    }
+    public UpdateView() {
+        if (this.client != null) {
+            this.client.UpdateView();
+        }
+    }
+    public Mode(mode: string, div: HTMLDivElement, r: Function, f: Function) {
+        this.view.SetContainer(div);
+        this.client = new Client(this.logic, this.log, this.view, this.userInput, this.sound, this.network, mode, r, f);
     }
 }
 

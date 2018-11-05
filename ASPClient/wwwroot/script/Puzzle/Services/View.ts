@@ -3,16 +3,17 @@
 class View {
     private app: PIXI.Application;
     public textures: PIXI.Texture[] = [];
-    constructor(element: HTMLElement, resolve: Function) {
-
+    constructor(resolve: Function) {
         this.app = new PIXI.Application(306, 659, { backgroundColor: 0x1099bb });
-        element.appendChild(this.app.view);
         PIXI.loader
             .add("/images/textures.json")
             .load((() => {
             this.textures = PIXI.loader.resources["/images/textures.json"].spritesheet.textures;
                 resolve();
             }).bind(this));
+    }
+    public SetContainer(element: HTMLElement) {
+        element.appendChild(this.app.view);
     }
     public AddContainer(container: PIXI.Container) {
         this.app.stage.addChild(container);

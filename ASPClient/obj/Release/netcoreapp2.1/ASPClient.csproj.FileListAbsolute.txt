@@ -1,0 +1,14 @@
+C:\Users\marks\Source\Repos\Puzzle\ASPClient\obj\Release\netcoreapp2.1\ASPClient.csprojAssemblyReference.cache
+C:\Users\marks\Source\Repos\Puzzle\ASPClient\bin\Release\netcoreapp2.1\ASPClient.deps.json
+C:\Users\marks\Source\Repos\Puzzle\ASPClient\bin\Release\netcoreapp2.1\ASPClient.runtimeconfig.json
+C:\Users\marks\Source\Repos\Puzzle\ASPClient\bin\Release\netcoreapp2.1\ASPClient.runtimeconfig.dev.json
+C:\Users\marks\Source\Repos\Puzzle\ASPClient\bin\Release\netcoreapp2.1\ASPClient.dll
+C:\Users\marks\Source\Repos\Puzzle\ASPClient\bin\Release\netcoreapp2.1\ASPClient.pdb
+C:\Users\marks\Source\Repos\Puzzle\ASPClient\obj\Release\netcoreapp2.1\ASPClient.csproj.CoreCompileInputs.cache
+C:\Users\marks\Source\Repos\Puzzle\ASPClient\obj\Release\netcoreapp2.1\ASPClient.RazorAssemblyInfo.cache
+C:\Users\marks\Source\Repos\Puzzle\ASPClient\obj\Release\netcoreapp2.1\ASPClient.RazorAssemblyInfo.cs
+C:\Users\marks\Source\Repos\Puzzle\ASPClient\obj\Release\netcoreapp2.1\ASPClient.AssemblyInfoInputs.cache
+C:\Users\marks\Source\Repos\Puzzle\ASPClient\obj\Release\netcoreapp2.1\ASPClient.AssemblyInfo.cs
+C:\Users\marks\Source\Repos\Puzzle\ASPClient\obj\Release\netcoreapp2.1\ASPClient.RazorTargetAssemblyInfo.cache
+C:\Users\marks\Source\Repos\Puzzle\ASPClient\obj\Release\netcoreapp2.1\ASPClient.dll
+C:\Users\marks\Source\Repos\Puzzle\ASPClient\obj\Release\netcoreapp2.1\ASPClient.pdb

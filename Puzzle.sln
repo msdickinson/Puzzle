@@ -3,26 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Puzzle", "Puzzle\Puzzle.csproj", "{F4245CFC-9076-4B64-9930-541472E40126}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "C", "C", "{E0242569-449F-4A10-8712-41A2CEE4BE99}"
-	ProjectSection(SolutionItems) = preProject
-		C\main.cpp = C\main.cpp
-	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Console", "Console\Console.csproj", "{65E30465-1E12-4E81-95E1-1500C3DAAE28}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PixiJs", "PixiJs\PixiJs.csproj", "{A773EA12-A766-4DF7-947E-1C64AED4FB19}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{350EF34E-4540-45E3-9150-A363E5433832}"
-	ProjectSection(SolutionItems) = preProject
-		Files\Flows.png = Files\Flows.png
-	EndProjectSection
-EndProject
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Puzzle-TS", "Puzzle-TS\Puzzle-TS.njsproj", "{24C83CB3-EB13-45F9-822C-EB619A48C81A}"
-EndProject
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Node-Client", "Node-Puzzle\Node-Client.njsproj", "{0E8B5EFF-B7E4-4A12-96AE-E041E1E4D274}"
-EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Node-Server", "Node-Server\Node-Server.njsproj", "{42ABF09B-477D-4CA2-A33F-162D1FEE0DED}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASPClient", "ASPClient\ASPClient.csproj", "{1126A4C1-17A8-4F42-8FC5-A2A04D049069}"
@@ -33,26 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F4245CFC-9076-4B64-9930-541472E40126}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F4245CFC-9076-4B64-9930-541472E40126}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F4245CFC-9076-4B64-9930-541472E40126}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F4245CFC-9076-4B64-9930-541472E40126}.Release|Any CPU.Build.0 = Release|Any CPU
-		{65E30465-1E12-4E81-95E1-1500C3DAAE28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{65E30465-1E12-4E81-95E1-1500C3DAAE28}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{65E30465-1E12-4E81-95E1-1500C3DAAE28}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{65E30465-1E12-4E81-95E1-1500C3DAAE28}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A773EA12-A766-4DF7-947E-1C64AED4FB19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A773EA12-A766-4DF7-947E-1C64AED4FB19}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A773EA12-A766-4DF7-947E-1C64AED4FB19}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A773EA12-A766-4DF7-947E-1C64AED4FB19}.Release|Any CPU.Build.0 = Release|Any CPU
-		{24C83CB3-EB13-45F9-822C-EB619A48C81A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{24C83CB3-EB13-45F9-822C-EB619A48C81A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{24C83CB3-EB13-45F9-822C-EB619A48C81A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{24C83CB3-EB13-45F9-822C-EB619A48C81A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0E8B5EFF-B7E4-4A12-96AE-E041E1E4D274}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E8B5EFF-B7E4-4A12-96AE-E041E1E4D274}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0E8B5EFF-B7E4-4A12-96AE-E041E1E4D274}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0E8B5EFF-B7E4-4A12-96AE-E041E1E4D274}.Release|Any CPU.Build.0 = Release|Any CPU
 		{42ABF09B-477D-4CA2-A33F-162D1FEE0DED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{42ABF09B-477D-4CA2-A33F-162D1FEE0DED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42ABF09B-477D-4CA2-A33F-162D1FEE0DED}.Release|Any CPU.ActiveCfg = Release|Any CPU

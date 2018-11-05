@@ -5,7 +5,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <Name>Node-Client</Name>
     <RootNamespace>Node-Puzzle</RootNamespace>
-    <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
+    <LastActiveSolutionConfig>Release|Any CPU</LastActiveSolutionConfig>
     <SaveNodeJsSettingsInProjectFile>True</SaveNodeJsSettingsInProjectFile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -53,9 +53,6 @@
     <TypeScriptCompile Include="public\script\Puzzle\Services\UserInput.ts" />
     <TypeScriptCompile Include="public\script\Puzzle\Services\View.ts" />
     <TypeScriptCompile Include="server.ts" />
-    <Content Include="index.html">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="public\index.html" />
     <Content Include="public\script\Lib\class-transformer\ClassTransformer.js.map" />
     <Content Include="public\script\Lib\class-transformer\ClassTransformOptions.js.map" />
@@ -71,7 +68,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="public\" />
-    <Folder Include="public\css\" />
     <Folder Include="public\images\" />
     <Folder Include="public\script\Lib\mainloop\" />
     <Folder Include="public\script\Lib\class-transformer\" />

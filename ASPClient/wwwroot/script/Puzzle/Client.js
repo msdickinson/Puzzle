@@ -1,7 +1,7 @@
 import { Player, InputOptions, InputSet, LogicState, SoundState, SoundRequest, NetworkState } from './dataTypes.js';
 import { seedRandom } from "../lib/seedrandom/seedrandom.js";
 class Client {
-    constructor(logic, log, view, userInput, sound, network) {
+    constructor(logic, log, view, userInput, sound, network, gameMode, r, f) {
         this.Players = [];
         this.Random = seedRandom.seedrandom(null, { state: false });
         this.Network = network;
@@ -11,9 +11,30 @@ class Client {
         this.UserInput = userInput;
         this.UserInput.CallBack = this.PlayerInput.bind(this);
         this.Sound = sound;
-        this.UIState = "OnePlayer";
-        this.UpdateUI();
-        this.SinglePlayerOnline();
+        this.r = r;
+        this.f = f;
+        this.GameMode = gameMode;
+        if (gameMode === "SinglePlayer") {
+            this.SinglePlayer();
+        }
+        if (gameMode === "Online") {
+            this.SinglePlayerOnline();
+        }
+        if (gameMode === "TwoPlayer") {
+            this.TwoPlayerLocal();
+        }
+    }
+    StartSinglePlayer(level) {
+        this.Logic.Reset(this.Players[0].LogicState);
+        this.Players[0].LogicState.Level = level;
+    }
+    StartTwoSinglePlayer(levelPlayerOne, levelPlayerTwo) {
+        this.Logic.Reset(this.Players[0].LogicState);
+        this.Players[0].LogicState.Level = levelPlayerOne;
+        this.Logic.Reset(this.Players[1].LogicState);
+        this.Players[1].LogicState.Level = levelPlayerTwo;
+        this.Players[0].LogicState.Active.Puzzle = true;
+        this.Players[1].LogicState.Active.Puzzle = true;
     }
     SinglePlayer() {
         let player = new Player();
@@ -26,7 +47,9 @@ class Client {
         player.SoundState.SoundMute = true;
         this.View.CreatePlayerView(player);
         this.View.AddContainer(player.ViewState.Container);
+        player.LogicState.Active.Puzzle = false;
         this.Players.push(player);
+        this.r();
     }
     SinglePlayerOnline() {
         let player = new Player();
@@ -37,12 +60,14 @@ class Client {
         this.Logic.Reset(player.LogicState);
         player.SoundState = new SoundState();
         player.SoundState.SoundMute = true;
+        player.LogicState.Active.Puzzle = false;
         this.View.CreatePlayerView(player);
         this.View.AddContainer(player.ViewState.Container);
         this.ConnectToServer(player);
         this.Players.push(player);
     }
-    UpdateUI() {
+    TwoPlayerLocal() {
+        this.r();
     }
     Tick() {
         for (let i = 0; i < this.Players.length; i++) {
@@ -111,8 +136,9 @@ class Client {
             this.ReciveNetworkRequest(player, request.Request, JSON.parse(request.Data));
         }.bind(this);
         player.Socket.onerror = function (e) {
+            this.f();
             console.log("Socket Error: " + e);
-        };
+        }.bind(this);
     }
     NetworkHandler(player) {
         if (player.NetworkState === null) {
@@ -132,6 +158,7 @@ class Client {
                 if (player.NetworkState.JoinedGameCallBack != null) {
                     player.NetworkState.JoinedGameCallBack();
                 }
+                this.r();
                 break;
             }
             case "Inactive": {
@@ -168,6 +195,11 @@ class Client {
             default: {
                 break;
             }
+        }
+    }
+    Terminate() {
+        if (this.Players.length > 0 && this.Players[0].Socket != null && (this.Players[0].Socket.readyState === 0 || this.Players[0].Socket.readyState === 1)) {
+            this.Network.LeaveGame(this.Players[0].Socket);
         }
     }
 }
