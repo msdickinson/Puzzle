@@ -17,6 +17,7 @@
     <Folder Include="wwwroot\components\MenuBar\" />
     <Folder Include="wwwroot\components\TwoPlayerPlayArea\" />
     <Folder Include="wwwroot\components\SinglePlayerPlayArea\" />
+    <Folder Include="wwwroot\icons\" />
   </ItemGroup>
 
   <ItemGroup>

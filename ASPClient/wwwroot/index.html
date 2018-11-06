@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <link href="css/main.css" rel="stylesheet" />
     <link href="css/pure.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
     <title></title>
     <script src="script/Lib/howler/howler.js"></script>
     <script src="script/Lib/mainloop/mainloop.js"></script>
@@ -19,16 +20,138 @@
             </center>
         </div>
         <div id="Home" hidden>
-            <h3>Survial</h3>
-            <button onclick="SetPage('SinglePlayerLobby')">Single Player </button>
-            <button onclick="SetPage('HighScores')">High Scores</button>
+            <center>
+                <h1>Puzzle</h1>
+                <div onclick="SetPage('SinglePlayerLobby')" style="border-width: 3px;
+                        border-style: solid;
+                        margin-top: 20px;
+                        padding: 10px;
+                        border-radius: 25px;
+                        background-color: #e7e7e7;
+                        width: 300px">
 
-            <h3>Battle Mode</h3>
-            <button onclick="SetPage('TwoPlayerLobby')">Two Player Local</button>
-            <button onclick="SetPage('RoomLobby')">Find Oppents</button>
+                    <i class="fas fa-gamepad fa-5x"></i>
 
-            <h3>Misc</h3>
-            <button onclick="SetPage('HowToPlay')">HowToPlay</button>
+                </div>
+
+                <div onclick="SetPage('RoomLobby')" style="border-width: 3px;
+                        border-style: solid;
+                        margin-top: 20px;
+                        padding: 10px;
+                        border-radius: 25px;
+                        background-color: #e7e7e7;  width: 300px;">
+
+                    <i class="fas fa-users fa-5x"></i>
+
+                </div>
+
+                <div onclick="SetPage('HowToPlay')" style="border-width: 3px;
+                        border-style: solid;
+                        margin-top: 20px;
+                        padding: 10px;
+                        border-radius: 25px;
+                        background-color: #e7e7e7; width: 300px;">
+
+                    <i class="fas fa-question fa-5x"></i>
+
+                </div>
+            </center>
+            <!--<center>
+                <h1>Lobby</h1>
+                <div style="border-width: 3px;
+                        border-style: solid;
+                        margin-top: 20px;
+                        padding: 10px;
+                        border-radius: 25px;
+                        background-color: #e7e7e7;
+                        width: 300px">
+                    <i class="fas fa-arrow-up fa-5x"></i>
+                </div>
+                <div style="border-width: 3px;
+                        border-style: solid;
+                        margin-top: 20px;
+                        padding: 10px;
+                        border-radius: 25px;
+                        background-color: #e7e7e7;
+                        width: 300px">
+                    <i class="fas fa-arrow-down fa-5x"></i>
+                </div>
+                <div style="border-width: 3px;
+                border-style: solid;
+                margin-top: 20px;
+                padding: 10px;
+                border-radius: 25px;
+                background-color: #e7e7e7;
+                width: 400px">
+
+                    <span style="font-size: 2.44141rem; font-weight: 500;">
+                        1
+                    </span>
+                </div>
+                <div style="border-width: 3px;
+                        border-style: solid;
+                        margin-top: 20px;
+                        padding: 10px;
+                        border-radius: 25px;
+                        background-color: #e7e7e7;
+                        width: 300px">
+                    <i class="fas fa-play fa-5x"></i>
+                </div>
+
+
+            </center>-->
+            <!--<center>
+        <h1>Puzzle</h1>
+        <div style="border-width: 3px;
+                border-style: solid;
+                margin-top: 20px;
+                padding: 10px;
+                border-radius: 25px;
+                background-color: #e7e7e7;
+                width: 400px">
+
+            <i class="fas fa-gamepad fa-5x"></i>
+            <span style="font-size: 2.44141rem; font-weight: 500;">
+                Single Player
+            </span>
+        </div>
+
+        <div style="border-width: 3px;
+                border-style: solid;
+                margin-top: 20px;
+                padding: 10px;
+                border-radius: 25px;
+                background-color: #e7e7e7;  width: 400px;">
+
+            <i class="fas fa-users fa-5x"></i>
+            <span style="font-size: 2.44141rem; font-weight: 500;">
+                Multiplayer
+            </span>
+
+
+        </div>
+
+        <div style="border-width: 3px;
+                border-style: solid;
+                margin-top: 20px;
+                padding: 10px;
+                border-radius: 25px;
+                background-color: #e7e7e7; width: 400px;">
+
+            <i class="fas fa-question fa-5x"></i>
+            <span style="font-size: 2.44141rem; font-weight: 500;">
+                How To Play
+            </span>
+        </div>
+    </center>-->
+            <!--<button onclick="SetPage('SinglePlayerLobby')">Single Player </button>
+    <button onclick="SetPage('HighScores')">High Scores</button>
+    <h3>Battle Mode</h3>
+    <button onclick="SetPage('TwoPlayerLobby')">Two Player Local</button>
+    <button onclick="SetPage('RoomLobby')">Find Oppents</button>
+
+    <h3>Misc</h3>
+    <button onclick="SetPage('HowToPlay')">HowToPlay</button>-->
         </div>
         <div id="SinglePlayerLobby" hidden>
             <button onclick="SetPage('Home')">Home</button>
