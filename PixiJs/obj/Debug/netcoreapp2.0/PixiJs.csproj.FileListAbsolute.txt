@@ -8,3 +8,6 @@ C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.Assembl
 C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.AssemblyInfo.cs
 C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.dll
 C:\Users\marks\Source\Repos\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.pdb
+C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.csprojAssemblyReference.cache
+C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.dll
+C:\Mark\Learning Projects\Puzzle\Puzzle\Puzzle\PixiJs\obj\Debug\netcoreapp2.0\PixiJs.pdb

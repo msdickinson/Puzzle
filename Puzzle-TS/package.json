@@ -17,9 +17,7 @@
     "@types/seedrandom": "^2.4.27",
     "@types/ws": "^6.0.1",
     "class-transformer": "^0.1.10",
-    "howler": "^2.0.15",
     "mainloop.js": "^1.0.4",
-    "pixi.js": "^4.8.2",
     "seedrandom": "^2.4.4",
     "ws": "^6.1.0"
   }

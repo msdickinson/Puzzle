@@ -20,21 +20,21 @@ namespace PixiJs
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        // This method gets called by the runtime. Use this method to add s to the container.
+        public void Configures(ICollection s)
         {
-            services.AddMvc();
-            services.AddResponseCompression(options =>
+            s.AddMvc();
+            s.AddResponseCompression(options =>
             {
                 options.Providers.Add<GzipCompressionProvider>();
             });
 
-            services.Configure<GzipCompressionProviderOptions>(options =>
+            s.Configure<GzipCompressionProviderOptions>(options =>
             {
                 options.Level = CompressionLevel.Optimal;
             });
 
-            services.AddResponseCompression(options =>
+            s.AddResponseCompression(options =>
             {
                 options.EnableForHttps = true;
             });

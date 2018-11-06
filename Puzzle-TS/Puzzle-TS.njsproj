@@ -37,19 +37,21 @@
     <Content Include="package.json" />
     <Content Include="README.md" />
     <Content Include="tsconfig.json" />
-    <TypeScriptCompile Include="Client.ts" />
-    <TypeScriptCompile Include="FileService.ts" />
-    <TypeScriptCompile Include="DebugService.ts" />
-    <TypeScriptCompile Include="ViewService.ts" />
-    <TypeScriptCompile Include="InputService.ts" />
-    <TypeScriptCompile Include="SoundService.ts" />
-    <TypeScriptCompile Include="ServerNetwork.ts" />
-    <TypeScriptCompile Include="DataTypes.ts" />
-    <TypeScriptCompile Include="PuzzleLogService.ts" />
-    <TypeScriptCompile Include="NetworkService.ts" />
-    <TypeScriptCompile Include="Server.ts" />
-    <TypeScriptCompile Include="PuzzleLogic.ts" />
-    <TypeScriptCompile Include=".ts" />
+    <TypeScriptCompile Include="Puzzle\Client.ts" />
+    <TypeScriptCompile Include="Puzzle\DataTypes.ts" />
+    <TypeScriptCompile Include="Puzzle\Services\Debug.ts" />
+    <TypeScriptCompile Include="Puzzle\Services\File.ts" />
+    <TypeScriptCompile Include="Puzzle\Services\UserInput.ts" />
+    <TypeScriptCompile Include="Puzzle\Services\Network.ts" />
+    <TypeScriptCompile Include="Puzzle\Services\Logic.ts" />
+    <TypeScriptCompile Include="Puzzle\Services\Log.ts" />
+    <TypeScriptCompile Include="Puzzle\Services\Sound.ts" />
+    <TypeScriptCompile Include="Puzzle\Services\View.ts" />
+    <TypeScriptCompile Include="Puzzle\Server.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Puzzle\" />
+    <Folder Include="Puzzle\Services\" />
   </ItemGroup>
   <!-- Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them. -->
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
