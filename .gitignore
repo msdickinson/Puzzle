@@ -18,6 +18,7 @@
 /API/obj/Release/netcoreapp2.1
 /API/bin/Release/netcoreapp2.1
 /Database/obj/Release
-/Database/bin/Release
+/Database/bin/
 /Database/Database.dbmdl
 /Database/Database.jfm
+/API/obj/Debug/netcoreapp2.1
