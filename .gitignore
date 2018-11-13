@@ -16,7 +16,7 @@
 # Other
 /.vs/Puzzle/v15/Server/sqlite3
 /API/obj/Release/netcoreapp2.1
-/API/bin/Release/netcoreapp2.1
+/API/bin/
 /Database/obj/Release
 /Database/bin/
 /Database/Database.dbmdl
