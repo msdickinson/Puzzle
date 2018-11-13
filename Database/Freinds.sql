@@ -1,0 +1,4 @@
+﻿CREATE TABLE [dbo].[Freinds]
+(
+	[Id] INT NOT NULL PRIMARY KEY
+)

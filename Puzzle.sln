@@ -7,6 +7,10 @@ Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Node-Server", "Node-Server\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ASPClient", "ASPClient\ASPClient.csproj", "{1126A4C1-17A8-4F42-8FC5-A2A04D049069}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PuzzleAPI", "PuzzleAPI\PuzzleAPI.csproj", "{8E9EA735-3FFA-4916-A5D8-0B43DA03CF28}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Database", "Database\Database.sqlproj", "{96E3C754-0030-482C-91A6-951818BED3D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,16 @@ Global
 		{1126A4C1-17A8-4F42-8FC5-A2A04D049069}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1126A4C1-17A8-4F42-8FC5-A2A04D049069}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1126A4C1-17A8-4F42-8FC5-A2A04D049069}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E9EA735-3FFA-4916-A5D8-0B43DA03CF28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E9EA735-3FFA-4916-A5D8-0B43DA03CF28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E9EA735-3FFA-4916-A5D8-0B43DA03CF28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E9EA735-3FFA-4916-A5D8-0B43DA03CF28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96E3C754-0030-482C-91A6-951818BED3D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96E3C754-0030-482C-91A6-951818BED3D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96E3C754-0030-482C-91A6-951818BED3D0}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{96E3C754-0030-482C-91A6-951818BED3D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96E3C754-0030-482C-91A6-951818BED3D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96E3C754-0030-482C-91A6-951818BED3D0}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
