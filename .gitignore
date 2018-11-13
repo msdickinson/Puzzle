@@ -1,15 +1,23 @@
-﻿# Node-Server
-/Node-Server/node_modules
+﻿# Server
+/Server/node_modules
 
-# Node-Client
-/Node-Client/node_modules
-/Node-Client/build
-/Node-Client/.DS_Store
-/Node-Client/.env.local
-/Node-Client/.env.development.local
-/Node-Client/.env.test.local
-/Node-Client/.env.production.local
-/Node-Client/npm-debug.log*
-/Node-Client/yarn-debug.log*
-/Node-Client/yarn-error.log*
+# Client
+/Client/node_modules
+/ClientClient/build
+/Client/.DS_Store
+/Client/.env.local
+/Client/.env.development.local
+/Client/.env.test.local
+/Client/.env.production.local
+/Client/npm-debug.log*
+/Client/yarn-debug.log*
+/Client/yarn-error.log*
+
+# Other
 /.vs/Puzzle/v15/Server/sqlite3
+/API/obj/Release/netcoreapp2.1
+/API/bin/Release/netcoreapp2.1
+/Database/obj/Release
+/Database/bin/Release
+/Database/Database.dbmdl
+/Database/Database.jfm
