@@ -1,0 +1,38 @@
+.main-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #2f2f2f
+}
+
+.myBtn {
+  width: 250px;
+  margin: 5px;
+  color: #fff;
+}
+
+.dList{
+  list-style-type: none;
+}
+
+.d1-btn {
+  background-color: #282ca7;
+  border-color: #2843a7
+}
+
+.d2-btn {
+  background-color: #36a728;
+  border-color: #2aa728
+}
+
+.d3-btn {
+  background-color: #ff8406;
+  border-color: #a75d28
+}
+
+.d4-btn {
+  background-color: #ff0606;
+  border-color: #a73428
+}

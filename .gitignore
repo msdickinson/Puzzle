@@ -1,5 +1,15 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
+﻿# Node-Server
+/Node-Server/node_modules
 
+# Node-Client
+/Node-Client/node_modules
+/Node-Client/build
+/Node-Client/.DS_Store
+/Node-Client/.env.local
+/Node-Client/.env.development.local
+/Node-Client/.env.test.local
+/Node-Client/.env.production.local
+/Node-Client/npm-debug.log*
+/Node-Client/yarn-debug.log*
+/Node-Client/yarn-error.log*
 /.vs/Puzzle/v15/Server/sqlite3
