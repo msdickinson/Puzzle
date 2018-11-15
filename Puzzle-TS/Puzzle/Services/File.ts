@@ -1,5 +1,0 @@
-﻿class File {
-  
-}
-
-export { File };

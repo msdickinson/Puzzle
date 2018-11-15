@@ -1,0 +1,199 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{df5125b2-2a36-4ab9-9985-f991979b4726}</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <ProjectView>ProjectFiles</ProjectView>
+    <StartupFile>
+    </StartupFile>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <TypeScriptSourceMap>true</TypeScriptSourceMap>
+    <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
+    <EnableTypeScript>true</EnableTypeScript>
+    <TypeScriptToolsVersion>3.0</TypeScriptToolsVersion>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
+    <StartWebBrowser>True</StartWebBrowser>
+    <SaveNodeJsSettingsInProjectFile>True</SaveNodeJsSettingsInProjectFile>
+    <ScriptArguments>yarn start</ScriptArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <ItemGroup>
+    <Content Include="package-lock.json" />
+    <Content Include="package.json" />
+    <Content Include="tsconfig.json" />
+    <Content Include="tsconfig.prod.json" />
+    <Content Include="tsconfig.test.json" />
+    <Content Include="tslint.json" />
+    <TypeScriptCompile Include="images.d.ts" />
+    <Content Include="build\index.html" />
+    <Content Include="build\favicon.ico" />
+    <Content Include="build\asset-manifest.json" />
+    <Content Include="build\manifest.json" />
+    <Content Include="public\index.html" />
+    <Content Include="public\favicon.ico" />
+    <Content Include="public\manifest.json" />
+    <Content Include="src\App.css" />
+    <Content Include="src\index.css" />
+    <Content Include="src\logo.svg" />
+    <TypeScriptCompile Include="src\Config.df.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="src\Enums.ts" />
+    <TypeScriptCompile Include="src\App.tsx" />
+    <TypeScriptCompile Include="src\index.tsx" />
+    <Content Include="build\static\css\main.fed2c82e.css" />
+    <Content Include="public\images\textures.png" />
+    <Content Include="public\images\textures.json" />
+    <TypeScriptCompile Include="src\components\ServerError.tsx" />
+    <TypeScriptCompile Include="src\Puzzle\App.ts" />
+    <TypeScriptCompile Include="src\Puzzle\Client.ts" />
+    <TypeScriptCompile Include="src\Puzzle\DataTypes.ts" />
+    <Content Include="src\components\NavBar\NavBar.css" />
+    <TypeScriptCompile Include="src\components\NavBar\NavBar.tsx" />
+    <Content Include="src\components\PixiJSContainer\PixiJSContainer.css" />
+    <TypeScriptCompile Include="src\components\PixiJSContainer\PixiJSContainer.tsx" />
+    <TypeScriptCompile Include="src\Lib\howler\index.d.ts" />
+    <TypeScriptCompile Include="src\Lib\pixi\pixi.js.d.ts" />
+    <TypeScriptCompile Include="src\Lib\seedrandom\index.d.ts" />
+    <Content Include="src\pages\About\About.css" />
+    <TypeScriptCompile Include="src\pages\About\About.tsx" />
+    <Content Include="src\pages\Achievements\Achievements.css" />
+    <TypeScriptCompile Include="src\pages\Achievements\Achievements.tsx" />
+    <Content Include="src\pages\CreateAccount\CreateAccount.css" />
+    <TypeScriptCompile Include="src\pages\CreateAccount\CreateAccount.tsx" />
+    <Content Include="src\pages\HighScores\HighScores.css" />
+    <TypeScriptCompile Include="src\pages\HighScores\HighScores.tsx" />
+    <Content Include="src\pages\Home\HomePage.css" />
+    <TypeScriptCompile Include="src\pages\Home\HomePage.tsx" />
+    <Content Include="src\pages\HowToPlay\HowToPlay.css" />
+    <TypeScriptCompile Include="src\pages\HowToPlay\HowToPlay.tsx" />
+    <Content Include="src\pages\Ladder\Ladder.css" />
+    <TypeScriptCompile Include="src\pages\Ladder\Ladder.tsx" />
+    <Content Include="src\pages\Loading\Loading.css" />
+    <TypeScriptCompile Include="src\pages\Loading\Loading.tsx" />
+    <Content Include="src\pages\Login\Login.css" />
+    <TypeScriptCompile Include="src\pages\Login\Login.tsx" />
+    <Content Include="src\pages\Multiplayer\Multiplayer.css" />
+    <TypeScriptCompile Include="src\pages\Multiplayer\Multiplayer.tsx" />
+    <Content Include="src\pages\MultiplayerGame\MultiplayerGame.css" />
+    <TypeScriptCompile Include="src\pages\MultiplayerGame\MultiplayerGame.tsx" />
+    <Content Include="src\pages\MultiplayerLobby\MultiplayerLobby.css" />
+    <TypeScriptCompile Include="src\pages\MultiplayerLobby\MultiplayerLobby.tsx" />
+    <Content Include="src\pages\MultiplayerMatchQue\MultiplayerMatchQue.css" />
+    <TypeScriptCompile Include="src\pages\MultiplayerMatchQue\MultiplayerMatchQue.tsx" />
+    <Content Include="src\pages\MultiplayerPrivateGame\MultiplayerPrivateGame.css" />
+    <TypeScriptCompile Include="src\pages\MultiplayerPrivateGame\MultiplayerPrivateGame.tsx" />
+    <Content Include="src\pages\MultiplayerPrivateLobby\MultiplayerPrivateLobby.css" />
+    <TypeScriptCompile Include="src\pages\MultiplayerPrivateLobby\MultiplayerPrivateLobby.tsx" />
+    <Content Include="src\pages\ResetPassword\ResetPassword.css" />
+    <TypeScriptCompile Include="src\pages\ResetPassword\ResetPassword.tsx" />
+    <Content Include="src\pages\SinglePlayerGame\SinglePlayerGame.css" />
+    <TypeScriptCompile Include="src\pages\SinglePlayerGame\SinglePlayerGame.tsx" />
+    <Content Include="src\pages\SinglePlayerLobby\SinglePlayerLobby.css" />
+    <TypeScriptCompile Include="src\pages\SinglePlayerLobby\SinglePlayerLobby.tsx" />
+    <TypeScriptCompile Include="src\pages\Multiplayer\components\MainMenu.tsx" />
+    <TypeScriptCompile Include="src\pages\Multiplayer\components\ServerConnecting.tsx" />
+    <TypeScriptCompile Include="src\pages\MultiplayerMatchQue\components\SerachingForMatch.tsx" />
+    <TypeScriptCompile Include="src\pages\MultiplayerMatchQue\components\TimedOut.tsx" />
+    <TypeScriptCompile Include="src\Puzzle\Services\Log.ts" />
+    <TypeScriptCompile Include="src\Puzzle\Services\Logic.ts" />
+    <TypeScriptCompile Include="src\Puzzle\Services\Network.ts" />
+    <TypeScriptCompile Include="src\Puzzle\Services\Sound.ts" />
+    <TypeScriptCompile Include="src\Puzzle\Services\UserInput.ts" />
+    <TypeScriptCompile Include="src\Puzzle\Services\View.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="build" />
+    <Folder Include="build\static" />
+    <Folder Include="build\static\css" />
+    <Folder Include="build\static\js" />
+    <Folder Include="public" />
+    <Folder Include="public\images" />
+    <Folder Include="public\Lib" />
+    <Folder Include="public\Lib\howler" />
+    <Folder Include="public\Lib\mainLoop" />
+    <Folder Include="public\Lib\pixi" />
+    <Folder Include="src" />
+    <Folder Include="src\components" />
+    <Folder Include="src\components\NavBar" />
+    <Folder Include="src\components\PixiJSContainer" />
+    <Folder Include="src\Lib" />
+    <Folder Include="src\Lib\howler" />
+    <Folder Include="src\Lib\mainLoop" />
+    <Folder Include="src\Lib\pixi" />
+    <Folder Include="src\Lib\redux" />
+    <Folder Include="src\Lib\seedrandom" />
+    <Folder Include="src\pages" />
+    <Folder Include="src\pages\About" />
+    <Folder Include="src\pages\Achievements" />
+    <Folder Include="src\pages\CreateAccount" />
+    <Folder Include="src\pages\HighScores" />
+    <Folder Include="src\pages\Home" />
+    <Folder Include="src\pages\HowToPlay" />
+    <Folder Include="src\pages\Ladder" />
+    <Folder Include="src\pages\Loading" />
+    <Folder Include="src\pages\Login" />
+    <Folder Include="src\pages\Multiplayer" />
+    <Folder Include="src\pages\Multiplayer\components" />
+    <Folder Include="src\pages\MultiplayerGame" />
+    <Folder Include="src\pages\MultiplayerLobby" />
+    <Folder Include="src\pages\MultiplayerMatchQue" />
+    <Folder Include="src\pages\MultiplayerMatchQue\components" />
+    <Folder Include="src\pages\MultiplayerPrivateGame" />
+    <Folder Include="src\pages\MultiplayerPrivateLobby" />
+    <Folder Include="src\pages\ResetPassword" />
+    <Folder Include="src\pages\SinglePlayerGame" />
+    <Folder Include="src\pages\SinglePlayerLobby" />
+    <Folder Include="src\Puzzle" />
+    <Folder Include="src\Puzzle\Services" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <!--Do not delete the following Import Project.  While this appears to do nothing it is a marker for setting TypeScript properties before our import that depends on them.-->
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="False" />
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsTools.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

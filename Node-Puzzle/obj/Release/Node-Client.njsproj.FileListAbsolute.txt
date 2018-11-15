@@ -1,3 +1,0 @@
-C:\Users\marks\Source\Repos\Puzzle\Node-Puzzle\obj\Release\Node-Client.njsprojAssemblyReference.cache
-C:\Users\marks\Source\Repos\Puzzle\Node-Puzzle\obj\Release\Node-Client.njsproj.CoreCompileInputs.cache
-C:\Users\marks\Source\Repos\Puzzle\Node-Puzzle\bin\Microsoft.NodejsTools.WebRole.dll

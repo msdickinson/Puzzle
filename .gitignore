@@ -1,5 +1,36 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
+﻿# Server
+/Server/node_modules
+/Server/config/appsettings.Production.json
+/Server/config/appsettings.Development.json
 
+# Client
+/Client/node_modules
+/Client/build
+/Client/.DS_Store
+/Client/.env.local
+/Client/.env.development.local
+/Client/.env.test.local
+/Client/.env.production.local
+/Client/npm-debug.log*
+/Client/yarn-debug.log*
+/Client/yarn-error.log*
+/Client/obj/Debug
+
+# Database
+/Database/obj/Release
+/Database/bin/
+/Database/Database.dbmdl
+/Database/Database.jfm
+/Database/obj/Debug
+/Database/Database.publish.xml
+
+# API
+/API/obj/Release/netcoreapp2.1
+/API/bin/
+/API/obj/Debug/netcoreapp2.1
+/API/appsettings.json
+/API/appsettings.Production.json
+/API/appsettings.Development.json
+
+# Other
 /.vs/Puzzle/v15/Server/sqlite3
