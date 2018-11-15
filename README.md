@@ -1,6 +1,6 @@
 # Puzzle
 
-http://puzzlejs.dickinsonbros.com/
+http://puzzlejs.dickinsonbros.com/ <br/>
 Play puzzle single player or two player online.
 <br/>
 <b>API</b>: Handles access to database, emails, and authentication. Asp.net Core API Project, using JWT and Entityframework. <br/>
