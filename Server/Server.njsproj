@@ -5,7 +5,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <Name>Server</Name>
     <RootNamespace>Node-Server</RootNamespace>
-    <LastActiveSolutionConfig>Release|Any CPU</LastActiveSolutionConfig>
+    <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -41,11 +41,15 @@
     <TypeScriptCompile Include="Puzzle\Services\Log.ts" />
     <TypeScriptCompile Include="Puzzle\Services\Logic.ts" />
     <TypeScriptCompile Include="server.ts" />
+    <Content Include="config\appsettings.json" />
+    <Content Include="config\appsettings.Development.json" />
+    <Content Include="config\appsettings.Production.json" />
     <Content Include="tsconfig.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="config\" />
     <Folder Include="Puzzle\" />
     <Folder Include="Puzzle\Services\" />
   </ItemGroup>

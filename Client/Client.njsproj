@@ -17,7 +17,7 @@
     <TypeScriptToolsVersion>3.0</TypeScriptToolsVersion>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    <LastActiveSolutionConfig>Release|Any CPU</LastActiveSolutionConfig>
+    <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
     <StartWebBrowser>True</StartWebBrowser>
     <SaveNodeJsSettingsInProjectFile>True</SaveNodeJsSettingsInProjectFile>
     <ScriptArguments>yarn start</ScriptArguments>
@@ -42,6 +42,9 @@
     <Content Include="src\App.css" />
     <Content Include="src\index.css" />
     <Content Include="src\logo.svg" />
+    <TypeScriptCompile Include="src\Config.df.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="src\Enums.ts" />
     <TypeScriptCompile Include="src\App.tsx" />
     <TypeScriptCompile Include="src\index.tsx" />

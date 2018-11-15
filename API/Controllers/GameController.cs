@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using API.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -10,30 +12,17 @@ namespace API.Controllers
     [ApiController]
     public class GameController : ControllerBase
     {
-        // GET api/values
-        [HttpGet]
-        public ActionResult<string> HighScores()
-        {
-            return "";
-        }
+        PuzzleContext dbContext = new PuzzleContext();
 
-        [HttpGet]
-        public ActionResult<string> Ladder()
+        [AllowAnonymous]
+        [HttpPost("UploadGame")]
+        public void UploadGame(UploadGame uploadGame)
         {
-            return "";
+            if (uploadGame.Key == "")
+            {
+                dbContext.Game.Add(uploadGame.Game);
+                dbContext.SaveChanges();
+            }
         }
-
-        [HttpGet]
-        public ActionResult<string> Game(int id)
-        {
-            return "value";
-        }
-
-        [HttpGet]
-        public ActionResult<string> SubmitRankedGame(string game)
-        {
-            return "value";
-        }
-
     }
 }
